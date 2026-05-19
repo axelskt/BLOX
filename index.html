@@ -1121,9 +1121,9 @@
               <li class="fi-on"><span class="fi">✓</span>Audit IA TikTok, Instagram, YouTube, Site</li>
               <li class="fi-on"><span class="fi">✓</span>Module Offre sur mesure</li>
               <li class="fi-on"><span class="fi">✓</span>Scripts viraux + 10 hooks</li>
-              <li class="fi-off"><span class="fi">✗</span>Funnel · Site web · Calendrier 30j</li>
-              <li class="fi-off"><span class="fi">✗</span>Spy Concurrent</li>
-              <li class="fi-off"><span class="fi">✗</span>Audit Concurrent · ShortClip</li>
+              <li class="fi-on"><span class="fi">✓</span>Calendrier éditorial 30 jours</li>
+              <li class="fi-off"><span class="fi">✗</span>Spy Concurrent · Audit Concurrent · Analyse Vidéo</li>
+              <li class="fi-off"><span class="fi">✗</span>Funnel · Site web · ShortClip</li>
             </ul>
           </div>
 
@@ -1140,12 +1140,11 @@
             <button class="plan-cta plan-cta-pro" onclick="startPlanCheckout('pro')">Choisir Pro →</button>
             <ul class="plan-features">
               <li class="fi-on"><span class="fi">✓</span>Tout le Starter</li>
-              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Funnel de conversion</strong><em>Étapes, accroches, CTA</em></div></li>
-              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Site web qui vend</strong><em>Landing page prête à intégrer</em></div></li>
-              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Calendrier éditorial 30 jours</strong><em>Un post par jour, clé en main</em></div></li>
               <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Spy Concurrent</strong><em>Analyse 3 comptes, extrais leurs hooks</em></div></li>
+              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Audit Concurrent</strong><em>Décortique n'importe quel concurrent</em></div></li>
               <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Analyse Vidéo Virale</strong><em>Décode ce qui cartonne dans ta niche</em></div></li>
-              <li class="fi-off"><span class="fi">✗</span>Audit Concurrent · ShortClip</li>
+              <li class="fi-on"><span class="fi" style="color:#a855f7;margin-top:3px">✓</span><div class="fi-label"><strong>Hashtags optimisés</strong><em>Générés pour chaque contenu</em></div></li>
+              <li class="fi-off"><span class="fi">✗</span>Funnel · Site web · ShortClip</li>
             </ul>
           </div>
 
@@ -1162,9 +1161,9 @@
             <button class="plan-cta plan-cta-elite" onclick="startPlanCheckout('elite')">Choisir Élite →</button>
             <ul class="plan-features">
               <li class="fi-on"><span class="fi">✓</span>Tout le Pro</li>
-              <li class="fi-elite"><span class="fi" style="margin-top:3px">🔬</span><div class="fi-label"><strong>Audit Concurrent</strong><em>Décortique un concurrent, scripts à adapter</em></div></li>
+              <li class="fi-elite"><span class="fi" style="margin-top:3px">🔗</span><div class="fi-label"><strong>Funnel de conversion</strong><em>Système de vente complet, étapes + CTA</em></div></li>
+              <li class="fi-elite"><span class="fi" style="margin-top:3px">🌐</span><div class="fi-label"><strong>Site web qui vend</strong><em>Landing page personnalisée générée par l'IA</em></div></li>
               <li class="fi-elite"><span class="fi" style="margin-top:3px">✂️</span><div class="fi-label"><strong>ShortClip</strong><em>Vidéo longue → shorts découpés automatiquement</em></div></li>
-              <li class="fi-elite"><span class="fi" style="margin-top:3px">🌐</span><div class="fi-label"><strong>Site Web IA</strong><em>Landing page complète générée pour ton business</em></div></li>
               <li class="fi-elite"><span class="fi" style="margin-top:3px">⚡</span><div class="fi-label"><strong>Support prioritaire</strong><em>Accès bêta aux nouvelles features</em></div></li>
             </ul>
 
@@ -3667,10 +3666,10 @@ async function generateModule(n) {
   if (S.generating) return;
   // Starter: Offre, Scripts, Calendrier 30j
   const needsStarter = n === 2 || n === 3 || n === 6;
-  // Pro: Funnel, Site web, Spy Concurrent, Analyse Vidéo, Hashtags (et module 8 réservé)
-  const needsPro     = n === 4 || n === 5 || n === 7 || n === 8 || n === 10 || n === 12;
-  // Elite: Audit Concurrent, ShortClip
-  const needsElite   = n === 9 || n === 11;
+  // Pro: Spy Concurrent, Audit Concurrent, Analyse Vidéo, Hashtags (et module 8 réservé)
+  const needsPro     = n === 7 || n === 8 || n === 9 || n === 10 || n === 12;
+  // Elite: Funnel, Site web, ShortClip
+  const needsElite   = n === 4 || n === 5 || n === 11;
   if (needsStarter && !hasStarterAccess()) { openPaywall(); return; }
   if (needsPro     && !hasProAccess())     { openPaywall(); return; }
   if (needsElite   && !hasEliteAccess())   { openPaywall(); return; }
@@ -4287,10 +4286,10 @@ function updateTabBadges() {
     let locked = false;
     // Starter tier: modules 2, 3, 6
     if (i === 2 || i === 3 || i === 6)                   locked = !starter && !S.modules[i];
-    // Pro tier: modules 4, 5, 7, 8, 10, 12
-    if (i === 4 || i === 5 || i === 7 || i === 8 || i === 10 || i === 12) locked = !pro && !S.modules[i];
-    // Elite tier: modules 9, 11
-    if (i === 9 || i === 11)                             locked = !elite && !S.modules[i];
+    // Pro tier: Spy Concurrent, Audit Concurrent, Analyse Vidéo, Hashtags
+    if (i === 7 || i === 8 || i === 9 || i === 10 || i === 12) locked = !pro && !S.modules[i];
+    // Elite tier: Funnel, Site web, ShortClip
+    if (i === 4 || i === 5 || i === 11)                  locked = !elite && !S.modules[i];
     tab.classList.toggle('tab-locked', locked);
     if (i === 9 || i === 11) {
       tab.style.color = tab.classList.contains('tab-active') ? '#fff' : (elite ? '#f97316' : '');
@@ -4320,8 +4319,8 @@ function renderModuleContent(loading=false) {
   if (!data && n > 1) {
     // Check plan access per module tier
     const _needsStarter = n === 2 || n === 3 || n === 6;
-    const _needsPro     = n === 4 || n === 5 || n === 7 || n === 8 || n === 10 || n === 12;
-    const _needsElite   = n === 9 || n === 11;
+    const _needsPro     = n === 7 || n === 8 || n === 9 || n === 10 || n === 12;
+    const _needsElite   = n === 4 || n === 5 || n === 11;
     const _hasModAccess = (_needsStarter && hasStarterAccess()) ||
                           (_needsPro     && hasProAccess())     ||
                           (_needsElite   && hasEliteAccess());
@@ -4641,7 +4640,7 @@ function renderPaywallTeaser(n) {
     </div>
     <div style="background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(219,39,119,.08));border:1px solid rgba(124,58,237,.2)" class="rounded-2xl p-8 text-center fade-up">
       <div class="text-4xl mb-4">🔒</div>
-      <h3 class="text-xl font-black mb-2">Module ${MOD_LABELS[n]} — Accès ${(n===2||n===3||n===6)?'Starter':(n===9||n===11)?'Élite':'Pro'}</h3>
+      <h3 class="text-xl font-black mb-2">Module ${MOD_LABELS[n]} — Accès ${(n===2||n===3||n===6)?'Starter':(n===4||n===5||n===11)?'Élite':'Pro'}</h3>
       <p class="text-gray-400 text-sm mb-6 max-w-sm mx-auto">Débloque ton ${MOD_LABELS[n].toLowerCase()} personnalisé + tous les modules du système complet.</p>
       <div class="flex flex-wrap gap-3 justify-center mb-6 text-sm text-gray-400">
         <span>✓ Offre monétisable</span><span>✓ Scripts viraux</span><span>✓ Funnel complet</span><span>✓ Site web</span>
@@ -4654,8 +4653,8 @@ function renderPaywallTeaser(n) {
 
 function renderNextModuleCTA(current, next) {
   const _ns2 = next === 2 || next === 3 || next === 6;
-  const _np2 = next === 4 || next === 5 || next === 7 || next === 8 || next === 10 || next === 12;
-  const _ne2 = next === 9 || next === 11;
+  const _np2 = next === 7 || next === 8 || next === 9 || next === 10 || next === 12;
+  const _ne2 = next === 4 || next === 5 || next === 11;
   const hasnext = S.modules[next] || (_ns2 && hasStarterAccess()) || (_np2 && hasProAccess()) || (_ne2 && hasEliteAccess());
   return `<div class="mt-6" style="background:linear-gradient(135deg,rgba(124,58,237,.06),rgba(219,39,119,.06));border:1px solid rgba(124,58,237,.15)" class="rounded-2xl p-6 text-center fade-up">
     <p class="text-sm text-gray-400 mb-3">Étape suivante → <strong class="text-gray-200">${MOD_EMOJI[next]} Module ${MOD_LABELS[next]}</strong></p>
