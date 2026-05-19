@@ -1109,10 +1109,10 @@
             <div class="plan-name">Starter</div>
             <div class="plan-tagline">Pour démarrer et tester ta stratégie</div>
             <div class="plan-price-row">
-              <div class="plan-amount" id="price-starter">10,99€</div>
+              <div class="plan-amount" id="price-starter">14,99€</div>
               <div class="plan-period">/mois</div>
             </div>
-            <div class="plan-billed" id="billed-starter">Facturé 131,88€/an</div>
+            <div class="plan-billed" id="billed-starter">Sans engagement</div>
             <button class="plan-cta plan-cta-starter" onclick="startPlanCheckout('starter')">Choisir Starter →</button>
             <ul class="plan-features">
               <li class="fi-on"><span class="fi">✓</span>Audit IA TikTok, Instagram, YouTube, Site</li>
@@ -3022,7 +3022,15 @@ function saveApiKey() {
 
 /* ── Paywall ── */
 function openPaywall() {
-  document.getElementById('paywallModal').style.display = 'flex';
+  // Open the funnel modal at the payment step (real pricing)
+  const modal = document.getElementById('funnelModal');
+  if (modal) {
+    modal.style.display = 'block';
+    initPayStep();
+    showFunnelStep('5');
+  } else {
+    document.getElementById('paywallModal').style.display = 'flex';
+  }
 }
 function closePaywall() {
   document.getElementById('paywallModal').style.display = 'none';
@@ -3217,21 +3225,59 @@ RÉGULARITÉ & STRATÉGIE : incohérence entre les contenus postés, fréquence 
 CRÉDIBILITÉ : absence de preuve sociale, autorité perçue faible, message pas assez clair en moins de 3 secondes
 FUNNEL & CONVERSION : bio peu optimisée, landing page faible après clic, taux de conversion profil → abonnement faible`,
 
-    user: (p) => `Audite ce créateur TikTok avec ces informations déclarées :
+    user: (p) => {
+      const handle = (p.url||'').replace(/^@/,'').replace(/.*tiktok\.com\/@?/,'').split('/')[0].split('?')[0] || 'non fourni';
+      const tt = p.tiktokStats;
 
-HANDLE : @${(p.url||'').replace(/^@/,'').replace(/.*tiktok\.com\/@?/,'').split('/')[0].split('?')[0] || 'non fourni'}
+      // Build TikTok stats block
+      let ttBlock = '';
+      if (tt && tt.videoCount) {
+        const vCount   = tt.videoCount;
+        const followers = tt.followerCount ? tt.followerCount.toLocaleString('fr-FR') : '?';
+        const hearts   = tt.heartCount ? tt.heartCount.toLocaleString('fr-FR') : '?';
+        const avgLikes = tt.avgLikesPerVideo ? tt.avgLikesPerVideo.toLocaleString('fr-FR') : '?';
+        // Estimate frequency: TikTok shows total video count but no date
+        // Use level to estimate period
+        const periodMap = { zero: 0, start: 3, grind: 6, pro: 12 };
+        const months = periodMap[p.level] || 6;
+        const videosPerDay = months > 0 ? (vCount / (months * 30)).toFixed(1) : null;
+        ttBlock = `
+STATS TIKTOK RÉELLES (données directement depuis le profil) :
+- Vidéos publiées au total : ${vCount}
+- Abonnés : ${followers}
+- Total likes reçus : ${hearts}
+- Moyenne de likes par vidéo : ${avgLikes}
+- Estimation de fréquence de publication : environ ${videosPerDay ? videosPerDay + ' vidéo(s)/jour' : 'inconnue'} sur ~${months} mois${tt.bio ? `\n- Bio du compte : "${tt.bio}"` : ''}
+RÈGLE STATS : Utilise ces chiffres RÉELS dans le résumé. Exemple : "En ${months} mois tu as publié ${vCount} vidéos (soit ~${videosPerDay || '?'} vidéo/jour) avec une moyenne de ${avgLikes} likes par vidéo." Si les abonnés sont élevés vs les likes → problème d'engagement. Si peu de vidéos → problème de consistance.`;
+      }
+
+      // Build offer block
+      const nicheInfo = p.niche || '';
+      const hasOffer  = nicheInfo && nicheInfo.toLowerCase() !== 'je ne vends rien pour le moment';
+      const offerBlock = hasOffer
+        ? `OFFRE DÉCLARÉE PAR L'UTILISATEUR : "${nicheInfo}"
+RÈGLE OFFRE : Cette information est CERTAINE — l'utilisateur l'a déclaré lui-même. Mentionne cette offre spécifiquement dans le diagnostic. Ne dis JAMAIS qu'il n'a pas d'offre ou que son offre n'est pas claire si elle est fournie ici.`
+        : `OFFRE : L'utilisateur ne vend rien pour le moment, ou offre non précisée. Si son contenu suggère un business (bio, handle), mentionne-le. Sinon indique qu'il/elle devrait commencer par définir une offre claire.`;
+
+      return `Audite ce créateur avec ces informations déclarées :
+
+HANDLE : @${handle}
+PLATEFORME : ${p.platform || 'TikTok'}
 NIVEAU : ${{'zero':'Débutant — aucune publication encore','start':'A posté quelques vidéos — pas de stratégie claire','grind':'Poste régulièrement — stagne en vues ou ventes','pro':'Fait déjà +10k vues régulières — veut monétiser plus'}[p.level] || 'non précisé'}
 FREIN PRINCIPAL : ${{'start':'Ne sait pas par où commencer — trop d\'infos, pas assez d\'actions','peur':'Peur du regard des autres — se sent illégitime','temps':'Manque de temps — veut aller vite et efficace','idees':'Manque d\'idées et d\'inspiration — ne sait pas quoi poster','growth':'Pas de blocage précis — veut progresser et se développer'}[p.blocker] || 'non précisé'}
 STYLE DE CONTENU : ${{'faceless':'Faceless / voix off — choix STRATÉGIQUE délibéré, ne PAS critiquer l\'absence de visage','camera':'Face caméra — se montre dans ses vidéos','both':'Mix faceless + face caméra'}[p.contentStyle] || 'non précisé'}
 TYPE DE CONTENU PRINCIPAL : ${{'edu':'Éducatif / conseils','divert':'Divertissement / humour','story':'Storytelling / vie perso','faceless':'Faceless / voix off','life':'Lifestyle / quotidien'}[p.contentType] || 'non précisé'}
-NICHE / CE QU'IL VEND : ${p.niche || 'non précisé — base ton analyse sur le handle et les patterns TikTok classiques de cette niche'}
+${offerBlock}
 REVENUS ACTUELS : ${p.revenue || 'non précisé'}
+${ttBlock}
 
-IMPORTANT :
-- Si une niche ou offre est déclarée, base ton diagnostic dessus
+INSTRUCTIONS :
+- Si les stats TikTok réelles sont disponibles, commence le resume_compte par une phrase qui cite les chiffres réels (ex: "En X mois tu as publié Y vidéos..."). Ça montre qu'on analyse vraiment ton compte.
+- Si une offre est déclarée, base TON DIAGNOSTIC dessus — ne prétends pas qu'elle est absente ou floue
 - ADAPTE le diagnostic au format réel déclaré : ne pas critiquer un hook vidéo si le créateur fait des carrousels
 - Recommande des formats COMPLÉMENTAIRES à ce qu'il fait déjà (pas les mêmes)
-- Explique les termes techniques en français simple entre parenthèses
+- Explique les termes techniques en français simple entre parenthèses`;
+    }
 
 Réponds UNIQUEMENT avec ce JSON (sans markdown) :
 {
@@ -3543,6 +3589,26 @@ async function runAnalysis() {
 
   showView('loading');
   animateLoading();
+
+  // ── Fetch TikTok stats if platform = tiktok ────────────────────────────────
+  if ((S.platform === 'tiktok' || !S.platform) && url) {
+    try {
+      const handle = url.replace(/^@/, '').replace(/.*tiktok\.com\/@?/, '').split('/')[0].split('?')[0];
+      if (handle) {
+        const ttRes = await fetch(`${PROXY_URL || 'https://blox-proxy-kappa.vercel.app'}/api/tiktok-stats`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Proxy-Secret': PROXY_SECRET },
+          body: JSON.stringify({ username: handle }),
+        }).catch(() => null);
+        if (ttRes && ttRes.ok) {
+          const ttData = await ttRes.json().catch(() => null);
+          if (ttData?.ok && ttData?.stats) {
+            S.profile.tiktokStats = ttData.stats;
+          }
+        }
+      }
+    } catch(e) { /* silent — stats are optional */ }
+  }
 
   try {
     const result = await callClaude(PROMPTS[1].system, PROMPTS[1].user(S.profile), { model: 'claude-haiku-4-5', max_tokens: 1800 });
@@ -4180,14 +4246,19 @@ function showAvatarAdsNudge(moduleNum) {
 }
 
 function updateTabBadges() {
-  const pro   = hasProAccess();
-  const elite = hasEliteAccess();
+  const starter = hasStarterAccess();
+  const pro     = hasProAccess();
+  const elite   = hasEliteAccess();
   for (let i=1;i<=12;i++) {
     const tab = document.getElementById('tab-'+i);
     if (!tab) continue;
     let locked = false;
-    if ((i >= 2 && i <= 7) || i === 10 || i === 12) locked = !pro   && !S.modules[i];
-    if (i === 9 || i === 11)              locked = !elite && !S.modules[i];
+    // Starter tier: modules 2, 3, 6
+    if (i === 2 || i === 3 || i === 6)                   locked = !starter && !S.modules[i];
+    // Pro tier: modules 4, 5, 7, 8, 10, 12
+    if (i === 4 || i === 5 || i === 7 || i === 8 || i === 10 || i === 12) locked = !pro && !S.modules[i];
+    // Elite tier: modules 9, 11
+    if (i === 9 || i === 11)                             locked = !elite && !S.modules[i];
     tab.classList.toggle('tab-locked', locked);
     if (i === 9 || i === 11) {
       tab.style.color = tab.classList.contains('tab-active') ? '#fff' : (elite ? '#f97316' : '');
@@ -4215,7 +4286,14 @@ function renderModuleContent(loading=false) {
   }
 
   if (!data && n > 1) {
-    if (!S.hasAccess) {
+    // Check plan access per module tier
+    const _needsStarter = n === 2 || n === 3 || n === 6;
+    const _needsPro     = n === 7 || n === 10 || n === 11 || n === 12;
+    const _needsElite   = n === 4 || n === 5 || n === 8 || n === 9;
+    const _hasModAccess = (_needsStarter && hasStarterAccess()) ||
+                          (_needsPro     && hasProAccess())     ||
+                          (_needsElite   && hasEliteAccess());
+    if (!_hasModAccess) {
       el.innerHTML = renderPaywallTeaser(n);
       return;
     }
@@ -4531,8 +4609,8 @@ function renderPaywallTeaser(n) {
     </div>
     <div style="background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(219,39,119,.08));border:1px solid rgba(124,58,237,.2)" class="rounded-2xl p-8 text-center fade-up">
       <div class="text-4xl mb-4">🔒</div>
-      <h3 class="text-xl font-black mb-2">Module ${MOD_LABELS[n]} — Accès Pro</h3>
-      <p class="text-gray-400 text-sm mb-6 max-w-sm mx-auto">Débloque ton ${MOD_LABELS[n].toLowerCase()} personnalisé + les ${5-n} autres modules du système complet.</p>
+      <h3 class="text-xl font-black mb-2">Module ${MOD_LABELS[n]} — Accès ${(n===2||n===3||n===6)?'Starter':(n===4||n===5||n===8||n===9)?'Élite':'Pro'}</h3>
+      <p class="text-gray-400 text-sm mb-6 max-w-sm mx-auto">Débloque ton ${MOD_LABELS[n].toLowerCase()} personnalisé + tous les modules du système complet.</p>
       <div class="flex flex-wrap gap-3 justify-center mb-6 text-sm text-gray-400">
         <span>✓ Offre monétisable</span><span>✓ Scripts viraux</span><span>✓ Funnel complet</span><span>✓ Site web</span>
       </div>
@@ -4543,7 +4621,10 @@ function renderPaywallTeaser(n) {
 }
 
 function renderNextModuleCTA(current, next) {
-  const hasnext = S.hasAccess || S.modules[next];
+  const _ns2 = next === 2 || next === 3 || next === 6;
+  const _np2 = next === 7 || next === 10 || next === 11 || next === 12;
+  const _ne2 = next === 4 || next === 5 || next === 8 || next === 9;
+  const hasnext = S.modules[next] || (_ns2 && hasStarterAccess()) || (_np2 && hasProAccess()) || (_ne2 && hasEliteAccess());
   return `<div class="mt-6" style="background:linear-gradient(135deg,rgba(124,58,237,.06),rgba(219,39,119,.06));border:1px solid rgba(124,58,237,.15)" class="rounded-2xl p-6 text-center fade-up">
     <p class="text-sm text-gray-400 mb-3">Étape suivante → <strong class="text-gray-200">${MOD_EMOJI[next]} Module ${MOD_LABELS[next]}</strong></p>
     <button onclick="switchTab(${next})" class="btn" style="padding:10px 22px;font-size:14px">
@@ -5905,7 +5986,7 @@ let _payPlan    = 'pro';
 let _payBilling = 'yearly'; // 'monthly' | 'yearly'
 
 const PRICES = {
-  starter: { monthly: '12,99€', yearly: '9,99€', billedM: 'Sans engagement', billedY: 'Facturé 119,88€/an' },
+  starter: { monthly: '14,99€', yearly: '10,99€', billedM: 'Sans engagement', billedY: 'Facturé 131,88€/an' },
   pro:     { monthly: '24,99€', yearly: '17,99€', billedM: 'Sans engagement', billedY: 'Facturé 215,88€/an' },
   elite:   { monthly: '54,99€', yearly: '44,99€', billedM: 'Sans engagement', billedY: 'Facturé 539,88€/an' },
 };
