@@ -1940,6 +1940,136 @@ if (_supa) {
   });
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   SAUVEGARDE / RESTAURATION D'ANALYSE — 24h TTL + Supabase cloud
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const PENDING_ANALYSIS_KEY = 'bloxai_pending_analysis';
+const ANALYSIS_TTL = 24 * 60 * 60 * 1000; // 24h en ms
+
+/* Sauvegarder l'analyse en cours avec TTL 24h (local + Supabase) */
+function savePendingAnalysis(email) {
+  if (!S.modules[1]) return; // rien à sauvegarder
+  const snapshot = {
+    url:      S.profile.url      || '',
+    platform: S.profile.platform || '',
+    profile:  S.profile,
+    modules:  S.modules,
+    email:    email || localStorage.getItem('blowup_email') || '',
+    savedAt:  Date.now(),
+    expiresAt: Date.now() + ANALYSIS_TTL,
+  };
+  try { localStorage.setItem(PENDING_ANALYSIS_KEY, JSON.stringify(snapshot)); } catch(e) {}
+  // Aussi mettre à jour bloxai_last_analysis
+  try {
+    localStorage.setItem('bloxai_last_analysis', JSON.stringify({
+      url: snapshot.url, platform: snapshot.platform,
+      profile: snapshot.profile, modules: snapshot.modules, savedAt: snapshot.savedAt,
+    }));
+  } catch(e) {}
+  // Sauvegarde cloud Supabase (silencieuse)
+  if (snapshot.email) _saveAnalysisToCloud(snapshot).catch(() => {});
+}
+
+/* Sauvegarder dans la table bloxai_analyses (Supabase) */
+async function _saveAnalysisToCloud(snapshot) {
+  if (!snapshot?.email) return;
+  try {
+    if (_supa) {
+      // Via client Supabase JS (si session active)
+      await _supa.from('bloxai_analyses').upsert({
+        email:    snapshot.email,
+        url:      snapshot.url,
+        platform: snapshot.platform,
+        profile:  snapshot.profile,
+        modules:  snapshot.modules,
+        saved_at: new Date(snapshot.savedAt).toISOString(),
+      }, { onConflict: 'email' });
+    } else if (_SB_URL && _SB_KEY) {
+      // Fallback REST direct
+      await fetch(`${_SB_URL}/rest/v1/bloxai_analyses`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': _SB_KEY,
+          'Authorization': 'Bearer ' + _SB_KEY,
+          'Prefer': 'resolution=merge-duplicates',
+        },
+        body: JSON.stringify({
+          email:    snapshot.email,
+          url:      snapshot.url,
+          platform: snapshot.platform,
+          profile:  snapshot.profile,
+          modules:  snapshot.modules,
+          saved_at: new Date(snapshot.savedAt).toISOString(),
+        }),
+      });
+    }
+  } catch(e) { /* silent */ }
+}
+
+/* Charger analyse depuis Supabase cloud */
+async function _fetchAnalysisFromCloud(email) {
+  if (!email) return null;
+  try {
+    if (_supa) {
+      const { data } = await _supa
+        .from('bloxai_analyses')
+        .select('url,platform,profile,modules,saved_at')
+        .eq('email', email)
+        .maybeSingle();
+      if (data?.modules) return {
+        url: data.url, platform: data.platform,
+        profile: data.profile, modules: data.modules,
+        savedAt: new Date(data.saved_at).getTime(),
+      };
+    }
+  } catch(e) {}
+  return null;
+}
+
+/* Vérifier si une analyse pending est encore valide (< 24h) */
+function _getPendingAnalysis() {
+  try {
+    const raw = localStorage.getItem(PENDING_ANALYSIS_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data.expiresAt || Date.now() > data.expiresAt) {
+      localStorage.removeItem(PENDING_ANALYSIS_KEY);
+      return null;
+    }
+    return data;
+  } catch(e) { return null; }
+}
+
+/* Restaurer une analyse sauvegardée dans S + localStorage */
+function _applyAnalysisSnapshot(snap) {
+  if (!snap?.profile || !snap?.modules) return false;
+  S.profile = snap.profile;
+  S.modules = snap.modules;
+  S._pendingUrl = snap.url || '';
+  try {
+    localStorage.setItem('bloxai_last_analysis', JSON.stringify({
+      url: snap.url, platform: snap.platform,
+      profile: snap.profile, modules: snap.modules, savedAt: snap.savedAt || Date.now(),
+    }));
+  } catch(e) {}
+  return true;
+}
+
+/* Afficher un toast "Analyse restaurée" */
+function _showAnalysisRestoredToast(url) {
+  const existing = document.getElementById('analysisRestoredToast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.id = 'analysisRestoredToast';
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.1));border:1px solid rgba(34,197,94,.35);border-radius:14px;padding:14px 20px;color:#86efac;font-size:13px;font-weight:700;z-index:9999;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.4);max-width:90vw;backdrop-filter:blur(8px)';
+  t.innerHTML = `<span style="font-size:18px">✅</span><div><div style="font-weight:800;margin-bottom:1px">Ton analyse est restaurée !</div><div style="font-weight:400;font-size:11px;color:#4ade80">Résultats sauvegardés pour ${url||'ton compte'} — disponibles ci-dessous.</div></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#4ade80;cursor:pointer;font-size:16px;padding:0 0 0 8px;flex-shrink:0">✕</button>`;
+  document.body.appendChild(t);
+  setTimeout(() => t.style.opacity = '0', 6000);
+  setTimeout(() => t.remove(), 6500);
+}
+
 async function syncSupabaseSession() {
   if (!_supa) return;
   try {
@@ -1955,10 +2085,29 @@ async function syncSupabaseSession() {
       localStorage.setItem('blowup_access', plan);
       localStorage.setItem('blowup_user_email', user.email);
       _updateNavUser(user.email, plan);
+
+      // ── Restaurer l'analyse en attente (24h TTL) ───────────────────────────
+      const pending = _getPendingAnalysis();
+      if (pending && pending.modules?.[1]) {
+        // Analyse locale valide → l'appliquer directement
+        _applyAnalysisSnapshot(pending);
+      } else {
+        // Pas de pending local → essayer le cloud Supabase
+        _fetchAnalysisFromCloud(user.email).then(cloud => {
+          if (cloud?.modules?.[1]) _applyAnalysisSnapshot(cloud);
+        });
+      }
+
       // Si on n'est pas encore sur le dashboard → y aller
       const appView = document.getElementById('view-app');
       const isOnApp = appView && appView.style.display !== 'none';
-      if (!isOnApp) showView('app');
+      if (!isOnApp) {
+        showView('app');
+        // Toast après transition (300ms)
+        if (pending?.modules?.[1]) {
+          setTimeout(() => _showAnalysisRestoredToast(pending.url), 400);
+        }
+      }
     } else if (user.email) {
       // Plan pas encore chargé (RLS ou timing) → on garde ce qu'on a en localStorage
       _updateNavUser(user.email, localStorage.getItem('blowup_access') || 'free');
@@ -2692,9 +2841,19 @@ function _dashInit() {
     }
     /* Dernière analyse banner */
     const banner = document.getElementById('lastAnalysisBanner');
-    const lbl = document.getElementById('lastAnalysisLabel');
+    const lbl    = document.getElementById('lastAnalysisLabel');
     if (last && banner && lbl) {
-      lbl.textContent = (last.url || 'Analyse précédente') + (last.platform ? ' · ' + last.platform : '');
+      const pending = _getPendingAnalysis();
+      let sublabel = (last.url || 'Analyse précédente') + (last.platform ? ' · ' + last.platform : '');
+      // Ajouter info TTL si analyse pending encore valide
+      if (pending?.expiresAt) {
+        const remainMs = pending.expiresAt - Date.now();
+        if (remainMs > 0) {
+          const remainH = Math.ceil(remainMs / 3600000);
+          sublabel += ` · ⏳ expire dans ${remainH}h`;
+        }
+      }
+      lbl.textContent = sublabel;
       banner.style.display = 'block';
     } else if (banner) {
       banner.style.display = 'none';
@@ -3414,6 +3573,16 @@ function renderResults() {
       savedAt: Date.now()
     }));
   } catch(e) {}
+
+  // Sauvegarde cloud si l'utilisateur est connecté
+  const _connectedEmail = localStorage.getItem('blowup_user_email') || localStorage.getItem('blowup_email') || '';
+  if (_connectedEmail) {
+    _saveAnalysisToCloud({
+      email: _connectedEmail,
+      url: S.profile.url, platform: S.profile.platform,
+      profile: S.profile, modules: S.modules, savedAt: Date.now(),
+    }).catch(() => {});
+  }
 
   updateTabBadges();
   showView('results');
@@ -5595,6 +5764,9 @@ async function submitFunnelEmail() {
 
   // Always save lead to Supabase (non-blocking)
   saveLeadToSupabase(email, S.profile, S.modules[1]);
+
+  // Sauvegarder l'analyse avec TTL 24h (pour restaurer après achat)
+  savePendingAnalysis(email);
 
   try {
     await sendRecapEmail(email, S.modules[1], S.profile);
