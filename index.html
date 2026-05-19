@@ -1849,7 +1849,8 @@
         <div class="font-bold truncate" id="profileName">Analyse business</div>
         <div class="text-sm text-gray-500 truncate" id="profileMeta">—</div>
       </div>
-      <div style="display:flex;gap:8px;flex-shrink:0">
+      <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+        <button onclick="generateAllModules()" id="btnGenerateAll" class="btn text-xs py-2 px-3" style="background:linear-gradient(135deg,#7c3aed,#db2777);border:none;font-weight:700" title="Générer tous les modules accessibles">⚡ Tout générer</button>
         <button onclick="exportAnalysis()" class="btn-outline text-xs py-2 px-3" title="Exporter l'analyse">⬇ Export</button>
         <button onclick="showView('app')" class="btn-outline text-xs py-2 px-3" title="Retour au dashboard">🏠 Dashboard</button>
         <button onclick="goNewAnalysis()" class="btn-outline text-xs py-2 px-3">+ Nouveau</button>
@@ -3908,7 +3909,7 @@ async function generateModule(n) {
   try {
     let prevData;
     if (n === 2) prevData = S.modules[1];
-    if (n === 3) prevData = S.modules[2];
+    if (n === 3) prevData = S.modules[2] || S.modules[1];
     if (n === 4) prevData = S.modules[2] || S.modules[1];
     if (n === 5) prevData = S.modules[4] || S.modules[2] || S.modules[1];
     if (n === 6) prevData = S.modules[1];                  // audit → calendrier
@@ -3920,7 +3921,17 @@ async function generateModule(n) {
 
     const pFn = PROMPTS[n].user;
     const userPrompt = pFn(S.profile, prevData);
-    const result = await callClaude(PROMPTS[n].system, userPrompt);
+
+    // Auto-retry once on network errors (Load failed, timeout…)
+    let result;
+    try {
+      result = await callClaude(PROMPTS[n].system, userPrompt);
+    } catch(e1) {
+      if (e1.message === 'no_key') throw e1;
+      // Wait 2s then retry
+      await new Promise(r => setTimeout(r, 2000));
+      result = await callClaude(PROMPTS[n].system, userPrompt);
+    }
     S.modules[n] = result;
   } catch(e) {
     if (e.message !== 'no_key') alert('Erreur : ' + e.message);
@@ -3931,6 +3942,106 @@ async function generateModule(n) {
 
   // AvatarAds post-generation nudge (modules 1, 2, 3)
   if ([1, 2, 3].includes(n) && S.modules[n]) showAvatarAdsNudge(n);
+}
+
+/* ── Generate All accessible modules sequentially ── */
+async function generateAllModules() {
+  if (S.generating) return;
+  if (!S.modules[1]) { alert('Lance d\'abord une analyse TikTok/Instagram !'); return; }
+
+  // Build ordered list of modules to generate (respecting dependencies)
+  const order = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12]; // skip 8 (reserved)
+  const toGenerate = order.filter(n => {
+    if (S.modules[n]) return false; // already done
+    const needsStarter = n === 2 || n === 3 || n === 6;
+    const needsPro     = n === 7 || n === 9 || n === 10 || n === 12;
+    const needsElite   = n === 4 || n === 5 || n === 11;
+    return (needsStarter && hasStarterAccess()) ||
+           (needsPro     && hasProAccess())     ||
+           (needsElite   && hasEliteAccess());
+  });
+
+  if (toGenerate.length === 0) {
+    // Everything already generated
+    const btn = document.getElementById('btnGenerateAll');
+    if (btn) { btn.textContent = '✅ Tout est prêt'; setTimeout(() => { btn.textContent = '⚡ Tout générer'; }, 2000); }
+    return;
+  }
+
+  const moduleNames = { 2:'Offre', 3:'Scripts', 4:'Funnel', 5:'Site web', 6:'Calendrier', 7:'Spy', 9:'Audit Concurrent', 10:'Analyse Vidéo', 11:'ShortClip', 12:'Hashtags' };
+
+  // Progress toast
+  const toast = document.createElement('div');
+  toast.id = 'generateAllToast';
+  toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,rgba(124,58,237,.95),rgba(219,39,119,.85));border:1px solid rgba(168,85,247,.5);border-radius:16px;padding:16px 22px;color:#fff;font-size:13px;font-weight:700;z-index:9999;display:flex;align-items:center;gap:14px;box-shadow:0 8px 40px rgba(0,0,0,.5);min-width:280px;backdrop-filter:blur(12px)';
+  toast.innerHTML = `<div style="width:22px;height:22px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div><div><div id="gaToastTitle" style="font-weight:800;font-size:14px">⚡ Génération en cours…</div><div id="gaToastSub" style="font-weight:400;font-size:11px;margin-top:2px;opacity:.8">Préparation…</div></div><div id="gaToastCount" style="margin-left:auto;font-size:12px;background:rgba(255,255,255,.15);border-radius:99px;padding:3px 10px;flex-shrink:0">0/${toGenerate.length}</div>`;
+  document.body.appendChild(toast);
+
+  const btn = document.getElementById('btnGenerateAll');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ En cours…'; }
+
+  S.generating = true;
+  let done = 0;
+  let failed = 0;
+
+  for (const n of toGenerate) {
+    // Update toast
+    const sub  = document.getElementById('gaToastSub');
+    const cnt  = document.getElementById('gaToastCount');
+    if (sub) sub.textContent = `Module ${moduleNames[n] || n}…`;
+    if (cnt) cnt.textContent = `${done}/${toGenerate.length}`;
+
+    try {
+      // Resolve prevData dependency (same logic as generateModule)
+      let prevData;
+      if (n === 2) prevData = S.modules[1];
+      if (n === 3) prevData = S.modules[2] || S.modules[1];
+      if (n === 4) prevData = S.modules[2] || S.modules[1];
+      if (n === 5) prevData = S.modules[4] || S.modules[2] || S.modules[1];
+      if (n === 6) prevData = S.modules[1];
+      if (n === 7) prevData = S.modules[1];
+      if (n === 9) prevData = S.modules[1];
+      if (n === 10) prevData = S.modules[1];
+      if (n === 11) prevData = S.modules[1];
+      if (n === 12) prevData = S.modules[1];
+
+      const userPrompt = PROMPTS[n].user(S.profile, prevData);
+      const result = await callClaude(PROMPTS[n].system, userPrompt);
+      S.modules[n] = result;
+      done++;
+    } catch(e) {
+      console.warn(`[generateAll] module ${n} failed:`, e.message);
+      failed++;
+      done++;
+    }
+  }
+
+  S.generating = false;
+
+  // Update toast to done
+  const title = document.getElementById('gaToastTitle');
+  const sub   = document.getElementById('gaToastSub');
+  const cnt   = document.getElementById('gaToastCount');
+  if (title) title.textContent = failed === 0 ? '✅ Tous les modules générés !' : `✅ ${done - failed} modules générés`;
+  if (sub)   sub.textContent  = failed > 0 ? `${failed} module(s) ont échoué — réessaie-les manuellement` : 'Tes modules sont prêts 🎉';
+  if (cnt)   cnt.textContent  = `${done - failed}/${toGenerate.length}`;
+  const spinner = toast.querySelector('div[style*="animation"]');
+  if (spinner) { spinner.style.animation = 'none'; spinner.textContent = failed === 0 ? '✅' : '⚠️'; spinner.style.border = 'none'; spinner.style.width = 'auto'; spinner.style.height = 'auto'; spinner.style.fontSize = '18px'; }
+
+  setTimeout(() => { toast.remove(); }, 4000);
+
+  if (btn) { btn.disabled = false; btn.textContent = '⚡ Tout générer'; }
+
+  // Save & render
+  renderModuleContent();
+  updateTabBadges();
+  try {
+    localStorage.setItem('bloxai_last_analysis', JSON.stringify({
+      url: S.profile.url, platform: S.profile.platform,
+      profile: S.profile, modules: S.modules, savedAt: Date.now()
+    }));
+  } catch(e) {}
+  _pushCurrentAccount();
 }
 
 /* ── Render results view ── */
