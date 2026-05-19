@@ -3661,14 +3661,20 @@ async function runBusinessAnalysis() {
         'Content-Type':  'application/json',
         'X-Proxy-Secret': 'axel2024',
       },
-      body: JSON.stringify(metrics),
+      body: JSON.stringify({
+        metrics: { bloxai: metrics },
+        context: metrics.notes || '',
+      }),
     });
 
-    const data = await res.json();
+    const raw = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.error || `Erreur ${res.status}`);
+      throw new Error(raw.error || `Erreur ${res.status}`);
     }
+
+    // La réponse est wrappée dans { ok: true, analysis: {...} }
+    const data = raw.analysis || raw;
 
     // Sauvegarder en cache
     localStorage.setItem(AGENT_IA_CACHE_KEY, JSON.stringify({
@@ -3779,12 +3785,10 @@ function _renderAxes(filter) {
           <div style="font-size:12px;color:#94a3b8;line-height:1.5">${axe.action||''}</div>
         </div>
       </div>
-      ${axe.impact_estime ? `
-      <div style="margin-top:10px;text-align:right">
-        <span style="font-size:10px;color:#7c3aed;font-weight:700;background:rgba(124,58,237,.1);padding:3px 10px;border-radius:20px;border:1px solid rgba(124,58,237,.2)">
-          📈 ${axe.impact_estime}
-        </span>
-      </div>` : ''}
+      <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+        ${axe.impact_estime ? `<span style="font-size:10px;color:#7c3aed;font-weight:700;background:rgba(124,58,237,.1);padding:3px 10px;border-radius:20px;border:1px solid rgba(124,58,237,.2)">📈 Impact ${axe.impact_estime}</span>` : '<span></span>'}
+        ${axe.metrique_cible ? `<span style="font-size:10px;color:#6b7280;font-weight:600;background:rgba(255,255,255,.04);padding:3px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.07)">📊 ${axe.metrique_cible}</span>` : ''}
+      </div>
     `;
     list.appendChild(card);
   });
