@@ -1468,6 +1468,29 @@
     .dash-card-locked { opacity:0.35;pointer-events:none; }
     .score-ring { transform:rotate(-90deg); }
     @media(max-width:768px){.dash-sidebar{display:none;}.dash-sidebar.open{display:block;position:fixed;top:64px;left:0;bottom:0;z-index:50;width:280px;}.dash-main{padding:12px;}}
+    /* ── Agent IA ── */
+    .agent-nav-btn { display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border-radius:9px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all .2s;text-align:left;margin-top:8px; }
+    .agent-nav-btn.inactive { background:rgba(168,85,247,.08);color:#7c3aed;border:1px solid rgba(124,58,237,.2); }
+    .agent-nav-btn.active { background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(168,85,247,.15));color:#c4b5fd;border:1px solid rgba(124,58,237,.4); }
+    .agent-nav-btn:hover { border-color:rgba(168,85,247,.5)!important; }
+    .ia-score-ring { transform:rotate(-90deg); }
+    .axe-card { background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px 18px;margin-bottom:10px;transition:border-color .2s; }
+    .axe-card:hover { border-color:rgba(124,58,237,.3); }
+    .axe-card.done { opacity:.45; }
+    .prio-badge { display:inline-block;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase; }
+    .prio-haute  { background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25); }
+    .prio-moyenne{ background:rgba(234,179,8,.12);color:#fbbf24;border:1px solid rgba(234,179,8,.25); }
+    .prio-faible { background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.2); }
+    .cat-badge { display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.2); }
+    .effort-badge { display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,.05);color:#6b7280;border:1px solid rgba(255,255,255,.08); }
+    .metric-inp { background:#0d0d1a;border:1px solid rgba(124,58,237,.2);border-radius:9px;color:#e2e8f0;font-size:13px;padding:9px 12px;width:100%;box-sizing:border-box;outline:none;transition:border-color .2s; }
+    .metric-inp:focus { border-color:rgba(168,85,247,.5); }
+    .metric-inp::placeholder { color:#374151; }
+    .metric-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px; }
+    @media(max-width:600px){.metric-grid{grid-template-columns:1fr;}}
+    .axe-two-col { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    @media(max-width:600px){.axe-two-col{grid-template-columns:1fr;}}
+    .forte-pill { display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:5px 12px;font-size:12px;color:#86efac;font-weight:600;margin:3px; }
   </style>
   <div style="background:#08080f;border-top:1px solid #0f0f1e;border-bottom:1px solid #0f0f1e" class="py-24">
     <div class="max-w-2xl mx-auto px-5">
@@ -1567,8 +1590,16 @@
         </button>
       </div>
 
+      <!-- Agent IA nav -->
+      <div style="font-size:10px;font-weight:700;color:#4b5563;letter-spacing:.6px;margin-bottom:6px;padding:0 2px">🤖 INTELLIGENCE</div>
+      <button class="agent-nav-btn inactive" id="agentIANavBtn" onclick="toggleAgentIA()">
+        <span style="font-size:14px">🤖</span>
+        <span>Agent IA</span>
+        <span id="agentIABadge" style="display:none;margin-left:auto;background:#7c3aed;color:#fff;border-radius:99px;font-size:9px;padding:1px 7px;font-weight:800"></span>
+      </button>
+
       <!-- Modules list -->
-      <div style="font-size:10px;font-weight:700;color:#4b5563;letter-spacing:.6px;margin-bottom:8px;padding:0 2px">⚡ MODULES</div>
+      <div style="font-size:10px;font-weight:700;color:#4b5563;letter-spacing:.6px;margin-top:14px;margin-bottom:8px;padding:0 2px">⚡ MODULES</div>
       <div id="dashModuleToggles"></div>
 
       <!-- Nouvelle analyse -->
@@ -1605,6 +1636,99 @@
           <div style="font-size:20px;color:#a78bfa">→</div>
         </div>
       </div>
+
+      <!-- ── Agent IA Panel ── -->
+      <div id="agentIAWrap" style="display:none;margin-bottom:20px">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#a855f7);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤖</div>
+              <div>
+                <div style="font-size:16px;font-weight:800;color:#f1f5f9">Agent IA Business</div>
+                <div style="font-size:11px;color:#6b7280">Analyse IA de tes métriques → plan d'action priorisé</div>
+              </div>
+            </div>
+          </div>
+          <button onclick="toggleAgentIA()" style="background:none;border:none;color:#4b5563;cursor:pointer;font-size:18px;padding:4px" title="Fermer">✕</button>
+        </div>
+
+        <!-- Metrics input form -->
+        <div id="agentIAForm" style="background:rgba(255,255,255,.025);border:1px solid rgba(124,58,237,.2);border-radius:14px;padding:20px;margin-bottom:16px">
+          <div style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.6px;margin-bottom:12px">📊 MÉTRIQUES ACTUELLES</div>
+          <div class="metric-grid">
+            <div>
+              <label style="font-size:11px;color:#9ca3af;font-weight:600;display:block;margin-bottom:5px">Membres payants</label>
+              <input class="metric-inp" id="mMembres" type="number" min="0" placeholder="0" />
+            </div>
+            <div>
+              <label style="font-size:11px;color:#9ca3af;font-weight:600;display:block;margin-bottom:5px">MRR (€)</label>
+              <input class="metric-inp" id="mMrr" type="number" min="0" placeholder="0" />
+            </div>
+            <div>
+              <label style="font-size:11px;color:#9ca3af;font-weight:600;display:block;margin-bottom:5px">Taux de conversion (%)</label>
+              <input class="metric-inp" id="mConversion" type="number" min="0" max="100" step="0.1" placeholder="0" />
+            </div>
+            <div>
+              <label style="font-size:11px;color:#9ca3af;font-weight:600;display:block;margin-bottom:5px">Churns ce mois</label>
+              <input class="metric-inp" id="mChurns" type="number" min="0" placeholder="0" />
+            </div>
+            <div>
+              <label style="font-size:11px;color:#9ca3af;font-weight:600;display:block;margin-bottom:5px">Leads générés ce mois</label>
+              <input class="metric-inp" id="mLeads" type="number" min="0" placeholder="0" />
+            </div>
+            <div>
+              <label style="font-size:11px;color:#9ca3af;font-weight:600;display:block;margin-bottom:5px">Notes (optionnel)</label>
+              <input class="metric-inp" id="mNotes" type="text" placeholder="Ex: lancement récent, bug pricing…" />
+            </div>
+          </div>
+          <button onclick="runBusinessAnalysis()" id="analyzeBtn" style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:8px">
+            <span id="analyzeBtnText">🤖 Analyser mon business →</span>
+          </button>
+          <div id="analyzeError" style="display:none;margin-top:10px;padding:10px 14px;border-radius:9px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171;font-size:12px"></div>
+        </div>
+
+        <!-- Results -->
+        <div id="agentIAResults" style="display:none">
+
+          <!-- Score + synthèse -->
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:rgba(255,255,255,.025);border:1px solid rgba(124,58,237,.2);border-radius:14px;padding:20px;margin-bottom:14px">
+            <div style="text-align:center">
+              <svg width="72" height="72" viewBox="0 0 72 72" class="ia-score-ring">
+                <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="6"/>
+                <circle id="iaScoreCircle" cx="36" cy="36" r="30" fill="none" stroke="#22c55e" stroke-width="6" stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round" style="transition:stroke-dashoffset 1s,stroke .4s"/>
+              </svg>
+              <div style="font-size:26px;font-weight:900;color:#e2e8f0;margin-top:-50px;position:relative;z-index:1;line-height:1" id="iaScoreValue">—</div>
+              <div style="font-size:9px;color:#6b7280;font-weight:700;letter-spacing:.5px;margin-top:32px">SCORE</div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#6b7280;letter-spacing:.6px;margin-bottom:6px">SYNTHÈSE</div>
+              <div id="iaSynthese" style="font-size:13px;color:#cbd5e1;line-height:1.6"></div>
+              <div id="iaPointsForts" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:2px"></div>
+            </div>
+          </div>
+
+          <!-- Axes filtres -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+            <div style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.6px">AXES D'AMÉLIORATION</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="axeFilters">
+              <button onclick="filterAxes('all')" class="axe-filter-btn active" data-filter="all" style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#e2e8f0;font-size:11px;font-weight:700;cursor:pointer">Tout</button>
+              <button onclick="filterAxes('haute')" class="axe-filter-btn" data-filter="haute" style="padding:4px 10px;border-radius:20px;border:1px solid rgba(239,68,68,.25);background:transparent;color:#f87171;font-size:11px;font-weight:700;cursor:pointer">🔴 Haute</button>
+              <button onclick="filterAxes('moyenne')" class="axe-filter-btn" data-filter="moyenne" style="padding:4px 10px;border-radius:20px;border:1px solid rgba(234,179,8,.25);background:transparent;color:#fbbf24;font-size:11px;font-weight:700;cursor:pointer">🟡 Moyenne</button>
+              <button onclick="filterAxes('faible')" class="axe-filter-btn" data-filter="faible" style="padding:4px 10px;border-radius:20px;border:1px solid rgba(34,197,94,.2);background:transparent;color:#4ade80;font-size:11px;font-weight:700;cursor:pointer">🟢 Faible</button>
+              <button onclick="clearAllAxes()" style="padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:transparent;color:#4b5563;font-size:11px;font-weight:700;cursor:pointer">Masquer terminés</button>
+            </div>
+          </div>
+          <div id="axesList"></div>
+
+          <!-- Refresh -->
+          <button onclick="resetAnalysis()" style="width:100%;margin-top:6px;padding:10px;border-radius:10px;background:transparent;border:1px dashed rgba(124,58,237,.25);color:#7c3aed;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s">
+            🔄 Relancer une analyse avec nouvelles métriques
+          </button>
+        </div>
+
+      </div><!-- /agentIAWrap -->
 
       <!-- Module cards grid -->
       <div id="dashCardsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -2556,6 +2680,9 @@ function _dashInit() {
   localStorage.setItem('bloxai_dashboard_modules', JSON.stringify(active));
 
   _dashRender(plan, active, accent);
+
+  /* Agent IA — badge si analyse en cache */
+  initAgentIABadge();
 }
 
 function _dashRender(plan, active, accent) {
@@ -3457,6 +3584,297 @@ function _doImportAnalysis() {
     msg.style.color = '#f87171';
     msg.textContent = '❌ JSON invalide — vérifie le format.';
   }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   AGENT IA BUSINESS — analyse métriques + todo-list priorisée
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const AGENT_IA_CACHE_KEY = 'bloxai_agent_ia_v1';
+const ANALYZE_URL = 'https://blox-proxy-kappa.vercel.app/api/analyze';
+
+/* Toggle affichage panneau */
+function toggleAgentIA() {
+  const wrap   = document.getElementById('agentIAWrap');
+  const cards  = document.getElementById('dashCardsGrid');
+  const navBtn = document.getElementById('agentIANavBtn');
+  const isOpen = wrap.style.display !== 'none';
+
+  if (isOpen) {
+    wrap.style.display = 'none';
+    if (cards) cards.style.display = 'grid';
+    navBtn.className = 'agent-nav-btn inactive';
+  } else {
+    wrap.style.display = 'block';
+    if (cards) cards.style.display = 'none';
+    navBtn.className = 'agent-nav-btn active';
+    // Charger cache si dispo
+    _loadCachedAnalysis();
+  }
+}
+
+/* Charger résultat depuis localStorage */
+function _loadCachedAnalysis() {
+  try {
+    const raw = localStorage.getItem(AGENT_IA_CACHE_KEY);
+    if (!raw) return;
+    const { data, metrics, ts } = JSON.parse(raw);
+    if (!data) return;
+    // Pré-remplir métriques
+    if (metrics) {
+      document.getElementById('mMembres').value    = metrics.membres    || '';
+      document.getElementById('mMrr').value        = metrics.mrr        || '';
+      document.getElementById('mConversion').value = metrics.conversion || '';
+      document.getElementById('mChurns').value     = metrics.churns     || '';
+      document.getElementById('mLeads').value      = metrics.leads      || '';
+      document.getElementById('mNotes').value      = metrics.notes      || '';
+    }
+    _renderAnalysis(data);
+    // Badge sidebar avec nombre d'axes haute priorité
+    _updateAgentBadge(data);
+  } catch(e) {}
+}
+
+/* Lancer l'analyse */
+async function runBusinessAnalysis() {
+  const btn     = document.getElementById('analyzeBtn');
+  const btnText = document.getElementById('analyzeBtnText');
+  const errBox  = document.getElementById('analyzeError');
+
+  const metrics = {
+    membres:    parseFloat(document.getElementById('mMembres').value)    || 0,
+    mrr:        parseFloat(document.getElementById('mMrr').value)        || 0,
+    conversion: parseFloat(document.getElementById('mConversion').value) || 0,
+    churns:     parseFloat(document.getElementById('mChurns').value)     || 0,
+    leads:      parseFloat(document.getElementById('mLeads').value)      || 0,
+    notes:      document.getElementById('mNotes').value.trim(),
+  };
+
+  errBox.style.display = 'none';
+  btn.disabled = true;
+  btnText.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite">⟳</span> Analyse en cours…';
+
+  try {
+    const res = await fetch(ANALYZE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'X-Proxy-Secret': 'axel2024',
+      },
+      body: JSON.stringify(metrics),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || `Erreur ${res.status}`);
+    }
+
+    // Sauvegarder en cache
+    localStorage.setItem(AGENT_IA_CACHE_KEY, JSON.stringify({
+      data,
+      metrics,
+      ts: Date.now(),
+    }));
+
+    _renderAnalysis(data);
+    _updateAgentBadge(data);
+
+  } catch(err) {
+    errBox.style.display = 'block';
+    errBox.textContent   = '❌ ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btnText.textContent = '🤖 Analyser mon business →';
+  }
+}
+
+/* Rendre les résultats */
+function _renderAnalysis(data) {
+  const form    = document.getElementById('agentIAForm');
+  const results = document.getElementById('agentIAResults');
+
+  form.style.display    = 'none';
+  results.style.display = 'block';
+
+  // Score
+  const score  = Math.max(0, Math.min(100, data.score_global || 0));
+  const circle = document.getElementById('iaScoreCircle');
+  const valEl  = document.getElementById('iaScoreValue');
+  const circumference = 188.5;
+  const offset = circumference - (score / 100) * circumference;
+
+  valEl.textContent = score;
+  circle.style.strokeDashoffset = offset;
+  // Couleur selon score
+  if (score >= 70)      circle.style.stroke = '#22c55e';
+  else if (score >= 45) circle.style.stroke = '#f59e0b';
+  else                  circle.style.stroke = '#ef4444';
+
+  // Synthèse
+  document.getElementById('iaSynthese').textContent = data.synthese || '';
+
+  // Points forts
+  const pf = document.getElementById('iaPointsForts');
+  pf.innerHTML = '';
+  (data.points_forts || []).forEach(p => {
+    const pill = document.createElement('span');
+    pill.className = 'forte-pill';
+    pill.innerHTML = '✓ ' + p;
+    pf.appendChild(pill);
+  });
+
+  // Charger axes (avec états done depuis localStorage)
+  window._iaAxes = data.axes || [];
+  window._iaAxesDone = _loadAxesDone();
+  _renderAxes('all');
+}
+
+/* Rendre la liste d'axes */
+function _renderAxes(filter) {
+  const list = document.getElementById('axesList');
+  const axes = window._iaAxes || [];
+  const done = window._iaAxesDone || {};
+
+  list.innerHTML = '';
+
+  const filtered = filter === 'all'
+    ? axes
+    : axes.filter(a => a.priorite === filter);
+
+  filtered.forEach((axe, idx) => {
+    const globalIdx = axes.indexOf(axe);
+    const isDone    = !!done[globalIdx];
+
+    if (isDone && filter !== 'all') return; // masquer terminés si filtré
+
+    const card = document.createElement('div');
+    card.className = 'axe-card' + (isDone ? ' done' : '');
+    card.dataset.idx = globalIdx;
+
+    const prioClass  = 'prio-' + (axe.priorite || 'faible');
+    const effortIcon = axe.effort === 'faible' ? '⚡' : axe.effort === 'moyen' ? '⚙️' : '🏋️';
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span class="prio-badge ${prioClass}">${(axe.priorite||'').toUpperCase()}</span>
+          <span class="cat-badge">${axe.categorie||''}</span>
+          <span class="effort-badge">${effortIcon} Effort ${axe.effort||''}</span>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0">
+          <input type="checkbox" ${isDone?'checked':''} onchange="toggleAxeDone(${globalIdx},this.checked)"
+            style="width:15px;height:15px;accent-color:#a855f7;cursor:pointer" />
+          <span style="font-size:11px;color:${isDone?'#22c55e':'#6b7280'};font-weight:700">${isDone?'✓ Fait':'À faire'}</span>
+        </label>
+      </div>
+      <div style="font-size:14px;font-weight:800;color:${isDone?'#4b5563':'#f1f5f9'};margin-bottom:10px">${axe.titre||''}</div>
+      <div class="axe-two-col">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:#6b7280;letter-spacing:.5px;margin-bottom:4px">PROBLÈME / OPPORTUNITÉ</div>
+          <div style="font-size:12px;color:#94a3b8;line-height:1.5">${axe.probleme||''}</div>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:#6b7280;letter-spacing:.5px;margin-bottom:4px">ACTION À MENER</div>
+          <div style="font-size:12px;color:#94a3b8;line-height:1.5">${axe.action||''}</div>
+        </div>
+      </div>
+      ${axe.impact_estime ? `
+      <div style="margin-top:10px;text-align:right">
+        <span style="font-size:10px;color:#7c3aed;font-weight:700;background:rgba(124,58,237,.1);padding:3px 10px;border-radius:20px;border:1px solid rgba(124,58,237,.2)">
+          📈 ${axe.impact_estime}
+        </span>
+      </div>` : ''}
+    `;
+    list.appendChild(card);
+  });
+
+  if (list.children.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:#4b5563;font-size:13px;padding:20px">Aucun axe dans cette catégorie.</div>';
+  }
+}
+
+/* Filtrer les axes */
+function filterAxes(filter) {
+  document.querySelectorAll('.axe-filter-btn').forEach(b => {
+    const isActive = b.dataset.filter === filter;
+    b.style.background = isActive ? 'rgba(255,255,255,.08)' : 'transparent';
+    b.style.color = isActive ? '#e2e8f0' : (b.dataset.filter === 'haute' ? '#f87171' : b.dataset.filter === 'moyenne' ? '#fbbf24' : b.dataset.filter === 'faible' ? '#4ade80' : '#4b5563');
+  });
+  _renderAxes(filter);
+}
+
+/* Masquer les terminés */
+function clearAllAxes() {
+  const done  = window._iaAxesDone || {};
+  const axes  = window._iaAxes || [];
+  const list  = document.getElementById('axesList');
+  list.querySelectorAll('.axe-card').forEach(card => {
+    const idx = parseInt(card.dataset.idx);
+    if (done[idx]) card.style.display = 'none';
+  });
+}
+
+/* Toggle état terminé d'un axe */
+function toggleAxeDone(idx, checked) {
+  if (!window._iaAxesDone) window._iaAxesDone = {};
+  window._iaAxesDone[idx] = checked;
+  _saveAxesDone(window._iaAxesDone);
+
+  const card = document.querySelector(`.axe-card[data-idx="${idx}"]`);
+  if (card) {
+    card.classList.toggle('done', checked);
+    const label = card.querySelector('label span');
+    if (label) {
+      label.textContent = checked ? '✓ Fait' : 'À faire';
+      label.style.color = checked ? '#22c55e' : '#6b7280';
+    }
+    const title = card.querySelector('[style*="font-weight:800"]');
+    if (title) title.style.color = checked ? '#4b5563' : '#f1f5f9';
+  }
+
+  // Re-calculer badge
+  const data = _getCachedAnalysis();
+  if (data) _updateAgentBadge(data);
+}
+
+/* Réinitialiser pour relancer */
+function resetAnalysis() {
+  document.getElementById('agentIAForm').style.display    = 'block';
+  document.getElementById('agentIAResults').style.display = 'none';
+}
+
+/* Badge sidebar */
+function _updateAgentBadge(data) {
+  const badge = document.getElementById('agentIABadge');
+  if (!badge) return;
+  const done  = _loadAxesDone();
+  const axes  = data.axes || [];
+  const remaining = axes.filter((a,i) => a.priorite === 'haute' && !done[i]).length;
+  if (remaining > 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = remaining;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+/* Persistance états done */
+const AXESDONE_KEY = 'bloxai_axesdone_v1';
+function _loadAxesDone()  { try { return JSON.parse(localStorage.getItem(AXESDONE_KEY)) || {}; } catch(e) { return {}; } }
+function _saveAxesDone(d) { localStorage.setItem(AXESDONE_KEY, JSON.stringify(d)); }
+function _getCachedAnalysis() {
+  try {
+    const raw = localStorage.getItem(AGENT_IA_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw).data || null;
+  } catch(e) { return null; }
+}
+
+/* Init badge au chargement du dashboard */
+function initAgentIABadge() {
+  const data = _getCachedAnalysis();
+  if (data) _updateAgentBadge(data);
 }
 
 /* ── AvatarAds post-generation nudge toast ── */
