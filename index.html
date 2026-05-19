@@ -3395,64 +3395,85 @@ Réponds UNIQUEMENT avec ce JSON :
   },
 
   3: {
-    system: `Tu es un expert en scripts TikTok viraux orientés conversion — style "faceless voix off" et "face cam éducatif".
-OBJECTIF : Générer des scripts courts, percutants, qui vendent sans avoir l'air de vendre.
-STYLE OBLIGATOIRE :
-- Hook choc en 1 phrase (crée la curiosité ou le FOMO dès la 1ère seconde)
-- Corps : 3-5 bullet points bénéfices/faits (pas de blabla)
-- Langage simple, direct, familier — "tu" pas "vous"
-- CTA en commentaire : "Commente [MOT CLÉ]" ou "Écris [MOT] en commentaire"
-- Scripts faceless-friendly par défaut (voix off + B-roll ou texte à l'écran)
-- Durée cible : 15-25 secondes (TikTok court format)
+    system: `Tu es un expert en scripts TikTok viraux orientés conversion + scripts de vente en DM.
+OBJECTIF : Générer des scripts courts percutants qui vendent, ET des scripts DM pour closer les prospects.
+RÈGLES SCRIPTS TIKTOK :
+- Hook choc en 1 phrase (curiosité ou FOMO dès la 1ère seconde)
+- Corps : 3-5 bullet points bénéfices (pas de blabla)
+- Langage direct, familier — "tu" pas "vous"
+- CTA : "Commente [MOT CLÉ]" pour générer des leads
+- Faceless-friendly par défaut (voix off + texte écran)
+- Durée cible : 15-25 secondes
+RÈGLES SCRIPTS DM (si offre formation/accompagnement) :
+- Scripts naturels, pas commerciaux — conversation d'abord
+- Gérer les objections classiques avec empathie + pivot
+- Toujours terminer par une question ouverte
 - Réponds en JSON uniquement`,
 
-    user: (p, prev) => `Crée des scripts TikTok viraux pour ce créateur.
+    user: (p, prev) => {
+      const isFormation = (p.niche||'').toLowerCase().match(/formation|accompagnement|coaching|mentoring|programme|cours/);
+      const offerName = prev?.offre_principale?.nom || prev?.nom_offre || p.niche || 'ton offre';
+      const offerPrice = prev?.offre_principale?.prix || '';
+      const objectionBlock = isFormation ? `
+SCRIPTS DM & OBJECTIONS FORMATION À GÉNÉRER :
+L'utilisateur vend une formation/accompagnement (${offerName}${offerPrice ? ' — ' + offerPrice : ''}). Génère des scripts DM complets pour gérer ces 4 objections courantes :
+1. "J'ai pas le temps"
+2. "J'ai pas l'argent / c'est trop cher"
+3. "Je vais réfléchir / je te reviens"
+4. "J'en ai pas besoin pour l'instant"
+Chaque script : message d'accroche → empathie → reframe → question de relance. Style naturel, humain, pas commercial.` : '';
+
+      return `Crée des scripts TikTok viraux pour ce créateur.
 
 HANDLE : ${p.url}
-NICHE / OFFRE : ${p.niche || p.desc || 'voir diagnostic ci-dessous'}
+NICHE / OFFRE : ${p.niche || 'non précisé'}
 STYLE : ${{'faceless':'Faceless / voix off','camera':'Face caméra','both':'Mix faceless + face cam'}[p.contentStyle] || 'mixte'}
-DIAGNOSTIC : ${JSON.stringify(prev?.diagnostic || prev || {})}
+OFFRE PRINCIPALE : ${offerName}${offerPrice ? ' — ' + offerPrice : ''}
+PROBLÈME PRINCIPAL : ${prev?.diagnostic?.probleme_principal || prev?.probleme_principal || 'voir audit'}
+${objectionBlock}
 
-Génère des scripts dans le style : hook accrocheur → bullet points bénéfices → CTA commentaire.
-Exemple de structure attendue : "Le business le plus rentable en 2026 que personne ne te montre / ✓ 0 stock / ✓ 0 expérience / ✓ 100% en ligne / Commente PLAN je t'envoie les détails"
+Scripts attendus : hook accrocheur → bullet bénéfices → CTA commentaire.
+Ex: "Le business le plus rentable en 2026 / ✓ 0 stock / ✓ 100% en ligne / Commente PLAN"
 
 Réponds UNIQUEMENT avec ce JSON :
 {
   "video_scripts": [
     {
-      "titre": "string — nom du script",
+      "titre": "string",
       "format": "string — Faceless voix off / Face cam / B-roll texte",
       "duree_cible": "string — ex: 18 sec",
-      "hook": "string — LA phrase d'accroche exacte (les 2-3 premières secondes)",
-      "corps": ["string — point 1 (bénéfice ou fait choc)", "string — point 2", "string — point 3", "string — point 4"],
-      "cta": "string — CTA exact à dire/écrire (ex: Commente PLAN en commentaire)",
+      "hook": "string — accroche exacte (2-3 premières secondes)",
+      "corps": ["bénéfice 1", "bénéfice 2", "bénéfice 3", "bénéfice 4"],
+      "cta": "string — ex: Commente PLAN en commentaire",
       "objectif": "string — lead / vente / viralité / notoriété"
     },
     { "titre":"","format":"","duree_cible":"","hook":"","corps":["","","",""],"cta":"","objectif":"" },
     { "titre":"","format":"","duree_cible":"","hook":"","corps":["","","",""],"cta":"","objectif":"" },
     { "titre":"","format":"","duree_cible":"","hook":"","corps":["","","",""],"cta":"","objectif":"" }
   ],
-  "content_angles": [
-    "string — angle de contenu 1 (ex: POV tu découvres X)",
-    "string — angle 2",
-    "string — angle 3",
-    "string — angle 4",
-    "string — angle 5"
-  ],
-  "hooks_viraux": [
-    "string — hook choc 1",
-    "string — hook choc 2",
-    "string — hook choc 3",
-    "string — hook choc 4",
-    "string — hook choc 5",
-    "string — hook choc 6",
-    "string — hook choc 7",
-    "string — hook choc 8",
-    "string — hook choc 9",
-    "string — hook choc 10"
-  ],
-  "mots_cles_cta": ["string — mot clé CTA 1 (ex: PLAN)","string — GUIDE","string — INFO","string — GO","string — LINK"]
-}`
+  "content_angles": ["angle 1","angle 2","angle 3","angle 4","angle 5"],
+  "hooks_viraux": ["hook 1","hook 2","hook 3","hook 4","hook 5","hook 6","hook 7","hook 8","hook 9","hook 10"],
+  "mots_cles_cta": ["PLAN","GUIDE","INFO","GO","LINK"],
+  "scripts_dm": ${isFormation ? `[
+    {
+      "objection": "J'ai pas le temps",
+      "script": "string — script DM complet naturel avec accroche → empathie → reframe → question"
+    },
+    {
+      "objection": "C'est trop cher / j'ai pas l'argent",
+      "script": "string"
+    },
+    {
+      "objection": "Je vais réfléchir",
+      "script": "string"
+    },
+    {
+      "objection": "J'en ai pas besoin maintenant",
+      "script": "string"
+    }
+  ]` : '[]'}
+}`;
+    }
   },
 
   4: {
@@ -3492,37 +3513,66 @@ Réponds UNIQUEMENT avec ce JSON :
   },
 
   5: {
-    system: `Tu es un expert en conversion web (landing pages SaaS et infopreneurs).
-OBJECTIF : Décrire un site web ultra simple qui vend une offre automatiquement.
-RULES:
-- Structure conversion only
-- Focus psychologie d'achat
-- Copywriting puissant et direct
+    system: `Tu es un expert en conversion web pour infopreneurs et créateurs qui vendent des formations, accompagnements ou services premium.
+OBJECTIF : Créer la structure complète d'une landing page haute conversion + un tunnel de qualification Typeform → Calendly pour filtrer les prospects et ne parler qu'aux gens sérieux.
+RÈGLES :
+- Landing page : copywriting direct, bénéfices concrets, preuve sociale, objections réfutées
+- Tunnel qualification : 5-7 questions Typeform qui filtrent les prospects non qualifiés AVANT le Calendly
+- Objectif Typeform : éliminer les "curieux" et ne garder que les prospects avec budget + intention d'achat
+- Le Calendly apparaît seulement si le prospect répond correctement aux questions de filtre
+- Questions Typeform : niveau de motivation, budget approximatif, situation actuelle, objectif en 90 jours
 - Réponds en JSON uniquement`,
 
-    user: (p, prev) => `Crée la structure d'un site web qui vend pour ce profil.
+    user: (p, prev) => {
+      const offerName = prev?.offre_principale?.nom || prev?.nom_offre || p.niche || 'ton offre';
+      const offerPrice = prev?.offre_principale?.prix || '';
+      const niche = p.niche || p.desc || p.url;
+      return `Crée la structure complète d'un site web + tunnel de qualification pour ce créateur.
 
-PROFIL : ${p.desc || p.url}
-FUNNEL : ${JSON.stringify(prev)}
+HANDLE : ${p.url}
+NICHE / OFFRE : ${niche}
+OFFRE PRINCIPALE : ${offerName}${offerPrice ? ' — ' + offerPrice : ''}
+PROBLÈME RÉSOLU : ${prev?.diagnostic?.probleme_principal || prev?.etapes?.[0]?.titre || 'non précisé'}
 
 Réponds UNIQUEMENT avec ce JSON :
 {
   "homepage": {
-    "hero": "string — titre principal H1",
-    "subheadline": "string — sous-titre accrocheur",
-    "cta": "string — texte CTA principal"
+    "hero": "string — titre H1 puissant (bénéfice principal en 8-12 mots)",
+    "subheadline": "string — sous-titre qui précise pour qui et le résultat attendu",
+    "cta": "string — texte du CTA principal (ex: Réserver mon appel stratégique →)"
   },
   "sections": [
-    { "type": "probleme", "titre": "string", "contenu": "string" },
-    { "type": "solution", "titre": "string", "contenu": "string" },
-    { "type": "offre", "titre": "string", "contenu": "string", "prix": "string" },
-    { "type": "preuve", "titre": "string", "contenu": "string" },
+    { "type": "probleme", "titre": "string", "contenu": "string — 2-3 phrases qui décrivent la douleur exacte du prospect" },
+    { "type": "solution", "titre": "string", "contenu": "string — comment tu résous ce problème, résultat promis" },
+    { "type": "offre", "titre": "string", "contenu": "string — ce que comprend l'offre concrètement", "prix": "string" },
+    { "type": "preuve", "titre": "string", "contenu": "string — témoignage type / résultat client / chiffre clé" },
     { "type": "faq", "titre": "string", "questions": ["Q: ... A: ...","Q: ... A: ...","Q: ... A: ..."] }
   ],
-  "cta_final": "string — texte du CTA de fermeture",
-  "meta_description": "string — meta description SEO 160 chars",
-  "domaine_suggere": "string — nom de domaine idéal pour ce business"
-}`
+  "tunnel_qualification": {
+    "titre": "string — titre de la page Typeform (ex: Candidature — Accès à [offre])",
+    "intro": "string — texte d'intro Typeform qui cadre les attentes et élimine les non-sérieux",
+    "questions": [
+      {
+        "num": 1,
+        "question": "string — question de qualification #1",
+        "type": "string — choix_multiple / texte_libre / échelle_1_10",
+        "options": ["string option A", "string option B", "string option C"],
+        "filtre": "string — quelle réponse est disqualifiante (ex: 'Si répond Option A → ne pas montrer Calendly')"
+      },
+      { "num": 2, "question": "string", "type": "string", "options": [], "filtre": "string" },
+      { "num": 3, "question": "string — budget approximatif disponible", "type": "choix_multiple", "options": ["Moins de 500€","500€ - 1 500€","1 500€ - 3 000€","Plus de 3 000€"], "filtre": "Disqualifier si Moins de 500€" },
+      { "num": 4, "question": "string — objectif en 90 jours", "type": "texte_libre", "options": [], "filtre": "none" },
+      { "num": 5, "question": "string — niveau de motivation / urgence", "type": "échelle_1_10", "options": [], "filtre": "Disqualifier si score < 7" }
+    ],
+    "message_qualifie": "string — message affiché au prospect qualifié avant le Calendly (ex: 'Parfait ! Tu corresponds exactement au profil de nos membres. Réserve ton appel stratégique gratuit de 30 min :')",
+    "message_non_qualifie": "string — message doux pour les non-qualifiés (ex: 'Merci pour ta candidature. Tu ne corresponds pas encore au profil idéal, mais voici une ressource gratuite...')",
+    "conseils_calendly": "string — conseils pour paramétrer le Calendly : titre de l'événement, durée conseillée, questions pré-RDV à ajouter"
+  },
+  "cta_final": "string — CTA de fermeture de page",
+  "meta_description": "string — meta SEO 160 chars",
+  "domaine_suggere": "string — nom de domaine idéal"
+}`;
+    }
   },
 
   12: {
@@ -3659,6 +3709,19 @@ async function switchTab(n) {
     t.classList.toggle('tab-active', i+1 === n);
   });
   renderModuleContent();
+
+  // Auto-génération : si audit fait + accès + module vide → génère automatiquement
+  if (n > 1 && S.modules[1] && !S.modules[n] && !S.generating) {
+    const needsStarter = n === 2 || n === 3 || n === 6;
+    const needsPro     = n === 7 || n === 8 || n === 9 || n === 10 || n === 12;
+    const needsElite   = n === 4 || n === 5 || n === 11;
+    const hasAccess    = (needsStarter && hasStarterAccess()) ||
+                         (needsPro     && hasProAccess())     ||
+                         (needsElite   && hasEliteAccess());
+    if (hasAccess) {
+      generateModule(n); // génère en arrière-plan, affiche le spinner
+    }
+  }
 }
 
 /* ── Generate module ── */
@@ -4938,6 +5001,26 @@ function renderModule3(d) {
       </div>
     </div>
 
+    ${(d.scripts_dm||[]).length > 0 ? `
+    <!-- Scripts DM & Objections -->
+    <div class="card p-6" style="border-color:rgba(6,182,212,.25);background:rgba(6,182,212,.03)">
+      <div class="section-lbl" style="color:#22d3ee">💬 Scripts DM — Gérer les objections</div>
+      <p style="font-size:12px;color:#6b7280;margin-bottom:14px">Scripts naturels pour closer en DM. Copie et adapte.</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        ${(d.scripts_dm||[]).map((dm,i)=>`
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(6,182,212,.15);border-radius:12px;padding:14px 16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="font-size:10px;font-weight:800;color:#06b6d4;background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);padding:3px 10px;border-radius:20px">OBJECTION ${i+1}</span>
+            <span style="font-size:13px;font-weight:700;color:#e2e8f0">"${esc(dm.objection||'')}"</span>
+          </div>
+          <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:12px 14px;position:relative">
+            <p style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-line;margin:0;padding-right:60px">${esc(dm.script||'')}</p>
+            <button onclick="navigator.clipboard?.writeText(${JSON.stringify(dm.script||'')}).then(()=>{this.textContent='✓ Copié';this.style.color='#4ade80';setTimeout(()=>{this.textContent='📋 Copier';this.style.color='#6b7280'},1500)})" style="position:absolute;top:8px;right:8px;background:none;border:none;color:#6b7280;cursor:pointer;font-size:11px;font-weight:700">📋 Copier</button>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
+
     <!-- AvatarAds cross-promo — transformer les scripts en vidéos -->
     <a href="https://avatarads.fr" target="_blank" rel="noopener" style="display:block;text-decoration:none">
       <div style="background:linear-gradient(135deg,rgba(249,115,22,.06),rgba(239,68,68,.04));border:1px solid rgba(249,115,22,.25);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(249,115,22,.55)'" onmouseout="this.style.borderColor='rgba(249,115,22,.25)'">
@@ -5043,6 +5126,52 @@ function renderModule5(d) {
       <p class="text-gray-400 text-xs leading-relaxed">${esc(d.meta_description)}</p>
     </div>` : ''}
 
+    ${d.tunnel_qualification ? `
+    <!-- Tunnel Typeform + Calendly -->
+    <div class="card p-6" style="border-color:rgba(20,184,166,.3);background:rgba(20,184,166,.04)">
+      <div class="section-lbl" style="color:#2dd4bf;margin-bottom:4px">🔗 Tunnel de qualification — Typeform → Calendly</div>
+      <p style="font-size:12px;color:#6b7280;margin-bottom:16px">Filtre les prospects non qualifiés AVANT qu'ils réservent un appel. Tu ne parles qu'aux gens sérieux.</p>
+
+      <!-- Titre + Intro Typeform -->
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(20,184,166,.15);border-radius:12px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:800;color:#2dd4bf;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">📋 Page Typeform</div>
+        <p style="font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:6px">${esc(d.tunnel_qualification.titre||'')}</p>
+        <p style="font-size:12px;color:#9ca3af;line-height:1.6">${esc(d.tunnel_qualification.intro||'')}</p>
+      </div>
+
+      <!-- Questions -->
+      <div style="font-size:10px;font-weight:800;color:#2dd4bf;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">❓ Questions de qualification</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        ${(d.tunnel_qualification.questions||[]).map(q=>`
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px 14px">
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px">
+            <span style="font-size:10px;font-weight:800;color:#14b8a6;background:rgba(20,184,166,.15);border-radius:20px;padding:2px 8px;flex-shrink:0">Q${q.num}</span>
+            <span style="font-size:13px;font-weight:600;color:#e2e8f0">${esc(q.question||'')}</span>
+          </div>
+          ${(q.options||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px">${q.options.map(o=>`<span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:2px 10px;color:#9ca3af">${esc(o)}</span>`).join('')}</div>` : ''}
+          ${q.filtre && q.filtre !== 'none' ? `<div style="font-size:11px;color:#f87171;display:flex;gap:5px;align-items:flex-start"><span>⛔</span><span>${esc(q.filtre)}</span></div>` : ''}
+        </div>`).join('')}
+      </div>
+
+      <!-- Messages qualifié / non qualifié -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:12px">
+          <div style="font-size:10px;font-weight:800;color:#4ade80;margin-bottom:6px">✅ PROSPECT QUALIFIÉ</div>
+          <p style="font-size:11px;color:#86efac;line-height:1.5">${esc(d.tunnel_qualification.message_qualifie||'')}</p>
+        </div>
+        <div style="background:rgba(107,114,128,.07);border:1px solid rgba(107,114,128,.2);border-radius:10px;padding:12px">
+          <div style="font-size:10px;font-weight:800;color:#9ca3af;margin-bottom:6px">❌ NON QUALIFIÉ</div>
+          <p style="font-size:11px;color:#6b7280;line-height:1.5">${esc(d.tunnel_qualification.message_non_qualifie||'')}</p>
+        </div>
+      </div>
+
+      <!-- Conseils Calendly -->
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:10px;padding:12px">
+        <div style="font-size:10px;font-weight:800;color:#818cf8;margin-bottom:6px">📅 Paramétrer ton Calendly</div>
+        <p style="font-size:12px;color:#a5b4fc;line-height:1.6">${esc(d.tunnel_qualification.conseils_calendly||'')}</p>
+      </div>
+    </div>` : ''}
+
     <!-- Export / systeme.io hint -->
     <div class="card p-5" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.06)">
       <div class="section-lbl" style="color:#a855f7;margin-bottom:8px">🚀 Comment mettre en ligne ce site ?</div>
@@ -5051,11 +5180,10 @@ function renderModule5(d) {
         <li>Va sur <a href="https://systeme.io" target="_blank" style="color:#a855f7;text-decoration:none">systeme.io</a> → crée un compte gratuit</li>
         <li>Dans le menu, clique <strong style="color:#fff">Tunnels de vente → Créer un nouveau tunnel</strong></li>
         <li>Choisis un modèle de page vierge ou un template proche de ton offre</li>
-        <li>Dans l'éditeur, clique sur <strong style="color:#fff">Paramètres → Code personnalisé / HTML</strong></li>
-        <li>Copie-colle le contenu ci-dessus section par section (hero, CTA, FAQ…) dans les blocs texte</li>
-        <li>Publie → tu as un site qui vend en moins de 30 minutes ✅</li>
+        <li>Copie-colle le contenu ci-dessus section par section dans les blocs texte</li>
+        <li>Intègre ton Typeform via widget embed → puis redirige les qualifiés vers ton Calendly ✅</li>
       </ol>
-      <p class="text-gray-500 text-xs mt-3">Tu peux aussi utiliser <strong style="color:#d1d5db">Webflow</strong>, <strong style="color:#d1d5db">Framer</strong>, <strong style="color:#d1d5db">Carrd</strong> ou tout éditeur no-code — la structure reste identique.</p>
+      <p class="text-gray-500 text-xs mt-3">Tu peux aussi utiliser <strong style="color:#d1d5db">Webflow</strong>, <strong style="color:#d1d5db">Framer</strong> ou <strong style="color:#d1d5db">Carrd</strong>.</p>
     </div>
   </div>`;
 }
