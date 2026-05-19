@@ -1636,7 +1636,7 @@
       <!-- Nouvelle analyse -->
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)">
         <input id="profileUrlApp" type="text" class="inp mb-2" style="font-size:12px;padding:10px 12px" placeholder="@toncompte TikTok / Instagram" />
-        <button onclick="startAnalysisFromApp()" class="btn w-full justify-center" style="font-size:12px;padding:10px 14px">
+        <button onclick="_addNewAccount()" class="btn w-full justify-center" style="font-size:12px;padding:10px 14px">
           + Nouvelle analyse
         </button>
       </div>
@@ -1656,6 +1656,9 @@
 
     <!-- ── Main zone ── -->
     <main class="dash-main">
+
+      <!-- Account Switcher -->
+      <div id="accountSwitcher" style="display:none"></div>
 
       <!-- Dernière analyse banner -->
       <div id="lastAnalysisBanner" style="display:none;margin-bottom:16px;padding:14px 18px;border-radius:14px;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(219,39,119,.08));border:1px solid rgba(124,58,237,.25);cursor:pointer" onclick="restoreLastAnalysis()">
@@ -2464,22 +2467,179 @@ async function supaLogout() {
 /* ── State ── */
 const S = {
   platform: 'tiktok',
-  level: null,            // 'zero' | 'start' | 'grind' | 'pro'
-  blocker: null,          // 'start' | 'peur' | 'temps' | 'idees'
-  contentType: null,      // 'edu' | 'divert' | 'story' | 'faceless' | 'life'
-  contentStyle: 'both',   // 'faceless' | 'camera' | 'both'
-  niche: '',              // niche / ce que l'user vend (texte libre)
+  level: null,
+  blocker: null,
+  contentType: null,
+  contentStyle: 'both',
+  niche: '',
   selectedPlan: 'yearly',
-  apiKey: localStorage.getItem('blowup_api_key') || '',  // clé perso optionnelle
+  apiKey: localStorage.getItem('blowup_api_key') || '',
   profile: { url: '', desc: '', platform: '', contentStyle: 'both' },
   modules: { 1:null, 2:null, 3:null, 4:null, 5:null, 6:null, 7:null, 8:null, 9:null, 10:null, 11:null, 12:null },
-  subtitleStyle: 'hormozi',   // style de sous-titres pour module 10
-  videoUrl: '',               // URL vidéo à analyser (module 10)
-  videoTranscript: '',        // transcription/description (module 10)
-  mcTranscript: '',           // transcription vidéo longue (module 11 ShortClip)
+  subtitleStyle: 'hormozi',
+  videoUrl: '',
+  videoTranscript: '',
+  mcTranscript: '',
   activeTab: 1,
   generating: false,
+  // Multi-account
+  accounts: [],          // [{ id, handle, platform, type, profile, modules, savedAt }]
+  activeAccountIdx: -1,  // index dans accounts (-1 = analyse en cours non sauvée)
 };
+
+/* ── Account limits per plan ── */
+const ACCOUNT_LIMITS = {
+  free:    { total:1, tiktok:1, instagram:0, youtube:0, funnel:0 },
+  starter: { total:1, tiktok:1, instagram:1, youtube:1, funnel:0 },
+  pro:     { total:3, tiktok:2, instagram:1, youtube:1, funnel:0 },
+  elite:   { total:9, tiktok:5, instagram:2, youtube:2, funnel:2 },
+  trial:   { total:9, tiktok:5, instagram:2, youtube:2, funnel:2 },
+};
+const ACCOUNTS_KEY = 'bloxai_accounts_v2';
+
+function _loadAccounts() {
+  try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]'); } catch(e) { return []; }
+}
+function _saveAccounts() {
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(S.accounts));
+}
+
+function _getAccountLimits() {
+  const plan = localStorage.getItem('blowup_access') || 'free';
+  return ACCOUNT_LIMITS[plan] || ACCOUNT_LIMITS.free;
+}
+
+function _getAccountType(platform) {
+  if (!platform || platform === 'tiktok') return 'tiktok';
+  if (platform === 'instagram') return 'instagram';
+  if (platform === 'youtube') return 'youtube';
+  if (platform === 'site') return 'funnel';
+  return 'tiktok';
+}
+
+function _canAddAccount(type) {
+  const limits = _getAccountLimits();
+  const existing = S.accounts;
+  if (existing.length >= limits.total) return { ok: false, reason: `Limite de ${limits.total} compte(s) atteinte pour ton plan.` };
+  const typeCount = existing.filter(a => a.type === type).length;
+  const typeLimit = limits[type] || 0;
+  if (typeCount >= typeLimit) {
+    const planNames = { tiktok:'TikTok', instagram:'Instagram', youtube:'YouTube', funnel:'Funnel' };
+    return { ok: false, reason: `Limite de ${typeLimit} compte(s) ${planNames[type]||type} atteinte pour ton plan.` };
+  }
+  return { ok: true };
+}
+
+function _pushCurrentAccount() {
+  if (!S.modules[1]) return; // no audit = nothing to save
+  const handle = (S.profile.url||'').replace(/^@/,'').replace(/.*tiktok\.com\/@?/,'').split('/')[0].split('?')[0] || S.profile.url || 'Compte';
+  const type   = _getAccountType(S.profile.platform);
+  const id     = 'acc_' + Date.now();
+
+  // Check if handle already exists → update instead of duplicate
+  const existingIdx = S.accounts.findIndex(a => a.handle === handle && a.type === type);
+  const entry = { id: existingIdx >= 0 ? S.accounts[existingIdx].id : id, handle, platform: S.profile.platform || 'tiktok', type,
+    profile: { ...S.profile }, modules: { ...S.modules }, savedAt: Date.now() };
+
+  if (existingIdx >= 0) {
+    S.accounts[existingIdx] = entry;
+    S.activeAccountIdx = existingIdx;
+  } else {
+    S.accounts.push(entry);
+    S.activeAccountIdx = S.accounts.length - 1;
+  }
+  _saveAccounts();
+  _renderAccountSwitcher();
+}
+
+function _switchAccount(idx) {
+  const acc = S.accounts[idx];
+  if (!acc) return;
+  // Save current before switching if has data
+  if (S.modules[1] && S.activeAccountIdx !== idx) _pushCurrentAccount();
+  // Load selected
+  S.activeAccountIdx = idx;
+  S.profile  = { ...acc.profile };
+  S.modules  = { 1:null,2:null,3:null,4:null,5:null,6:null,7:null,8:null,9:null,10:null,11:null,12:null, ...acc.modules };
+  S.activeTab = 1;
+  renderResults();
+  _renderAccountSwitcher();
+}
+
+function _deleteAccount(idx, e) {
+  e && e.stopPropagation();
+  if (S.accounts.length <= 1) { alert('Tu ne peux pas supprimer le seul compte sauvegardé.'); return; }
+  if (!confirm(`Supprimer le compte @${S.accounts[idx]?.handle} ?`)) return;
+  S.accounts.splice(idx, 1);
+  _saveAccounts();
+  const newIdx = Math.min(idx, S.accounts.length - 1);
+  _switchAccount(newIdx);
+}
+
+function _addNewAccount() {
+  // Check limit for any platform first (will re-check after platform chosen in funnel)
+  const limits = _getAccountLimits();
+  if (S.accounts.length >= limits.total) {
+    const planLabel = { free:'Gratuit', starter:'Starter', pro:'Pro', elite:'Élite', trial:'Trial' };
+    const plan = localStorage.getItem('blowup_access') || 'free';
+    alert(`⛔ Limite atteinte — ton plan ${planLabel[plan]||plan} permet jusqu'à ${limits.total} compte(s).\n\nPasse à un plan supérieur pour ajouter plus de comptes.`);
+    return;
+  }
+
+  // If sidebar URL input has a value, use it like startAnalysisFromApp
+  const appInput = document.getElementById('profileUrlApp');
+  const sideUrl = appInput ? appInput.value.trim() : '';
+  if (!sideUrl && !S.modules[1]) {
+    // No saved analysis and no URL — just open funnel normally
+    const modal = document.getElementById('funnelModal');
+    if (modal) { modal.style.display = 'block'; showFunnelStep('0a'); }
+    return;
+  }
+
+  // Save current analysis first
+  if (S.modules[1]) _pushCurrentAccount();
+
+  // Reset S for new analysis
+  S.modules = { 1:null,2:null,3:null,4:null,5:null,6:null,7:null,8:null,9:null,10:null,11:null,12:null };
+  S.profile  = { url:'', desc:'', platform:'', contentStyle:'both' };
+  S.activeAccountIdx = -1;
+
+  // Pre-fill URL if provided from sidebar input
+  if (sideUrl) {
+    const mainInput = document.getElementById('profileUrl');
+    if (mainInput) mainInput.value = sideUrl;
+    S._pendingUrl = sideUrl;
+    if (appInput) appInput.value = '';
+  }
+
+  // Open funnel
+  const modal = document.getElementById('funnelModal');
+  if (modal) { modal.style.display = 'block'; showFunnelStep('0a'); }
+}
+
+function _renderAccountSwitcher() {
+  const wrap = document.getElementById('accountSwitcher');
+  if (!wrap || S.accounts.length === 0) { if(wrap) wrap.style.display='none'; return; }
+  const limits  = _getAccountLimits();
+  const canAdd  = S.accounts.length < limits.total;
+  const platIcons = { tiktok:'🎵', instagram:'📸', youtube:'▶️', funnel:'🔗' };
+
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <span style="font-size:10px;font-weight:700;color:#4b5563;letter-spacing:.6px;flex-shrink:0">📂 COMPTES</span>
+      ${S.accounts.map((a, i) => `
+        <div onclick="_switchAccount(${i})" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;cursor:pointer;border:1px solid ${S.activeAccountIdx===i?'rgba(168,85,247,.5)':'rgba(255,255,255,.08)'};background:${S.activeAccountIdx===i?'rgba(168,85,247,.15)':'rgba(255,255,255,.03)'};transition:all .15s;position:relative">
+          <span style="font-size:13px">${platIcons[a.type]||'🎵'}</span>
+          <span style="font-size:12px;font-weight:700;color:${S.activeAccountIdx===i?'#c4b5fd':'#9ca3af'};max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@${esc(a.handle)}</span>
+          <button onclick="_deleteAccount(${i}, event)" style="background:none;border:none;color:#4b5563;cursor:pointer;font-size:12px;padding:0 0 0 4px;line-height:1" title="Supprimer">✕</button>
+        </div>`).join('')}
+      ${canAdd ? `<button onclick="_addNewAccount()" style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:10px;border:1px dashed rgba(168,85,247,.3);background:transparent;color:#7c3aed;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(168,85,247,.6)'" onmouseout="this.style.borderColor='rgba(168,85,247,.3)'">
+        <span>+</span> Ajouter un compte
+        <span style="font-size:10px;color:#4b5563;font-weight:600">(${S.accounts.length}/${limits.total})</span>
+      </button>` : `<span style="font-size:10px;color:#4b5563;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.05)">Limite ${S.accounts.length}/${limits.total} atteinte</span>`}
+    </div>`;
+}
 
 // Checkout links Formation — hardcodés, non affichés dans l'UI
 /* ── Supabase config — remplis avec tes clés du dashboard Supabase ── */
@@ -2586,6 +2746,10 @@ window.onload = () => {
     history.replaceState({}, '', window.location.pathname);
     setTimeout(() => { alert('🚀 Accès Starter activé ! Tu peux maintenant analyser toutes tes plateformes.'); }, 500);
   }
+
+  // Charger les comptes multi-comptes depuis localStorage
+  S.accounts = _loadAccounts();
+  _renderAccountSwitcher();
 
   selectPlan('yearly');
   initFunnelEmailListener();
@@ -3801,6 +3965,9 @@ function renderResults() {
       profile: S.profile, modules: S.modules, savedAt: Date.now(),
     }).catch(() => {});
   }
+
+  // Sauvegarder le compte courant dans le switcher multi-compte
+  _pushCurrentAccount();
 
   updateTabBadges();
   showView('results');
