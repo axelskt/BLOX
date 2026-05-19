@@ -1926,12 +1926,10 @@ async function syncSupabaseSession() {
       localStorage.setItem('blowup_access', plan);
       localStorage.setItem('blowup_user_email', user.email);
       _updateNavUser(user.email, plan);
-      // Si on est encore sur la LP → aller sur le dashboard
+      // Si on n'est pas encore sur le dashboard → y aller
       const appView = document.getElementById('view-app');
-      const landingView = document.getElementById('view-landing');
-      if (landingView && landingView.style.display !== 'none' && appView) {
-        showView('app');
-      }
+      const isOnApp = appView && appView.style.display !== 'none';
+      if (!isOnApp) showView('app');
     } else if (user.email) {
       // Plan pas encore chargé (RLS ou timing) → on garde ce qu'on a en localStorage
       _updateNavUser(user.email, localStorage.getItem('blowup_access') || 'free');
@@ -2110,13 +2108,14 @@ async function handlePasswordLogin() {
         msg.textContent = '🔒 Aucun accès trouvé pour cet email. Achète un plan pour continuer.';
         return;
       }
-      // Plan OK → fermer la modal directement
+      // Plan OK → écrire localStorage AVANT closeLoginModal (sinon showView reste sur LP)
+      localStorage.setItem('blowup_access', userData.plan);
+      localStorage.setItem('blowup_user_email', email);
       btn.disabled = false; btn.textContent = 'Se connecter →';
-      closeLoginModal();
-      syncSupabaseSession();
+      closeLoginModal(); // plan en localStorage → showView('app') appelé correctement
       return;
     } catch(e) {
-      // Timeout → fermer quand même (onAuthStateChange prendra le relais)
+      // Timeout → onAuthStateChange prendra le relais via syncSupabaseSession
       btn.disabled = false; btn.textContent = 'Se connecter →';
       closeLoginModal();
     }
