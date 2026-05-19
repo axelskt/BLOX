@@ -856,6 +856,9 @@
         <p id="fAuditResumeText" style="font-size:14px;color:#d1d5db;line-height:1.6"></p>
       </div>
 
+      <!-- Phase algo badge -->
+      <div id="fAuditPhaseAlgo" style="display:none"></div>
+
       <!-- Points forts / Points faibles -->
       <div id="fAuditPF" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
         <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.18);border-radius:12px;padding:12px 14px">
@@ -3214,6 +3217,33 @@ TENDANCE/HYPE : "On voit ça partout sur Instagram" | "Ça a cassé Internet" | 
 
 RÈGLE HOOKS : Quand tu génères des hooks_personnalises, adapte les templates ci-dessus à la niche exacte de l'utilisateur. Remplace les ___ par des éléments spécifiques à leur business/niche. Mélange les déclencheurs psychologiques (curiosité + preuve + identification).
 
+COMMENT FONCTIONNE VRAIMENT L'ALGORITHME TIKTOK (utilise ces règles dans le diagnostic) :
+
+SYSTÈME DE POINTS PAR VIDÉO — TikTok score chaque vidéo selon les interactions :
++1 point = Like | +2 points = Commentaire | +3 points = Partage | +4 points = Vu en entier | +5 points = Revu plusieurs fois (replay)
+→ Le watch time (= temps de visionnage complet) ET les replays sont les signaux les plus puissants. Un replay = +5 points. Une vidéo revue 3 fois = +15 points total.
+→ Conséquence diagnostic : si engagement likes élevé mais commentaires faibles → l'audience consomme passivement, pas de signal commentaire (+2 pts manquants). Si peu de partages → contenu non "save-worthy" (à sauvegarder).
+
+DISTRIBUTION EN PALIERS — TikTok montre d'abord à 200-300 personnes test :
+Si ce groupe interagit fort → distribution élargie (700 → 1 200 → 2 000 → 5 000 → VIRAL)
+Si engagement faible → la vidéo s'arrête là. C'est normal d'avoir 200-350 vues au début.
+→ Progression normale : 300 vues → 700 → 1 200 → 2 000 → 5 000 → viral
+
+PHASE DES 70 PREMIÈRES VIDÉOS — règle critique :
+Avant 70 vidéos publiées, l'algorithme n'a pas encore "calibré" le compte. Les vues faibles sont normales. MAIS il ne faut PAS garder la même stratégie aveuglément : il faut tester des hooks différents, des CTA variés et des formats divers à chaque vidéo pour trouver ce qui fait décoller. Volume + variation = apprentissage.
+→ Si videoCount < 70 : l'utilisateur est en phase d'apprentissage. Conseiller de maintenir le volume ET de varier les hooks/CTA à chaque vidéo pour identifier ce qui marche.
+→ Si videoCount >= 70 : l'algorithme est calibré. Analyser les patterns de ce qui fonctionne et doubler dessus.
+
+4 LEVIERS POUR MAXIMISER LE SCORE (quick wins prioritaires) :
+1. Accroche dans les 2 premières secondes — décide si quelqu'un continue ou scrolle. Question choc, stat surprenante, affirmation bold. = impact direct sur le score "vu en entier" (+4 pts)
+2. Durée optimale : 5-15 secondes pour une vidéo, 6-10 slides pour un carrousel — maximise le taux de visionnage complet (+4 pts) et les replays (+5 pts)
+3. Créer une boucle — la fin de la vidéo raccorde naturellement au début → TikTok rejoue automatiquement → +5 points à chaque replay
+4. CTA commentaires — poser une question dans la vidéo ou dans la légende → chaque commentaire = +2 points → demander : "dis-moi en commentaire si tu as déjà vécu ça" ou "commente 1 si tu veux la suite"
+
+RÈGLE DE CONSISTANCE — la plus ignorée :
+Si l'utilisateur ne poste pas pendant plusieurs jours → l'algorithme repart de zéro et pénalise l'inactivité. Il faut avoir des vidéos en avance (batch content) pour tenir même les jours sans inspiration.
+→ Si fréquence estimée < 0.5 vidéo/jour → signaler le risque de pénalité d'inactivité et recommander le batch content (filmer 5-10 vidéos en avance)
+
 LISTE DE CRITÈRES DE DIAGNOSTIC :
 HOOK & RÉTENTION : hook faible ou trop lent, chute de rétention dans les 1-3 premières secondes, swipe rate élevé (les gens font défiler immédiatement), rewatch rate faible — ATTENTION : pour les carrousels, le hook = première image/slide, pas une intro vidéo
 CALL TO ACTION : CTA absent, CTA faible ou trop répétitif — ATTENTION : pour les carrousels, le CTA est sur le dernier slide ou dans la légende, pas vocal
@@ -3272,59 +3302,58 @@ REVENUS ACTUELS : ${p.revenue || 'non précisé'}
 ${ttBlock}
 
 INSTRUCTIONS :
-- Si les stats TikTok réelles sont disponibles, commence le resume_compte par une phrase qui cite les chiffres réels (ex: "En X mois tu as publié Y vidéos..."). Ça montre qu'on analyse vraiment ton compte.
+- Si les stats TikTok réelles sont disponibles, commence le resume_compte par une phrase qui cite les chiffres réels (ex: "En X mois tu as publié Y vidéos avec ~Z vidéo/jour et une moyenne de X likes").
+- Si videoCount < 70 : dans phase_algo, indique "apprentissage" et conseille de varier hooks/CTA à chaque vidéo tout en maintenant le volume
+- Si fréquence < 0.5 vidéo/jour : inclure un quick_win sur le batch content et la pénalité d'inactivité
 - Si une offre est déclarée, base TON DIAGNOSTIC dessus — ne prétends pas qu'elle est absente ou floue
 - ADAPTE le diagnostic au format réel déclaré : ne pas critiquer un hook vidéo si le créateur fait des carrousels
 - Recommande des formats COMPLÉMENTAIRES à ce qu'il fait déjà (pas les mêmes)
-- Explique les termes techniques en français simple entre parenthèses`;
-    }
+- Dans les quick_wins, inclure AU MOINS UN levier algorithme concret (boucle, CTA commentaire, durée optimale)
+- Explique les termes techniques en français simple entre parenthèses
 
 Réponds UNIQUEMENT avec ce JSON (sans markdown) :
 {
   "niche_detectee": "string — la niche en 3-5 mots simples",
   "note_compte": number entre 3 et 6,
-  "resume_compte": "string — résumé en 4-6 phrases simples et humaines. Couvre : qui est le créateur, ce qu'il poste/vend, son niveau actuel, ses forces visibles, ses faiblesses et ce qui l'empêche de décoller. Explique les termes techniques en français.",
+  "resume_compte": "string — résumé en 4-6 phrases. Commence par les stats réelles si disponibles (ex: 'En 6 mois tu as publié 90 vidéos soit ~0.5 vidéo/jour...'). Couvre : ce qu'il poste/vend, son niveau actuel, ses forces, ses faiblesses.",
+  "phase_algo": {
+    "phase": "string — 'apprentissage' (< 70 vidéos) | 'calibration' (70-200 vidéos) | 'optimisation' (> 200 vidéos) | 'inconnu' (pas de stats)",
+    "message": "string — message personnalisé sur la phase actuelle, ex: 'Tu es dans la phase apprentissage (37 vidéos publiées). L'algorithme n'est pas encore calibré sur ton contenu — c'est NORMAL. Varie tes hooks et CTA à chaque vidéo pour trouver ce qui cartonne.'",
+    "score_engagement": "string — évaluation de l'engagement basée sur les stats : 'faible' | 'correct' | 'bon' | 'excellent' | 'inconnu'",
+    "alerte_consistance": "boolean — true si fréquence de posting estimée < 0.5 vidéo/jour (risque pénalité inactivité)"
+  },
   "points_forts": ["string — force #1 courte (max 12 mots, en français simple)", "string — force #2"],
   "points_faibles": ["string — faiblesse #1 (en français simple, adapté au format réel)", "string — faiblesse #2"],
   "diagnostic": {
-    "probleme_principal": "string — le vrai blocage #1 en 1 phrase directe, adapté au format réel (carrousel vs vidéo)",
+    "probleme_principal": "string — le vrai blocage #1 en 1 phrase directe, adapté au format réel",
     "raison_perte_argent": "string — pourquoi il/elle laisse de l'argent sur la table EN CE MOMENT, en français simple"
   },
   "quick_wins": [
-    "string — action #1 concrète à faire CETTE SEMAINE (max 15 mots, ultra actionnable, en français)",
-    "string — action #2",
-    "string — action #3"
+    "string — action #1 concrète cette semaine, basée sur les leviers algorithme si pertinent (ex: 'Ajoute une boucle à ta prochaine vidéo → chaque replay = +5 pts algorithme')",
+    "string — action #2 (varier hook ou CTA si < 70 vidéos)",
+    "string — action #3 (batch content si fréquence faible)"
   ],
   "formats_recommandes": [
     {
       "id": number,
-      "nom": "string — ex: Screen recording",
-      "raison": "string — pourquoi ce format est complémentaire à sa stratégie actuelle (1 phrase)",
-      "hook_exemple": "string — exemple de hook pour sa niche avec ce format"
-    },
-    {
-      "id": number,
       "nom": "string",
-      "raison": "string",
-      "hook_exemple": "string"
+      "raison": "string — pourquoi complémentaire à sa stratégie actuelle",
+      "hook_exemple": "string — hook pour sa niche avec ce format"
     },
-    {
-      "id": number,
-      "nom": "string",
-      "raison": "string",
-      "hook_exemple": "string"
-    }
+    { "id": number, "nom": "string", "raison": "string", "hook_exemple": "string" },
+    { "id": number, "nom": "string", "raison": "string", "hook_exemple": "string" }
   ],
   "hooks_personnalises": [
-    "string — hook #1 adapté à sa niche exacte, utilise les templates de la banque de hooks, remplace les ___ par des éléments spécifiques à son business",
-    "string — hook #2 avec un déclencheur psychologique différent (ex: preuve si #1 était curiosité)",
-    "string — hook #3 déclencheur différent encore",
+    "string — hook #1 adapté à sa niche, template banque de hooks avec ___ remplacés",
+    "string — hook #2 déclencheur psychologique différent",
+    "string — hook #3",
     "string — hook #4",
     "string — hook #5"
   ],
-  "recommandation": "string — LA recommandation concrète #1 pour décoller dans les 30 prochains jours, spécifique à leur niche et revenus, en français simple",
-  "besoin_contenu_video": "boolean — true si le compte manque clairement de contenu vidéo court format pour convertir (vs. juste du contenu organique statique)"
-}`
+  "recommandation": "string — LA recommandation #1 pour les 30 prochains jours, spécifique à leur niche et niveau, en français",
+  "besoin_contenu_video": "boolean — true si le compte manque de contenu vidéo court format pour convertir"
+}`;
+    }
   },
 
   2: {
@@ -4638,8 +4667,37 @@ function renderModule1(d) {
   const diag = d.diagnostic || {};
   const analyse = d.analyse || {};
   const wins = d.quick_wins || [];
+  const pa = d.phase_algo || null;
+
+  // Phase algo card
+  const phaseAlgoHtml = pa ? (() => {
+    const phaseColors = {
+      apprentissage: { bg:'rgba(234,179,8,.08)', border:'rgba(234,179,8,.3)', text:'#fbbf24', icon:'🌱' },
+      calibration:   { bg:'rgba(168,85,247,.08)', border:'rgba(168,85,247,.3)', text:'#c4b5fd', icon:'📈' },
+      optimisation:  { bg:'rgba(34,197,94,.08)', border:'rgba(34,197,94,.3)', text:'#86efac', icon:'🔥' },
+      inconnu:       { bg:'rgba(107,114,128,.06)', border:'rgba(107,114,128,.2)', text:'#9ca3af', icon:'📊' },
+    };
+    const c = phaseColors[pa.phase] || phaseColors.inconnu;
+    const alertHtml = pa.alerte_consistance
+      ? `<div style="margin-top:8px;padding:8px 12px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;font-size:11px;color:#fca5a5;display:flex;gap:8px"><span>⚠️</span><span>Fréquence faible — l'algorithme pénalise l'inactivité. Prépare du contenu en avance (batch filming).</span></div>`
+      : '';
+    const engHtml = pa.score_engagement && pa.score_engagement !== 'inconnu'
+      ? `<span style="font-size:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:2px 8px;color:#9ca3af">Engagement ${pa.score_engagement}</span>`
+      : '';
+    return `<div class="card p-5" style="border-color:${c.border};background:${c.bg}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:16px">${c.icon}</span>
+        <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:${c.text}">Phase ${pa.phase || ''}</span>
+        ${engHtml}
+      </div>
+      <p style="font-size:13px;color:#d1d5db;line-height:1.6;margin:0">${esc(pa.message||'')}</p>
+      ${alertHtml}
+    </div>`;
+  })() : '';
 
   return `<div class="fade-up space-y-5">
+    ${phaseAlgoHtml}
+
     <!-- Problème principal -->
     <div class="card p-6" style="border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04)">
       <div class="section-lbl" style="color:#ef4444">⚠ Problème principal</div>
@@ -5730,6 +5788,33 @@ function populateFreeAudit() {
     pfWrap.style.display = 'grid';
     if (fortsEl)  fortsEl.innerHTML  = forts.map(f  => `<div style="font-size:12px;color:#86efac;display:flex;gap:6px"><span style="flex-shrink:0;color:#22c55e">✓</span>${f}</div>`).join('');
     if (faiblesEl) faiblesEl.innerHTML = faibles.map(f => `<div style="font-size:12px;color:#fca5a5;display:flex;gap:6px"><span style="flex-shrink:0;color:#ef4444">✗</span>${f}</div>`).join('');
+  }
+
+  // Phase algo badge (inject after resume if element exists)
+  const phaseAlgo = d.phase_algo;
+  const phaseWrap = document.getElementById('fAuditPhaseAlgo');
+  if (phaseWrap && phaseAlgo) {
+    const phaseColors = {
+      apprentissage: { bg:'rgba(234,179,8,.1)', border:'rgba(234,179,8,.25)', text:'#fbbf24', icon:'🌱' },
+      calibration:   { bg:'rgba(168,85,247,.1)', border:'rgba(168,85,247,.25)', text:'#c4b5fd', icon:'📈' },
+      optimisation:  { bg:'rgba(34,197,94,.1)', border:'rgba(34,197,94,.25)', text:'#86efac', icon:'🔥' },
+      inconnu:       { bg:'rgba(107,114,128,.08)', border:'rgba(107,114,128,.2)', text:'#9ca3af', icon:'📊' },
+    };
+    const c = phaseColors[phaseAlgo.phase] || phaseColors.inconnu;
+    const alertHtml = phaseAlgo.alerte_consistance
+      ? `<div style="margin-top:8px;padding:7px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;font-size:11px;color:#fca5a5">⚠️ Fréquence faible détectée — risque de pénalité d'inactivité. Prépare tes vidéos en avance (batch content).</div>`
+      : '';
+    phaseWrap.style.display = 'block';
+    phaseWrap.innerHTML = `
+      <div style="background:${c.bg};border:1px solid ${c.border};border-radius:12px;padding:12px 16px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:16px">${c.icon}</span>
+          <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${c.text}">Phase ${phaseAlgo.phase || ''}</span>
+          ${phaseAlgo.score_engagement && phaseAlgo.score_engagement !== 'inconnu' ? `<span style="margin-left:auto;font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:2px 8px;color:#9ca3af">Engagement ${phaseAlgo.score_engagement}</span>` : ''}
+        </div>
+        <p style="font-size:12px;color:#d1d5db;line-height:1.6;margin:0">${phaseAlgo.message || ''}</p>
+        ${alertHtml}
+      </div>`;
   }
 
   // Problème principal
