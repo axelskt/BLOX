@@ -2700,7 +2700,8 @@ const S = {
   videoTranscript: '',
   mcTranscript: '',
   activeTab: 1,
-  generating: false,
+  generating: false,       // false | module number currently generating
+  generatingQueue: null,  // module number queued to generate after current finishes
   // Multi-account
   accounts: [],          // [{ id, handle, platform, type, profile, modules, savedAt }]
   activeAccountIdx: -1,  // index dans accounts (-1 = analyse en cours non sauvée)
@@ -4160,20 +4161,39 @@ async function switchTab(n) {
 
 /* ── Generate module ── */
 async function generateModule(n) {
-  if (S.generating) return;
-  // Starter: Offre, Scripts, Calendrier 30j
+  // Access checks (always immediate)
   const needsStarter = n === 2 || n === 3 || n === 6;
-  // Pro: Spy Concurrent, Audit Concurrent, Analyse Vidéo, Hashtags (et module 8 réservé)
   const needsPro     = n === 7 || n === 8 || n === 9 || n === 10 || n === 12;
-  // Elite: Funnel, Site web, ShortClip
   const needsElite   = n === 4 || n === 5 || n === 11;
   if (needsStarter && !hasStarterAccess()) { openPaywall(); return; }
   if (needsPro     && !hasProAccess())     { openPaywall(); return; }
   if (needsElite   && !hasEliteAccess())   { openPaywall(); return; }
   if (S.modules[n]) { renderModuleContent(); return; }
 
-  S.generating = true;
-  renderModuleContent(true); // show loading state
+  // If another module is generating, queue this one and show spinner for it
+  if (S.generating) {
+    S.generatingQueue = n;
+    // Show "en attente" state only if this is the active tab
+    if (S.activeTab === n) {
+      const el = _getModuleContentEl();
+      if (el) el.innerHTML = `<div class="card p-10 text-center fade-up">
+        <svg class="spin w-8 h-8 text-purple-500 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <p class="text-gray-400">En attente de la génération précédente…</p>
+        <p class="text-gray-600 text-xs mt-1">Module ${MOD_LABELS[n]} sera généré juste après</p>
+      </div>`;
+    }
+    return;
+  }
+
+  await _runGenerateModule(n);
+}
+
+async function _runGenerateModule(n) {
+  S.generating = n;
+  S.generatingQueue = null;
+
+  // Show spinner on active tab
+  if (S.activeTab === n) renderModuleContent(true);
 
   try {
     let prevData;
@@ -4181,28 +4201,25 @@ async function generateModule(n) {
     if (n === 3) prevData = S.modules[2] || S.modules[1];
     if (n === 4) prevData = S.modules[2] || S.modules[1];
     if (n === 5) prevData = S.modules[4] || S.modules[2] || S.modules[1];
-    if (n === 6) prevData = S.modules[1];                  // audit → calendrier
-    if (n === 7) prevData = S.modules[1];                  // audit → spy concurrent
-    if (n === 9) prevData = S.modules[1];                  // audit → audit concurrent
-    if (n === 10) prevData = S.modules[1];                 // audit → analyse vidéo
-    if (n === 11) prevData = S.modules[1];                 // audit → shortclip
-    if (n === 12) prevData = S.modules[1];                 // audit → hashtags
+    if (n === 6) prevData = S.modules[1];
+    if (n === 7) prevData = S.modules[1];
+    if (n === 9) prevData = S.modules[1];
+    if (n === 10) prevData = S.modules[1];
+    if (n === 11) prevData = S.modules[1];
+    if (n === 12) prevData = S.modules[1];
 
-    const pFn = PROMPTS[n].user;
-    const userPrompt = pFn(S.profile, prevData);
+    const userPrompt = PROMPTS[n].user(S.profile, prevData);
 
-    // Auto-retry once on network errors (Load failed, timeout…)
     let result;
     try {
       result = await callClaude(PROMPTS[n].system, userPrompt);
     } catch(e1) {
       if (e1.message === 'no_key') throw e1;
-      // Wait 2s then retry
       await new Promise(r => setTimeout(r, 2000));
       result = await callClaude(PROMPTS[n].system, userPrompt);
     }
     S.modules[n] = result;
-    // Save immediately so navigation doesn't lose the module
+    // Save immediately so navigation never loses this module
     try {
       localStorage.setItem('bloxai_last_analysis', JSON.stringify({
         url: S.profile.url, platform: S.profile.platform,
@@ -4220,8 +4237,14 @@ async function generateModule(n) {
   renderModuleContent();
   updateTabBadges();
 
-  // AvatarAds post-generation nudge (modules 1, 2, 3)
   if ([1, 2, 3].includes(n) && S.modules[n]) showAvatarAdsNudge(n);
+
+  // Process queued module if any
+  const queued = S.generatingQueue;
+  if (queued && !S.modules[queued]) {
+    S.generatingQueue = null;
+    await _runGenerateModule(queued);
+  }
 }
 
 /* ── Generate All accessible modules sequentially ── */
