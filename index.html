@@ -2161,14 +2161,15 @@ const PENDING_ANALYSIS_KEY = 'bloxai_pending_analysis';
 /* Sauvegarder l'analyse en cours — sans TTL (persistant) */
 function savePendingAnalysis(email) {
   if (!S.modules[1]) return; // rien à sauvegarder
+  const now = Date.now();
   const snapshot = {
-    url:      S.profile.url      || '',
-    platform: S.profile.platform || '',
-    profile:  S.profile,
-    modules:  S.modules,
-    email:    email || localStorage.getItem('blowup_email') || '',
-    savedAt:  Date.now(),
-    // Pas d'expiresAt → analyse conservée indéfiniment
+    url:       S.profile.url      || '',
+    platform:  S.profile.platform || '',
+    profile:   S.profile,
+    modules:   S.modules,
+    email:     email || localStorage.getItem('blowup_email') || '',
+    savedAt:   now,
+    expiresAt: now + _getAnalysisTTL(), // 14j starter / 30j pro+élite
   };
   try { localStorage.setItem(PENDING_ANALYSIS_KEY, JSON.stringify(snapshot)); } catch(e) {}
   // Aussi mettre à jour bloxai_last_analysis
@@ -2246,6 +2247,11 @@ function _getPendingAnalysis() {
     if (!raw) return null;
     const data = JSON.parse(raw);
     if (!data?.modules?.[1]) return null; // invalide
+    // Vérifier TTL si expiresAt présent
+    if (data.expiresAt && Date.now() > data.expiresAt) {
+      localStorage.removeItem(PENDING_ANALYSIS_KEY);
+      return null; // expiré
+    }
     return data;
   } catch(e) { return null; }
 }
@@ -2262,6 +2268,8 @@ function _applyAnalysisSnapshot(snap) {
       profile: snap.profile, modules: snap.modules, savedAt: snap.savedAt || Date.now(),
     }));
   } catch(e) {}
+  // Auto-generate missing accessible modules (délai pour laisser le DOM se stabiliser)
+  setTimeout(() => _autoGenerateAll(), 1200);
   return true;
 }
 
@@ -2700,8 +2708,8 @@ const S = {
   videoTranscript: '',
   mcTranscript: '',
   activeTab: 1,
-  generating: false,       // false | module number currently generating
-  generatingQueue: null,  // module number queued to generate after current finishes
+  generating: false,      // false | module number currently generating
+  generateQueue: [],      // array of module numbers queued to generate
   // Multi-account
   accounts: [],          // [{ id, handle, platform, type, profile, modules, savedAt }]
   activeAccountIdx: -1,  // index dans accounts (-1 = analyse en cours non sauvée)
@@ -2718,7 +2726,12 @@ const ACCOUNT_LIMITS = {
 const ACCOUNTS_KEY = 'bloxai_accounts_v2';
 
 function _loadAccounts() {
-  try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]'); } catch(e) { return []; }
+  try {
+    const now  = Date.now();
+    const list = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
+    // Filtrer les comptes expirés (TTL dépassé)
+    return list.filter(a => !a.expiresAt || a.expiresAt > now);
+  } catch(e) { return []; }
 }
 function _saveAccounts() {
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(S.accounts));
@@ -2758,8 +2771,10 @@ function _pushCurrentAccount() {
 
   // Check if handle already exists → update instead of duplicate
   const existingIdx = S.accounts.findIndex(a => a.handle === handle && a.type === type);
+  const now = Date.now();
   const entry = { id: existingIdx >= 0 ? S.accounts[existingIdx].id : id, handle, platform: S.profile.platform || 'tiktok', type,
-    profile: { ...S.profile }, modules: { ...S.modules }, savedAt: Date.now() };
+    profile: { ...S.profile }, modules: { ...S.modules }, savedAt: now,
+    expiresAt: now + _getAnalysisTTL() };
 
   if (existingIdx >= 0) {
     S.accounts[existingIdx] = entry;
@@ -2782,8 +2797,12 @@ function _switchAccount(idx) {
   S.profile  = { ...acc.profile };
   S.modules  = { 1:null,2:null,3:null,4:null,5:null,6:null,7:null,8:null,9:null,10:null,11:null,12:null, ...acc.modules };
   S.activeTab = 1;
-  renderResults();
+  S.generateQueue = []; // reset queue for new account
+  _showModuleInDash(1);
+  updateTabBadges();
   _renderAccountSwitcher();
+  // Auto-générer les modules manquants pour ce compte
+  setTimeout(() => _autoGenerateAll(), 600);
 }
 
 function _deleteAccount(idx, e) {
@@ -4170,10 +4189,9 @@ async function generateModule(n) {
   if (needsElite   && !hasEliteAccess())   { openPaywall(); return; }
   if (S.modules[n]) { renderModuleContent(); return; }
 
-  // If another module is generating, queue this one and show spinner for it
+  // If another module is generating, enqueue and show waiting state
   if (S.generating) {
-    S.generatingQueue = n;
-    // Show "en attente" state only if this is the active tab
+    if (!S.generateQueue.includes(n)) S.generateQueue.push(n);
     if (S.activeTab === n) {
       const el = _getModuleContentEl();
       if (el) el.innerHTML = `<div class="card p-10 text-center fade-up">
@@ -4190,7 +4208,8 @@ async function generateModule(n) {
 
 async function _runGenerateModule(n) {
   S.generating = n;
-  S.generatingQueue = null;
+  // Remove from queue if it was queued
+  S.generateQueue = S.generateQueue.filter(q => q !== n);
 
   // Show spinner on active tab
   if (S.activeTab === n) renderModuleContent(true);
@@ -4239,11 +4258,16 @@ async function _runGenerateModule(n) {
 
   if ([1, 2, 3].includes(n) && S.modules[n]) showAvatarAdsNudge(n);
 
-  // Process queued module if any
-  const queued = S.generatingQueue;
-  if (queued && !S.modules[queued]) {
-    S.generatingQueue = null;
-    await _runGenerateModule(queued);
+  // Process next queued module
+  _updateAutoGenBanner();
+  const next = S.generateQueue.shift();
+  if (next && !S.modules[next]) {
+    await _runGenerateModule(next);
+  } else if (S.generateQueue.length > 0) {
+    // Skip already-done, try next
+    await _runGenerateModule(S.generateQueue.shift());
+  } else {
+    _hideAutoGenBanner();
   }
 }
 
@@ -4357,6 +4381,97 @@ async function generateAllModules() {
   savePendingAnalysis(_gaEmail);
 }
 
+/* ══════════════════════════════════════════════════════
+   AUTO-GENERATE : lance automatiquement tous les modules
+   accessibles dès qu'une analyse est disponible
+   ══════════════════════════════════════════════════════ */
+
+function _getAnalysisTTL() {
+  // TTL en ms selon le plan
+  if (hasEliteAccess() || hasProAccess()) return 30 * 86400000; // 30 jours
+  if (hasStarterAccess()) return 14 * 86400000;                  // 14 jours
+  return 3 * 86400000;                                            // 3 jours (trial/free)
+}
+
+function _autoGenerateAll() {
+  if (!S.modules[1]) return; // besoin de l'audit d'abord
+  const order = [2, 3, 6, 7, 9, 10, 12, 4, 5, 11];
+  const missing = order.filter(n => {
+    if (S.modules[n]) return false;
+    const ns = n===2||n===3||n===6;
+    const np = n===7||n===9||n===10||n===12;
+    const ne = n===4||n===5||n===11;
+    return (ns&&hasStarterAccess())||(np&&hasProAccess())||(ne&&hasEliteAccess());
+  });
+  if (missing.length === 0) return;
+
+  // Ajouter au queue (sans doublons)
+  missing.forEach(n => { if (!S.generateQueue.includes(n)) S.generateQueue.push(n); });
+
+  // Afficher la bannière de progression
+  _showAutoGenBanner(missing.length);
+
+  // Lancer si rien en cours
+  if (!S.generating) {
+    const first = S.generateQueue.shift();
+    if (first) _runGenerateModule(first);
+  }
+}
+
+/* Bannière de progression auto-génération */
+function _showAutoGenBanner(total) {
+  let banner = document.getElementById('autoGenBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'autoGenBanner';
+    banner.style.cssText = 'margin-bottom:14px;padding:12px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(219,39,119,.08));border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;gap:12px;animation:fadeIn .3s ease';
+    banner.innerHTML = `
+      <div style="width:18px;height:18px;border:2px solid rgba(168,85,247,.3);border-top-color:#a855f7;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>
+      <div style="flex:1">
+        <div id="autoGenBannerTitle" style="font-size:12px;font-weight:800;color:#c084fc">⚡ Génération automatique des modules…</div>
+        <div style="margin-top:4px;height:4px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden">
+          <div id="autoGenProgress" style="height:100%;background:linear-gradient(90deg,#7c3aed,#db2777);border-radius:99px;width:0%;transition:width .5s ease"></div>
+        </div>
+      </div>
+      <div id="autoGenBannerCount" style="font-size:11px;font-weight:700;color:#9ca3af;flex-shrink:0">0/${total}</div>`;
+    // Injecter dans la zone dashboard
+    const cardsGrid = document.getElementById('dashCardsGrid');
+    const moduleContent = document.getElementById('dashModuleContent');
+    const parent = (cardsGrid || moduleContent)?.parentElement;
+    if (parent) parent.insertBefore(banner, cardsGrid || moduleContent);
+    else document.body.appendChild(banner);
+  }
+  banner.dataset.total = total;
+  banner.dataset.done  = '0';
+  banner.style.display = 'flex';
+}
+
+function _updateAutoGenBanner() {
+  const banner = document.getElementById('autoGenBanner');
+  if (!banner) return;
+  const total = parseInt(banner.dataset.total || '1');
+  const done  = parseInt(banner.dataset.done  || '0') + 1;
+  banner.dataset.done = done;
+  const pct = Math.min(100, Math.round(done / total * 100));
+  const prog = document.getElementById('autoGenProgress');
+  const cnt  = document.getElementById('autoGenBannerCount');
+  const title= document.getElementById('autoGenBannerTitle');
+  if (prog)  prog.style.width  = pct + '%';
+  if (cnt)   cnt.textContent   = `${done}/${total}`;
+  if (title && done >= total) title.textContent = '✅ Tous les modules générés !';
+}
+
+function _hideAutoGenBanner() {
+  const banner = document.getElementById('autoGenBanner');
+  if (!banner) return;
+  const done  = parseInt(banner.dataset.done  || '0');
+  const total = parseInt(banner.dataset.total || '1');
+  if (done >= total) {
+    // Succès — laisser 3s puis disparaître
+    setTimeout(() => { banner.style.opacity = '0'; banner.style.transition = 'opacity .5s'; setTimeout(() => banner.remove(), 500); }, 3000);
+  }
+}
+
 /* ── Render results view ── */
 function renderResults() {
   const url = S.profile.url || 'Business analysé';
@@ -4398,8 +4513,10 @@ function renderResults() {
   savePendingAnalysis(_email);
 
   updateTabBadges();
-  showView('results');
-  switchTab(1);
+  showView('app');
+  _showModuleInDash(1);
+  // Auto-générer tous les modules accessibles dès la fin de l'analyse
+  setTimeout(() => _autoGenerateAll(), 800);
 }
 
 function restoreLastAnalysis(tab) {
