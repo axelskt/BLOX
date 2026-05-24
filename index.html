@@ -1282,6 +1282,9 @@
       <span style="font-size:11px;font-weight:400;color:#4a4a70;letter-spacing:.3px">by IA MANAGER</span>
     </div>
     <div class="flex items-center gap-3">
+      <!-- Dark / Light toggle -->
+      <button id="themeToggleBtn" onclick="toggleTheme()" title="Mode clair / sombre"
+        style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s">🌙</button>
       <div id="navUserInfo" style="display:none;align-items:center;gap:8px"></div>
       <button id="navLogoutBtn" onclick="supaLogout()" style="display:none;font-size:12px;font-weight:600;color:#f87171;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);padding:6px 14px;border-radius:99px;cursor:pointer">Se déconnecter</button>
       <button id="navLoginBtn" onclick="openLoginModal()" style="font-size:12px;font-weight:700;color:#a855f7;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);padding:6px 14px;border-radius:99px;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
@@ -1524,6 +1527,33 @@
     .axe-two-col { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
     @media(max-width:600px){.axe-two-col{grid-template-columns:1fr;}}
     .forte-pill { display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:5px 12px;font-size:12px;color:#86efac;font-weight:600;margin:3px; }
+
+    /* ════ LIGHT MODE ════ */
+    body.light-mode { background:#f4f4f8 !important; color:#1a1a2e !important; }
+    body.light-mode nav { background:rgba(255,255,255,.95) !important; border-color:#e5e7eb !important; }
+    body.light-mode .dash-sidebar { background:#ffffff !important; border-color:#e5e7eb !important; }
+    body.light-mode .dash-main { background:#f4f4f8 !important; }
+    body.light-mode .dash-card { background:#ffffff !important; border-color:#e5e7eb !important; }
+    body.light-mode .dash-card:hover { border-color:#a855f7 !important; }
+    body.light-mode .card { background:#ffffff !important; border-color:#e5e7eb !important; }
+    body.light-mode .inp { background:#f9fafb !important; border-color:#d1d5db !important; color:#1a1a2e !important; }
+    body.light-mode .inp::placeholder { color:#9ca3af !important; }
+    body.light-mode #view-app { background:#f4f4f8 !important; }
+    body.light-mode #view-results { background:#f4f4f8 !important; }
+    body.light-mode .res-sidebar { background:#ffffff !important; border-color:#e5e7eb !important; }
+    body.light-mode .res-main { background:#f4f4f8 !important; }
+    body.light-mode .res-topbar { background:#ffffff !important; border-color:#e5e7eb !important; }
+    body.light-mode .tab { background:#f3f4f6 !important; color:#4b5563 !important; border-color:#e5e7eb !important; }
+    body.light-mode .tab-active { background:linear-gradient(135deg,#7c3aed,#db2777) !important; color:#fff !important; }
+    body.light-mode h1,body.light-mode h2,body.light-mode h3 { color:#1a1a2e !important; }
+    body.light-mode p,body.light-mode span,body.light-mode div { color:inherit; }
+    body.light-mode .text-gray-400 { color:#6b7280 !important; }
+    body.light-mode .text-gray-500 { color:#9ca3af !important; }
+    body.light-mode .font-bold,.light-mode .font-black { color:#1a1a2e; }
+    body.light-mode #dashModuleContent { background:#f4f4f8; }
+    body.light-mode .axe-card { background:#ffffff !important; border-color:#e5e7eb !important; }
+    body.light-mode .mod-nav-item:hover { background:rgba(124,58,237,.06) !important; }
+    body.light-mode #themeToggleBtn { background:#f3f4f6 !important; border-color:#e5e7eb !important; }
   </style>
   <div style="background:#08080f;border-top:1px solid #0f0f1e;border-bottom:1px solid #0f0f1e" class="py-24">
     <div class="max-w-2xl mx-auto px-5">
@@ -1791,6 +1821,20 @@
         </div>
 
       </div><!-- /dashCardsGrid -->
+
+      <!-- Module content inline (remplace les cards quand on clique un module) -->
+      <div id="dashModuleContent" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.06)">
+          <button onclick="_backToDashCards()" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#9ca3af;font-size:12px;font-weight:700;cursor:pointer">← Dashboard</button>
+          <div id="dashModuleTitle" style="font-size:14px;font-weight:800;color:#e2e8f0"></div>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button onclick="generateAllModules()" id="btnGenerateAllDash" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#db2777);border:none;color:#fff;cursor:pointer">⚡ Tout générer</button>
+            <button onclick="exportAnalysis()" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#9ca3af;cursor:pointer">⬇ Export</button>
+          </div>
+        </div>
+        <div id="dashModuleInner"></div>
+      </div>
+
     </main>
 
   </div><!-- /dash-wrap -->
@@ -2364,6 +2408,22 @@ function _updateNavUser(email, plan) {
   if (info) info.innerHTML = `<div style="margin-bottom:4px;font-weight:600;color:#e2e8f0">${email}</div><div style="font-size:11px;background:${bgs[plan]||bgs.starter};color:${colors[plan]||colors.starter};display:inline-block;padding:2px 8px;border-radius:99px;font-weight:800;letter-spacing:.5px">${planLabels[plan]||plan.toUpperCase()}</div>`;
 }
 
+/* ── Dark / Light mode ── */
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('bloxai_theme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = isLight ? '☀️' : '🌙';
+}
+function _applyTheme() {
+  const saved = localStorage.getItem('bloxai_theme');
+  if (saved === 'light') {
+    document.body.classList.add('light-mode');
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.textContent = '☀️';
+  }
+}
+
 function openLoginModal() {
   const modal = document.getElementById('loginModal');
   if (!modal) return;
@@ -2906,6 +2966,9 @@ window.onload = () => {
     setTimeout(() => { alert('🚀 Accès Starter activé ! Tu peux maintenant analyser toutes tes plateformes.'); }, 500);
   }
 
+  // Appliquer le thème sauvegardé
+  _applyTheme();
+
   // Charger les comptes multi-comptes depuis localStorage
   S.accounts = _loadAccounts();
   _renderAccountSwitcher();
@@ -3256,12 +3319,13 @@ function _dashRender(plan, active, accent) {
           ? `<span style="width:7px;height:7px;border-radius:50%;background:#1e1e30;border:1px solid #2a2a45;flex-shrink:0;margin-left:auto"></span>`
           : `<span style="font-size:10px;margin-left:auto;color:#2a2a45">🔒</span>`;
       const clickAction = unlocked
-        ? (hasAnalysis ? `restoreLastAnalysis(${m.tab})` : `startAnalysisFromApp()`)
+        ? (S.modules?.[1] ? `_showModuleInDash(${m.tab})` : `startAnalysisFromApp()`)
         : ``;
       return `<div class="mod-nav-item ${isDone?'done':''} ${unlocked?'':'locked-item'}"
-        style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;cursor:${unlocked?'pointer':'default'};transition:background .15s;margin-bottom:2px;border:1px solid transparent;${unlocked?'':'opacity:.35'}"
+        data-tab="${m.tab}"
+        style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;cursor:${unlocked?'pointer':'default'};transition:all .15s;margin-bottom:2px;border:1px solid transparent;${unlocked?'':'opacity:.35'}"
         onmouseover="${unlocked?"this.style.background='rgba(255,255,255,.04)'":''}"
-        onmouseout="${unlocked?"this.style.background='transparent'":''}"
+        onmouseout="if(this.dataset.tab != ${S.activeTab}) this.style.background=''"
         onclick="${clickAction}">
         <span style="font-size:14px;width:20px;text-align:center;flex-shrink:0">${m.icon}</span>
         <span style="font-size:12px;font-weight:600;color:${isDone?'#c4b5fd':unlocked?'#9ca3af':'#4b5563'};flex:1;line-height:1.3">${m.label}</span>
@@ -4296,22 +4360,76 @@ function renderResults() {
 
 function restoreLastAnalysis(tab) {
   try {
-    // Si S.modules[1] déjà en mémoire → utiliser directement (pas besoin de localStorage)
-    if (S.modules && S.modules[1]) {
-      renderResults();
-      if (tab) setTimeout(() => switchTab(tab), 50);
-      return;
+    // Charger depuis localStorage si pas en mémoire
+    if (!S.modules?.[1]) {
+      const last = JSON.parse(localStorage.getItem('bloxai_last_analysis') || 'null')
+                 || _getPendingAnalysis();
+      if (!last) return;
+      S.profile     = last.profile  || S.profile;
+      S.modules     = last.modules  || S.modules;
+      S._pendingUrl = last.url || '';
     }
-    // Sinon charger depuis localStorage
-    const last = JSON.parse(localStorage.getItem('bloxai_last_analysis') || 'null')
-               || _getPendingAnalysis();
-    if (!last) return;
-    S.profile     = last.profile  || S.profile;
-    S.modules     = last.modules  || S.modules;
-    S._pendingUrl = last.url || '';
-    renderResults();
-    if (tab) setTimeout(() => switchTab(tab), 50);
+    // Afficher dans le dashboard (sans changer de vue)
+    _showModuleInDash(tab || 1);
   } catch(e) {}
+}
+
+/* ── Afficher un module dans la zone principale du dashboard ── */
+function _showModuleInDash(tab) {
+  tab = tab || S.activeTab || 1;
+  S.activeTab = tab;
+
+  // Mettre à jour le titre
+  const MOD_NAMES = {1:'Audit TikTok',2:'Offre & Monétisation',3:'Scripts viraux',
+    4:'Funnel & Conversion',5:'Site web IA',6:'Calendrier 30j',
+    7:'Spy Concurrent',9:'Audit Concurrent',10:'Analyse Vidéo',
+    11:'ShortClip IA',12:'Hashtags IA'};
+  const titleEl = document.getElementById('dashModuleTitle');
+  if (titleEl) titleEl.textContent = MOD_NAMES[tab] || '';
+
+  // Basculer cards ↔ module content
+  const cardsEl   = document.getElementById('dashCardsGrid');
+  const moduleEl  = document.getElementById('dashModuleContent');
+  const bannerEl  = document.getElementById('lastAnalysisBanner');
+  if (cardsEl)  cardsEl.style.display  = 'none';
+  if (moduleEl) moduleEl.style.display = 'block';
+  if (bannerEl) bannerEl.style.display = 'none';
+
+  // Mettre à jour l'état actif dans la sidebar du dashboard
+  document.querySelectorAll('.mod-nav-item').forEach(el => {
+    const elTab = parseInt(el.dataset.tab || '0');
+    el.style.background   = elTab === tab ? 'rgba(124,58,237,.12)' : '';
+    el.style.borderColor  = elTab === tab ? 'rgba(124,58,237,.25)' : 'transparent';
+  });
+
+  // Rendre le contenu
+  updateTabBadges();
+  renderModuleContent();
+
+  // Auto-génération si module vide + accès
+  if (tab > 1 && S.modules[1] && !S.modules[tab] && !S.generating) {
+    const needsStarter = tab === 2 || tab === 3 || tab === 6;
+    const needsPro     = tab === 7 || tab === 9 || tab === 10 || tab === 12;
+    const needsElite   = tab === 4 || tab === 5 || tab === 11;
+    const hasAccess    = (needsStarter && hasStarterAccess()) ||
+                         (needsPro     && hasProAccess())     ||
+                         (needsElite   && hasEliteAccess());
+    if (hasAccess) generateModule(tab);
+  }
+}
+
+/* ── Retour aux cards du dashboard ── */
+function _backToDashCards() {
+  const cardsEl  = document.getElementById('dashCardsGrid');
+  const moduleEl = document.getElementById('dashModuleContent');
+  if (cardsEl)  cardsEl.style.display  = '';
+  if (moduleEl) moduleEl.style.display = 'none';
+  // Désactiver tous les modules dans la sidebar
+  document.querySelectorAll('.mod-nav-item').forEach(el => {
+    el.style.background  = '';
+    el.style.borderColor = 'transparent';
+  });
+  _refreshAppHeader();
 }
 
 /* ── Générateur de script viral ── */
@@ -4861,8 +4979,17 @@ function updateTabBadges() {
 }
 
 /* ── Render module content ── */
+function _getModuleContentEl() {
+  const appView = document.getElementById('view-app');
+  const inApp   = appView && appView.style.display !== 'none';
+  return inApp
+    ? document.getElementById('dashModuleInner')
+    : document.getElementById('moduleContent');
+}
+
 function renderModuleContent(loading=false) {
-  const el = document.getElementById('moduleContent');
+  const el = _getModuleContentEl();
+  if (!el) return;
   const n  = S.activeTab;
   const data = S.modules[n];
 
