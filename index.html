@@ -3244,18 +3244,29 @@ function _dashRender(plan, active, accent) {
   }
   const hasAnalysis = !!localStorage.getItem('bloxai_last_analysis');
 
-  /* Sidebar toggles */
+  /* Sidebar — nav items cliquables style Whoscale */
   const togglesEl = document.getElementById('dashModuleToggles');
   if (togglesEl) {
     togglesEl.innerHTML = _DASH_MODULES.map(m => {
       const unlocked = m.plans.includes(plan);
-      const checked = active.includes(m.tab) && unlocked;
-      return `<label class="mod-toggle" style="opacity:${unlocked?1:0.4}" onclick="event.preventDefault();${unlocked?'toggleDashModule('+m.tab+')':''}">
-        <input type="checkbox" ${checked?'checked':''} ${unlocked?'':'disabled'} style="accent-color:${accent}" onclick="event.stopPropagation()">
-        <span style="font-size:14px">${m.icon}</span>
-        <span style="font-size:12px;font-weight:600;color:${unlocked?'#cbd5e1':'#4b5563'}">${m.label}</span>
-        ${unlocked?'':'<span style="margin-left:auto;font-size:10px">🔒</span>'}
-      </label>`;
+      const isDone   = !!(S.modules && S.modules[m.tab]);
+      const statusDot = isDone
+        ? `<span style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;margin-left:auto;box-shadow:0 0 5px rgba(34,197,94,.5)"></span>`
+        : unlocked
+          ? `<span style="width:7px;height:7px;border-radius:50%;background:#1e1e30;border:1px solid #2a2a45;flex-shrink:0;margin-left:auto"></span>`
+          : `<span style="font-size:10px;margin-left:auto;color:#2a2a45">🔒</span>`;
+      const clickAction = unlocked
+        ? (hasAnalysis ? `restoreLastAnalysis(${m.tab})` : `startAnalysisFromApp()`)
+        : ``;
+      return `<div class="mod-nav-item ${isDone?'done':''} ${unlocked?'':'locked-item'}"
+        style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;cursor:${unlocked?'pointer':'default'};transition:background .15s;margin-bottom:2px;border:1px solid transparent;${unlocked?'':'opacity:.35'}"
+        onmouseover="${unlocked?"this.style.background='rgba(255,255,255,.04)'":''}"
+        onmouseout="${unlocked?"this.style.background='transparent'":''}"
+        onclick="${clickAction}">
+        <span style="font-size:14px;width:20px;text-align:center;flex-shrink:0">${m.icon}</span>
+        <span style="font-size:12px;font-weight:600;color:${isDone?'#c4b5fd':unlocked?'#9ca3af':'#4b5563'};flex:1;line-height:1.3">${m.label}</span>
+        ${statusDot}
+      </div>`;
     }).join('');
   }
 
@@ -4285,13 +4296,21 @@ function renderResults() {
 
 function restoreLastAnalysis(tab) {
   try {
-    const last = JSON.parse(localStorage.getItem('bloxai_last_analysis') || 'null');
+    // Si S.modules[1] déjà en mémoire → utiliser directement (pas besoin de localStorage)
+    if (S.modules && S.modules[1]) {
+      renderResults();
+      if (tab) setTimeout(() => switchTab(tab), 50);
+      return;
+    }
+    // Sinon charger depuis localStorage
+    const last = JSON.parse(localStorage.getItem('bloxai_last_analysis') || 'null')
+               || _getPendingAnalysis();
     if (!last) return;
-    S.profile  = last.profile  || S.profile;
-    S.modules  = last.modules  || S.modules;
+    S.profile     = last.profile  || S.profile;
+    S.modules     = last.modules  || S.modules;
     S._pendingUrl = last.url || '';
     renderResults();
-    if (tab) setTimeout(() => switchTab(tab), 100);
+    if (tab) setTimeout(() => switchTab(tab), 50);
   } catch(e) {}
 }
 
