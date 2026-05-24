@@ -1546,7 +1546,6 @@
     body.light-mode .tab { background:#f3f4f6 !important; color:#4b5563 !important; border-color:#e5e7eb !important; }
     body.light-mode .tab-active { background:linear-gradient(135deg,#7c3aed,#db2777) !important; color:#fff !important; }
     body.light-mode h1,body.light-mode h2,body.light-mode h3 { color:#1a1a2e !important; }
-    body.light-mode p,body.light-mode span,body.light-mode div { color:inherit; }
     body.light-mode .text-gray-400 { color:#6b7280 !important; }
     body.light-mode .text-gray-500 { color:#9ca3af !important; }
     body.light-mode .font-bold,.light-mode .font-black { color:#1a1a2e; }
@@ -1554,6 +1553,93 @@
     body.light-mode .axe-card { background:#ffffff !important; border-color:#e5e7eb !important; }
     body.light-mode .mod-nav-item:hover { background:rgba(124,58,237,.06) !important; }
     body.light-mode #themeToggleBtn { background:#f3f4f6 !important; border-color:#e5e7eb !important; }
+
+    /* ── Light mode : module content overrides ── */
+    /* Cartes contenu modules */
+    body.light-mode .script-card { background:#f8f9ff !important; border-color:#e0e3f0 !important; }
+    body.light-mode .script-card * { color:#1a1a2e !important; }
+
+    /* Blocs colorés r-* : texte plus sombre */
+    body.light-mode .r-green  { background:rgba(34,197,94,.06) !important;  color:#166534 !important; border-color:rgba(34,197,94,.25) !important; }
+    body.light-mode .r-green  strong { color:#14532d !important; }
+    body.light-mode .r-purple { background:rgba(168,85,247,.06) !important; color:#5b21b6 !important; border-color:rgba(168,85,247,.25) !important; }
+    body.light-mode .r-purple strong { color:#4c1d95 !important; }
+    body.light-mode .r-blue   { background:rgba(59,130,246,.06) !important; color:#1d4ed8 !important; border-color:rgba(59,130,246,.25) !important; }
+    body.light-mode .r-blue   strong { color:#1e3a8a !important; }
+    body.light-mode .r-red    { background:rgba(239,68,68,.06) !important;  color:#b91c1c !important; border-color:rgba(239,68,68,.25) !important; }
+    body.light-mode .r-yellow { background:rgba(234,179,8,.06) !important;  color:#854d0e !important; border-color:rgba(234,179,8,.25) !important; }
+
+    /* Textes inline hardcodés sombres → lisibles en clair */
+    body.light-mode #dashModuleContent *,
+    body.light-mode #moduleContent * {
+      --txt-light: #1a1a2e;
+      --txt-muted: #4b5563;
+    }
+    /* Override les couleurs de texte "dark-mode only" dans les modules */
+    body.light-mode #dashModuleContent [style*="color:#e2e8f0"],
+    body.light-mode #moduleContent    [style*="color:#e2e8f0"]  { color:#1a1a2e !important; }
+    body.light-mode #dashModuleContent [style*="color:#cbd5e1"],
+    body.light-mode #moduleContent    [style*="color:#cbd5e1"]  { color:#374151 !important; }
+    body.light-mode #dashModuleContent [style*="color:#94a3b8"],
+    body.light-mode #moduleContent    [style*="color:#94a3b8"]  { color:#4b5563 !important; }
+    body.light-mode #dashModuleContent [style*="color:#9ca3af"],
+    body.light-mode #moduleContent    [style*="color:#9ca3af"]  { color:#6b7280 !important; }
+    body.light-mode #dashModuleContent [style*="color:#6b7280"],
+    body.light-mode #moduleContent    [style*="color:#6b7280"]  { color:#6b7280 !important; }
+
+    /* Fonds semi-transparents sombres → gris très léger */
+    body.light-mode #dashModuleContent [style*="background:rgba(0,0,0"],
+    body.light-mode #moduleContent    [style*="background:rgba(0,0,0"] { background:rgba(0,0,0,.04) !important; }
+    body.light-mode #dashModuleContent [style*="background:rgba(255,255,255,.03)"],
+    body.light-mode #moduleContent    [style*="background:rgba(255,255,255,.03)"] { background:rgba(0,0,0,.03) !important; }
+    body.light-mode #dashModuleContent [style*="background:rgba(255,255,255,.04)"],
+    body.light-mode #moduleContent    [style*="background:rgba(255,255,255,.04)"] { background:rgba(0,0,0,.04) !important; }
+    body.light-mode #dashModuleContent [style*="background:rgba(255,255,255,.05)"],
+    body.light-mode #moduleContent    [style*="background:rgba(255,255,255,.05)"] { background:rgba(0,0,0,.04) !important; }
+
+    /* Sections / labels */
+    body.light-mode .section-lbl { color:#6b7280 !important; }
+
+    /* Boutons outline dans les modules */
+    body.light-mode #dashModuleContent button[style*="border:1px solid rgba(255,255,255"],
+    body.light-mode #moduleContent    button[style*="border:1px solid rgba(255,255,255"] {
+      border-color:#d1d5db !important; color:#374151 !important; background:#f9fafb !important;
+    }
+
+    /* Sidebar modules nav items */
+    body.light-mode .mod-nav-item { color:#374151 !important; }
+    body.light-mode .mod-nav-item.active { background:rgba(124,58,237,.08) !important; color:#7c3aed !important; }
+
+    /* Spy / audit concurrent dark inner cards */
+    body.light-mode #dashModuleContent [style*="background:#111120"],
+    body.light-mode #moduleContent    [style*="background:#111120"] { background:#f8f9ff !important; }
+    body.light-mode #dashModuleContent [style*="border-color:#1e1e30"],
+    body.light-mode #moduleContent    [style*="border-color:#1e1e30"] { border-color:#e0e3f0 !important; }
+
+    /* Topbar module dans le dashboard */
+    body.light-mode #dashModuleContent > div > div[style*="background:rgba(255,255,255,.02)"],
+    body.light-mode #dashModuleContent [style*="background:rgba(255,255,255,.02)"] { background:#f0f0f8 !important; border-color:#e5e7eb !important; }
+
+    /* DM script text */
+    .dm-script-text { color:#cbd5e1; }
+    body.light-mode .dm-script-text { color:#374151 !important; }
+
+    /* Hooks tags */
+    body.light-mode .hook-tag { background:rgba(168,85,247,.1) !important; color:#6d28d9 !important; border-color:rgba(168,85,247,.3) !important; }
+    body.light-mode .cta-tag  { background:rgba(34,197,94,.1) !important;  color:#15803d !important; border-color:rgba(34,197,94,.3) !important; }
+
+    /* Inputs dark dans les modules */
+    body.light-mode .metric-inp { background:#f9fafb !important; border-color:#d1d5db !important; color:#1a1a2e !important; }
+    body.light-mode textarea { background:#f9fafb !important; border-color:#d1d5db !important; color:#1a1a2e !important; }
+    body.light-mode select   { background:#f9fafb !important; border-color:#d1d5db !important; color:#1a1a2e !important; }
+
+    /* Écran de score / jauge */
+    body.light-mode #iaSynthese { color:#374151 !important; }
+    body.light-mode #dashScoreValue { color:#1a1a2e !important; }
+    body.light-mode #iaScoreValue   { color:#1a1a2e !important; }
+
+    /* Banner auto-gen */
+    body.light-mode #autoGenBanner { background:#ede9fe !important; border-color:#c4b5fd !important; color:#4c1d95 !important; }
   </style>
   <div style="background:#08080f;border-top:1px solid #0f0f1e;border-bottom:1px solid #0f0f1e" class="py-24">
     <div class="max-w-2xl mx-auto px-5">
@@ -5820,9 +5906,9 @@ function renderModule3(d) {
             <span style="font-size:10px;font-weight:800;color:#06b6d4;background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);padding:3px 10px;border-radius:20px">OBJECTION ${i+1}</span>
             <span style="font-size:13px;font-weight:700;color:#e2e8f0">"${esc(dm.objection||'')}"</span>
           </div>
-          <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:12px 14px;position:relative">
-            <p style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-line;margin:0;padding-right:60px">${esc(dm.script||'')}</p>
-            <button onclick="_copyDmScript(this)" data-script="${esc(dm.script||'')}" style="position:absolute;top:8px;right:8px;background:none;border:none;color:#6b7280;cursor:pointer;font-size:11px;font-weight:700">📋 Copier</button>
+          <div style="background:rgba(0,0,0,.07);border-radius:8px;padding:12px 14px;position:relative">
+            <p class="dm-script-text" style="font-size:13px;line-height:1.7;white-space:pre-line;margin:0;padding-right:60px">${esc(dm.script||'')}</p>
+            <button onclick="_copyDmScript(this)" data-script="${encodeURIComponent(dm.script||'')}" style="position:absolute;top:8px;right:8px;background:none;border:none;color:#6b7280;cursor:pointer;font-size:11px;font-weight:700">📋 Copier</button>
           </div>
         </div>`).join('')}
       </div>
@@ -6343,7 +6429,7 @@ function _m5tab(name) {
 
 /* ── Copy helpers (safe — no JSON.stringify in onclick attributes) ── */
 function _copyDmScript(btn) {
-  const text = btn.dataset.script || '';
+  const text = decodeURIComponent(btn.dataset.script || '');
   navigator.clipboard?.writeText(text).then(() => {
     btn.textContent = '✓ Copié';
     btn.style.color = '#4ade80';
