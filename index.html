@@ -3982,15 +3982,24 @@ RÈGLES :
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => {
-      const offerName = prev?.offre_principale?.nom || prev?.nom_offre || p.niche || 'ton offre';
-      const offerPrice = prev?.offre_principale?.prix || '';
-      const niche = p.niche || p.desc || p.url;
+      const prefs = S._siteWebPrefs || {};
+      const offerName  = prefs.offerName  || prev?.offre_principale?.nom || prev?.nom_offre || p.niche || 'ton offre';
+      const offerPrice = prefs.price      || prev?.offre_principale?.prix || '';
+      const niche      = p.niche || p.desc || p.url;
       return `Crée le site web complet + stratégie pour ce créateur.
 
 HANDLE : ${p.url}
 NICHE / OFFRE : ${niche}
-OFFRE PRINCIPALE : ${offerName}${offerPrice ? ' — ' + offerPrice : ''}
-PROBLÈME RÉSOLU : ${prev?.diagnostic?.probleme_principal || prev?.etapes?.[0]?.titre || 'non précisé'}
+NOM DE L'OFFRE : ${offerName}
+TYPE D'OFFRE : ${prefs.offerType || 'non précisé'}
+PRIX : ${offerPrice || 'non précisé'}
+RÉSULTAT PROMIS : ${prefs.result || prev?.diagnostic?.probleme_principal || 'non précisé'}
+AUDIENCE CIBLE : ${prefs.audience || 'non précisé'}
+STYLE VISUEL SOUHAITÉ : ${prefs.style || 'Dark & premium'}
+TON DE COMMUNICATION : ${prefs.tone || 'Direct & cash'}
+ÉLÉMENTS OBLIGATOIRES : ${prefs.mustHave?.join(', ') || 'aucun spécifié'}
+CE QUI EST INTERDIT / NON VOULU : ${prefs.dontWant || 'aucune restriction'}
+CONTEXTE ANALYSE : ${prev?.diagnostic?.probleme_principal || prev?.etapes?.[0]?.titre || 'non précisé'}
 
 Réponds UNIQUEMENT avec ce JSON :
 {
@@ -5184,6 +5193,8 @@ function renderModuleContent(loading=false) {
     // Modules 10 & 11 have special video input UIs
     if (n === 10) { el.innerHTML = renderModule10Input(); return; }
     if (n === 11) { renderModule11(el); return; }
+    // Module 5 has a pre-generation intake form
+    if (n === 5) { el.innerHTML = renderModule5Form(); return; }
     // Has access but not generated yet
     el.innerHTML = `<div class="card p-8 text-center fade-up">
       <div class="text-4xl mb-4">${MOD_EMOJI[n]}</div>
@@ -5872,6 +5883,139 @@ function renderModule4(d) {
 }
 
 /* ── MODULE 5 RENDER ── */
+/* ── Module 5 — Formulaire de personnalisation ── */
+function renderModule5Form() {
+  const p = S.profile || {};
+  const prev = S.modules[2] || S.modules[1] || {};
+  const offerSuggest = prev?.offre_principale?.nom || prev?.nom_offre || '';
+  const priceSuggest = prev?.offre_principale?.prix || '';
+
+  return `<div class="fade-up" style="max-width:740px;margin:0 auto">
+  <div style="text-align:center;margin-bottom:28px">
+    <div style="font-size:36px;margin-bottom:10px">🌐</div>
+    <h2 style="font-size:20px;font-weight:900;color:#e2e8f0;margin-bottom:6px">Personnalise ton site web</h2>
+    <p style="font-size:13px;color:#9ca3af">Réponds à ces questions pour que l'IA génère un site <strong style="color:#c084fc">parfaitement adapté à ton business</strong></p>
+  </div>
+
+  <!-- Section 1 : Offre -->
+  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:800;color:#a855f7;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px">💰 Ton offre</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:5px">Nom exact de ton offre *</label>
+        <input id="sw_offerName" value="${esc(offerSuggest)}" placeholder="Ex: IA Cash Blueprint, Coaching TikTok Pro…" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#e2e8f0;font-size:13px;outline:none" />
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:5px">Prix affiché</label>
+        <input id="sw_price" value="${esc(priceSuggest)}" placeholder="Ex: 997€, 3 x 333€, Sur devis…" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#e2e8f0;font-size:13px;outline:none" />
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:5px">Type d'offre *</label>
+      <div style="display:flex;flex-wrap:wrap;gap:7px" id="sw_typeGroup">
+        ${['Formation en ligne','Coaching 1:1','Accompagnement groupe','Produit digital','Service (agence/freelance)','Mastermind / Communauté'].map(t=>`
+        <button type="button" onclick="_sw_pick('sw_typeGroup',this)" data-val="${t}" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#9ca3af;font-size:12px;cursor:pointer;transition:all .15s">${t}</button>`).join('')}
+      </div>
+    </div>
+    <div>
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:5px">Résultat promis en X semaines/mois *</label>
+      <input id="sw_result" placeholder="Ex: Faire ses premiers 5K€/mois avec l'IA en 60 jours" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#e2e8f0;font-size:13px;outline:none" />
+    </div>
+  </div>
+
+  <!-- Section 2 : Audience -->
+  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:800;color:#a855f7;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px">🎯 Ton audience</div>
+    <div>
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:5px">À qui s'adresse cette offre ? *</label>
+      <input id="sw_audience" placeholder="Ex: Créateurs TikTok 18-35 ans qui veulent monétiser, Entrepreneurs qui démarrent avec l'IA…" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#e2e8f0;font-size:13px;outline:none" />
+    </div>
+  </div>
+
+  <!-- Section 3 : Style -->
+  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:800;color:#a855f7;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px">🎨 Style & design</div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:5px">Ambiance visuelle</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px" id="sw_styleGroup">
+        ${[['Dark & premium','Fond sombre, couleurs vives, ambiance luxe'],['Light & clean','Fond blanc, épuré, minimaliste'],['Coloré & énergique','Dégradés, fort contraste, vibrant'],['Sombre & sérieux','Pro, sobre, couleurs neutres']].map(([s,d])=>`
+        <button type="button" onclick="_sw_pick('sw_styleGroup',this)" data-val="${s}" style="padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#9ca3af;font-size:12px;cursor:pointer;text-align:left;transition:all .15s"><strong style="display:block;color:#e2e8f0;margin-bottom:2px">${s}</strong><span style="font-size:10px;opacity:.7">${d}</span></button>`).join('')}
+      </div>
+    </div>
+    <div>
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:5px">Ton de communication</label>
+      <div style="display:flex;flex-wrap:wrap;gap:7px" id="sw_toneGroup">
+        ${['Direct & cash','Professionnel','Authentique / proche','Inspirationnel','Exclusif / premium'].map(t=>`
+        <button type="button" onclick="_sw_pick('sw_toneGroup',this)" data-val="${t}" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#9ca3af;font-size:12px;cursor:pointer;transition:all .15s">${t}</button>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4 : Souhaits -->
+  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;margin-bottom:20px">
+    <div style="font-size:11px;font-weight:800;color:#a855f7;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px">✅ / ❌ Ce que tu veux / ne veux pas</div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:7px">Éléments à inclure absolument</label>
+      <div style="display:flex;flex-wrap:wrap;gap:7px" id="sw_mustGroup">
+        ${['VSL vidéo','Témoignages clients','Garantie remboursement','FAQ','Timer / urgence','Section "À propos"','Formulaire de qualification','Preuve sociale (chiffres)','Section bonus'].map(t=>`
+        <button type="button" onclick="_sw_toggle(this)" data-val="${t}" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#9ca3af;font-size:12px;cursor:pointer;transition:all .15s">${t}</button>`).join('')}
+      </div>
+    </div>
+    <div>
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:5px">Ce que tu ne veux PAS sur ce site</label>
+      <input id="sw_dontWant" placeholder="Ex: pas de prix affiché, pas de formulaire, pas de couleur rose…" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#e2e8f0;font-size:13px;outline:none" />
+    </div>
+  </div>
+
+  <button onclick="_submitMod5Form()" style="width:100%;padding:16px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#db2777);border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 32px rgba(124,58,237,.4)">🌐 Générer mon site web personnalisé →</button>
+  <p style="text-align:center;font-size:11px;color:#4b5563;margin-top:10px">Génération ~15 secondes · Le site sera adapté à ton business exact</p>
+</div>`;
+}
+
+function _sw_pick(groupId, btn) {
+  document.querySelectorAll('#' + groupId + ' button').forEach(b => {
+    b.style.background  = 'rgba(255,255,255,.04)';
+    b.style.borderColor = 'rgba(255,255,255,.1)';
+    b.style.color       = '#9ca3af';
+  });
+  btn.style.background  = 'rgba(124,58,237,.2)';
+  btn.style.borderColor = 'rgba(124,58,237,.5)';
+  btn.style.color       = '#c084fc';
+  btn.dataset.selected  = '1';
+}
+
+function _sw_toggle(btn) {
+  const on = btn.dataset.selected === '1';
+  btn.dataset.selected  = on ? '' : '1';
+  btn.style.background  = on ? 'rgba(255,255,255,.04)' : 'rgba(124,58,237,.2)';
+  btn.style.borderColor = on ? 'rgba(255,255,255,.1)'  : 'rgba(124,58,237,.5)';
+  btn.style.color       = on ? '#9ca3af' : '#c084fc';
+}
+
+function _submitMod5Form() {
+  const offerName = document.getElementById('sw_offerName')?.value.trim();
+  const result    = document.getElementById('sw_result')?.value.trim();
+  const audience  = document.getElementById('sw_audience')?.value.trim();
+  if (!offerName) { document.getElementById('sw_offerName').style.borderColor='#f87171'; setTimeout(()=>document.getElementById('sw_offerName').style.borderColor='rgba(255,255,255,.1)',1500); return; }
+  if (!result)    { document.getElementById('sw_result').style.borderColor='#f87171'; setTimeout(()=>document.getElementById('sw_result').style.borderColor='rgba(255,255,255,.1)',1500); return; }
+
+  const getSelected  = id => document.querySelector('#'+id+' [data-selected="1"]')?.dataset.val || '';
+  const getMulti     = id => [...document.querySelectorAll('#'+id+' [data-selected="1"]')].map(b=>b.dataset.val);
+
+  S._siteWebPrefs = {
+    offerName,
+    price:     document.getElementById('sw_price')?.value.trim()    || '',
+    offerType: getSelected('sw_typeGroup'),
+    result,
+    audience:  audience || '',
+    style:     getSelected('sw_styleGroup'),
+    tone:      getSelected('sw_toneGroup'),
+    mustHave:  getMulti('sw_mustGroup'),
+    dontWant:  document.getElementById('sw_dontWant')?.value.trim() || '',
+  };
+  generateModule(5);
+}
+
 /* ── Module 5 — Site web : regen counter ── */
 const MOD5_REGENS_KEY = 'bloxai_mod5_regens';
 function _getMod5RegenCount() {
@@ -5893,7 +6037,7 @@ function _getMod5MaxRegens() {
 function regenerateMod5() {
   const count = _getMod5RegenCount();
   const max   = _getMod5MaxRegens();
-  if (count >= max) {
+  if (count >= max && max > 0) {
     // Show upgrade paywall
     const el = _getModuleContentEl();
     if (el) el.innerHTML = `<div class="card p-8 text-center fade-up" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.06)">
@@ -5909,7 +6053,8 @@ function regenerateMod5() {
   }
   _incMod5RegenCount();
   S.modules[5] = null;
-  generateModule(5);
+  S._siteWebPrefs = null; // reset prefs so form shows again for a fresh version
+  renderModuleContent();  // shows the form
 }
 
 /* ── HTML generator for systeme.io ── */
