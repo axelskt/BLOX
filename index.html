@@ -3822,6 +3822,7 @@ RULES:
 - Focus revenu direct et conversion
 - Propose des offres simples à vendre
 - Adapte le pricing à la niche et à l'audience
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => `Crée une offre monétisable pour ce profil.
@@ -3857,6 +3858,7 @@ Réponds UNIQUEMENT avec ce JSON :
   3: {
     system: `Tu es un expert en scripts TikTok viraux orientés conversion + scripts de vente en DM.
 OBJECTIF : Générer des scripts courts percutants qui vendent, ET des scripts DM pour closer les prospects.
+LANGUE OBLIGATOIRE : Français UNIQUEMENT. Zéro anglicisme, zéro franglais. Jamais "feel", "vibe", "check", "game", "mindset", "hype", "boost", "deal", "cool", "ok". Remplace par : "ressentir", "ambiance", "vérifier", "jeu", "état d'esprit", "engouement", "améliorer", "accord", "super", "d'accord".
 RÈGLES SCRIPTS TIKTOK :
 - Hook choc en 1 phrase (curiosité ou FOMO dès la 1ère seconde)
 - Corps : 3-5 bullet points bénéfices (pas de blabla)
@@ -3866,8 +3868,9 @@ RÈGLES SCRIPTS TIKTOK :
 - Durée cible : 15-25 secondes
 RÈGLES SCRIPTS DM (si offre formation/accompagnement) :
 - Scripts naturels, pas commerciaux — conversation d'abord
-- Gérer les objections classiques avec empathie + pivot
+- Gérer les objections classiques avec empathie + pivot — en français correct et naturel
 - Toujours terminer par une question ouverte
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => {
@@ -3943,6 +3946,7 @@ RULES:
 - Simple et exécutable immédiatement
 - Orienté DM + landing page + email
 - Pas de complexité inutile
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => `Crée un funnel de conversion pour ce profil.
@@ -3979,6 +3983,7 @@ RÈGLES :
 - Copywriting direct, bénéfices concrets, preuve sociale, objections réfutées
 - Tunnel qualification : 5 questions qui filtrent les prospects non qualifiés AVANT le Calendly
 - Inclure un raisonnement stratégique et des axes d'amélioration concrets (dont VSL)
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => {
@@ -4665,6 +4670,7 @@ RÈGLES :
 - Langage simple, conversationnel, comme si tu parlais à un ami
 - Inclus les indications [PAUSE], [EFFET SONORE], [TEXTE À L'ÉCRAN] quand pertinent
 - Termine par un CTA (appel à l'action) fort
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`;
 
   const userPrompt = `Crée un script TikTok viral pour ce mot-clé : "${keyword}"
@@ -5615,7 +5621,7 @@ function renderModule1(d) {
       <p style="font-size:12px;color:#6b7280;margin-bottom:12px">5 accroches prêtes à utiliser — adapte-les à ton contenu du jour.</p>
       <div style="display:flex;flex-direction:column;gap:8px">
         ${(d.hooks_personnalises||[]).map((h,i)=>`
-        <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(219,39,119,.12);border-radius:10px;padding:10px 14px;cursor:pointer;transition:border-color .2s" onclick="navigator.clipboard?.writeText(${JSON.stringify(h)}).then(()=>{this.style.borderColor='rgba(34,197,94,.5)';setTimeout(()=>this.style.borderColor='rgba(219,39,119,.12)',1200)})" title="Copier">
+        <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(219,39,119,.12);border-radius:10px;padding:10px 14px;cursor:pointer;transition:border-color .2s" onclick="_copyText(this,'${esc(h).replace(/'/g,'&#39;')}')" title="Copier">
           <span style="font-size:11px;font-weight:800;color:#db2777;background:rgba(219,39,119,.15);border:1px solid rgba(219,39,119,.25);padding:2px 7px;border-radius:20px;flex-shrink:0;margin-top:1px">#${i+1}</span>
           <span style="font-size:13px;color:#fce7f3;line-height:1.5;font-style:italic">"${esc(h)}"</span>
           <span style="font-size:14px;flex-shrink:0;margin-left:auto;color:#6b7280;padding-left:6px" title="Copier">📋</span>
@@ -5816,7 +5822,7 @@ function renderModule3(d) {
           </div>
           <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:12px 14px;position:relative">
             <p style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-line;margin:0;padding-right:60px">${esc(dm.script||'')}</p>
-            <button onclick="navigator.clipboard?.writeText(${JSON.stringify(dm.script||'')}).then(()=>{this.textContent='✓ Copié';this.style.color='#4ade80';setTimeout(()=>{this.textContent='📋 Copier';this.style.color='#6b7280'},1500)})" style="position:absolute;top:8px;right:8px;background:none;border:none;color:#6b7280;cursor:pointer;font-size:11px;font-weight:700">📋 Copier</button>
+            <button onclick="_copyDmScript(this)" data-script="${esc(dm.script||'')}" style="position:absolute;top:8px;right:8px;background:none;border:none;color:#6b7280;cursor:pointer;font-size:11px;font-weight:700">📋 Copier</button>
           </div>
         </div>`).join('')}
       </div>
@@ -6335,6 +6341,24 @@ function _m5tab(name) {
   }
 }
 
+/* ── Copy helpers (safe — no JSON.stringify in onclick attributes) ── */
+function _copyDmScript(btn) {
+  const text = btn.dataset.script || '';
+  navigator.clipboard?.writeText(text).then(() => {
+    btn.textContent = '✓ Copié';
+    btn.style.color = '#4ade80';
+    setTimeout(() => { btn.textContent = '📋 Copier'; btn.style.color = '#6b7280'; }, 1500);
+  });
+}
+function _copyText(el, text) {
+  const decoded = text.replace(/&#39;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+  navigator.clipboard?.writeText(decoded).then(() => {
+    const prev = el.style.borderColor;
+    el.style.borderColor = 'rgba(34,197,94,.5)';
+    setTimeout(() => el.style.borderColor = prev, 1200);
+  });
+}
+
 /* ── Copy mod5 HTML ── */
 function _copyMod5Html() {
   const data = S.modules[5];
@@ -6358,6 +6382,7 @@ RULES :
 - Chaque jour = 1 post avec hook + type de contenu + meilleur créneau horaire
 - Varier les formats (éducatif, storytelling, UGC, coulisses, motivation)
 - Adapter au secteur et à l'audience cible détectés dans l'audit
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => `Crée un calendrier 30 jours pour ce profil.
@@ -6403,6 +6428,7 @@ RULES :
 - Suggère 3 comptes d'inspiration dans des niches proches ou complémentaires (pas forcément concurrents directs)
 - Adapte les recommandations au style faceless / face caméra / les deux selon le profil
 - Hooks directement utilisables, pas des modèles vagues
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => `Intelligence concurrentielle pour ce créateur.
@@ -6452,6 +6478,7 @@ RULES :
 - Analyse factuelle et actionnable
 - Focus sur les patterns récurrents (pas les cas isolés)
 - Génère des hooks directement utilisables
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => `Audit concurrent approfondi pour ce créateur.
@@ -6509,6 +6536,7 @@ RULES :
 - Analyse factuelle et précise (pas générique)
 - Hooks directement utilisables et adaptés au profil
 - Découpage de sous-titres mot par mot tel qu'il apparaîtrait à l'écran
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => `Analyse cette vidéo virale et génère les sous-titres dans le style ${(S.subtitleStyle||'hormozi').toUpperCase()}.
@@ -6569,6 +6597,7 @@ RULES :
 - Priorité aux moments avec émotion forte, révélation, hook naturel ou humour
 - Durée idéale : 20-59 secondes pour TikTok/Reels, jusqu'à 60 sec pour Shorts
 - Les timestamps doivent être précis au format MM:SS
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => `Identifie les meilleurs moments à découper en shorts.
