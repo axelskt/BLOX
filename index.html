@@ -4438,21 +4438,6 @@ function _showModuleInDash(tab) {
     if (hasAccess) generateModule(tab);
   }
 
-  // Auto-génération de tous les modules accessibles en arrière-plan (seulement quand on arrive sur module 1)
-  if (tab === 1 && S.modules[1] && !S.generating) {
-    const accessOrder = [2, 3, 6, 7, 9, 10, 12, 4, 5, 11];
-    const missing = accessOrder.filter(n => {
-      if (S.modules[n]) return false;
-      const ns = n === 2 || n === 3 || n === 6;
-      const np = n === 7 || n === 9 || n === 10 || n === 12;
-      const ne = n === 4 || n === 5 || n === 11;
-      return (ns && hasStarterAccess()) || (np && hasProAccess()) || (ne && hasEliteAccess());
-    });
-    if (missing.length > 0) {
-      // Petit délai pour laisser le rendu se faire d'abord
-      setTimeout(() => { if (!S.generating) generateAllModules(); }, 800);
-    }
-  }
 }
 
 /* ── Retour aux cards du dashboard ── */
@@ -4532,22 +4517,8 @@ Réponds UNIQUEMENT avec ce JSON :
 }`;
 
   try {
-    const apiKey = OWNER_API_KEY || S.apiKey || localStorage.getItem('blowup_api_key') || '';
-    const res = await fetch(PROXY_URL || 'https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: PROXY_URL
-        ? { 'Content-Type': 'application/json' }
-        : { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({
-        model: 'claude-3-5-haiku-20241022',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }]
-      })
-    });
-    const json = await res.json();
-    const raw  = json?.content?.[0]?.text || '';
-    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    // Use the same callClaude helper so proxy auth is handled correctly
+    const data = await callClaude(systemPrompt, userPrompt, { model: 'claude-haiku-4-5', max_tokens: 1000 });
 
     result.style.display = 'block';
     result.innerHTML = `
