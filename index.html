@@ -4202,12 +4202,23 @@ async function generateModule(n) {
       result = await callClaude(PROMPTS[n].system, userPrompt);
     }
     S.modules[n] = result;
+    // Save immediately so navigation doesn't lose the module
+    try {
+      localStorage.setItem('bloxai_last_analysis', JSON.stringify({
+        url: S.profile.url, platform: S.profile.platform,
+        profile: S.profile, modules: S.modules, savedAt: Date.now()
+      }));
+    } catch(e) {}
+    _pushCurrentAccount();
+    const _saveEmail = localStorage.getItem('blowup_user_email') || localStorage.getItem('blowup_email') || '';
+    savePendingAnalysis(_saveEmail);
   } catch(e) {
     if (e.message !== 'no_key') alert('Erreur : ' + e.message);
   }
 
   S.generating = false;
   renderModuleContent();
+  updateTabBadges();
 
   // AvatarAds post-generation nudge (modules 1, 2, 3)
   if ([1, 2, 3].includes(n) && S.modules[n]) showAvatarAdsNudge(n);
@@ -4278,6 +4289,14 @@ async function generateAllModules() {
       const result = await callClaude(PROMPTS[n].system, userPrompt);
       S.modules[n] = result;
       done++;
+      // Save after each module so navigation never loses progress
+      try {
+        localStorage.setItem('bloxai_last_analysis', JSON.stringify({
+          url: S.profile.url, platform: S.profile.platform,
+          profile: S.profile, modules: S.modules, savedAt: Date.now()
+        }));
+      } catch(e) {}
+      _pushCurrentAccount();
     } catch(e) {
       console.warn(`[generateAll] module ${n} failed:`, e.message);
       failed++;
@@ -4311,6 +4330,8 @@ async function generateAllModules() {
     }));
   } catch(e) {}
   _pushCurrentAccount();
+  const _gaEmail = localStorage.getItem('blowup_user_email') || localStorage.getItem('blowup_email') || '';
+  savePendingAnalysis(_gaEmail);
 }
 
 /* ── Render results view ── */
@@ -4415,6 +4436,22 @@ function _showModuleInDash(tab) {
                          (needsPro     && hasProAccess())     ||
                          (needsElite   && hasEliteAccess());
     if (hasAccess) generateModule(tab);
+  }
+
+  // Auto-génération de tous les modules accessibles en arrière-plan (seulement quand on arrive sur module 1)
+  if (tab === 1 && S.modules[1] && !S.generating) {
+    const accessOrder = [2, 3, 6, 7, 9, 10, 12, 4, 5, 11];
+    const missing = accessOrder.filter(n => {
+      if (S.modules[n]) return false;
+      const ns = n === 2 || n === 3 || n === 6;
+      const np = n === 7 || n === 9 || n === 10 || n === 12;
+      const ne = n === 4 || n === 5 || n === 11;
+      return (ns && hasStarterAccess()) || (np && hasProAccess()) || (ne && hasEliteAccess());
+    });
+    if (missing.length > 0) {
+      // Petit délai pour laisser le rendu se faire d'abord
+      setTimeout(() => { if (!S.generating) generateAllModules(); }, 800);
+    }
   }
 }
 
