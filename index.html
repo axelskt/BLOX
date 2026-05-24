@@ -724,6 +724,54 @@
       <input type="hidden" id="fNicheInput" value="" />
     </div>
 
+    <!-- ── STEP 0d2 : Description business ── -->
+    <div class="funnel-step" id="fStep0d2">
+      <div class="f-prog-bar"><div class="f-prog-fill" style="width:65%"></div></div>
+      <div class="text-center mb-6">
+        <div style="font-size:48px;margin-bottom:14px">💬</div>
+        <h2 class="text-white text-2xl font-black mb-2">Décris ton business<br/>en détail</h2>
+        <p class="text-gray-500 text-sm">Ces infos permettent à l'IA de faire une analyse personnalisée. Plus tu précises, mieux c'est.</p>
+      </div>
+
+      <!-- Concept / offre -->
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#a855f7;margin-bottom:6px">✏️ Ton concept / offre exacte</label>
+        <textarea id="fBusinessDesc" class="inp" rows="3"
+          style="resize:none;font-size:13px;padding:12px 14px;line-height:1.6"
+          placeholder="Ex : Je vends une formation dropshipping pour débutants à 497€ — 6 semaines de vidéos + 1 coaching hebdo. Ma méthode : trouver des produits gagnants sans capital. Ou : je fais des vidéos faceless sur l'automatisation des revenus…"></textarea>
+        <div style="font-size:11px;color:#4a4a70;margin-top:5px">Décris ce que tu vends (ou ce que tu veux vendre), le format, le prix si possible.</div>
+      </div>
+
+      <!-- Cible principale -->
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#06b6d4;margin-bottom:6px">🎯 Ta cible principale</label>
+        <input id="fTargetAudience" type="text" class="inp" style="font-size:13px;padding:12px 14px"
+          placeholder="Ex : Femmes 25-40 ans qui veulent lancer un business en ligne depuis chez elles" />
+      </div>
+
+      <!-- Objectif principal -->
+      <div style="margin-bottom:18px">
+        <label style="display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#22c55e;margin-bottom:8px">🚀 Ton objectif principal</label>
+        <div style="display:flex;flex-direction:column;gap:8px" id="fGoalBtns">
+          <button class="f-ans" onclick="selectFunnelGoal('abonnes',this)" style="text-align:left;padding:11px 16px;font-size:13px">
+            📈 Gagner des abonnés rapidement
+          </button>
+          <button class="f-ans" onclick="selectFunnelGoal('vendre',this)" style="text-align:left;padding:11px 16px;font-size:13px">
+            💰 Vendre mon offre / générer des revenus
+          </button>
+          <button class="f-ans" onclick="selectFunnelGoal('prospects',this)" style="text-align:left;padding:11px 16px;font-size:13px">
+            🎯 Trouver des clients / prospects
+          </button>
+          <button class="f-ans" onclick="selectFunnelGoal('notoriete',this)" style="text-align:left;padding:11px 16px;font-size:13px">
+            🌐 Développer ma notoriété / ma marque
+          </button>
+        </div>
+      </div>
+
+      <button class="f-btn" onclick="submitBusinessDesc()">Analyser mon compte →</button>
+      <button onclick="submitBusinessDesc()" style="background:none;border:none;color:#4a4a70;font-size:12px;cursor:pointer;margin-top:8px;width:100%;text-align:center">Passer cette étape →</button>
+    </div>
+
     <!-- ── STEP 0e : Revenu déjà généré ── -->
     <div class="funnel-step" id="fStep0e">
       <div class="f-prog-bar"><div class="f-prog-fill" style="width:72%"></div></div>
@@ -2929,6 +2977,7 @@ function _addNewAccount() {
   S.modules = { 1:null,2:null,3:null,4:null,5:null,6:null,7:null,8:null,9:null,10:null,11:null,12:null };
   S.profile  = { url:'', desc:'', platform:'', contentStyle:'both' };
   S.activeAccountIdx = -1;
+  S.businessDesc = ''; S.targetAudience = ''; S.goal = '';
 
   // Pre-fill URL if provided from sidebar input
   if (sideUrl) {
@@ -3716,6 +3765,17 @@ async function callClaude(system, user, opts = {}) {
 }
 
 /* ── System prompts ── */
+/* ── Business context helper — injecté dans tous les prompts modules ── */
+function _bizCtx(p) {
+  const goalLabels = { abonnes:'Gagner des abonnés rapidement', vendre:'Vendre son offre / générer des revenus', prospects:'Trouver des clients / prospects', notoriete:'Développer sa notoriété / sa marque' };
+  const lines = [];
+  if (p.businessDesc)   lines.push(`- Concept / offre exacte : "${p.businessDesc}"`);
+  if (p.targetAudience) lines.push(`- Cible principale : "${p.targetAudience}"`);
+  if (p.goal)           lines.push(`- Objectif principal : ${goalLabels[p.goal] || p.goal}`);
+  if (!lines.length) return '';
+  return `\nCONTEXTE BUSINESS (déclaré par l'utilisateur — utilise ces infos pour personnaliser) :\n${lines.join('\n')}`;
+}
+
 const PROMPTS = {
   1: {
     system: `Tu es un consultant growth hacker TikTok ultra direct, spécialisé dans la monétisation de comptes creators.
@@ -3834,6 +3894,15 @@ RÈGLE STATS : Utilise ces chiffres RÉELS dans le résumé. Exemple : "En ${mon
 RÈGLE OFFRE : Cette information est CERTAINE — l'utilisateur l'a déclaré lui-même. Mentionne cette offre spécifiquement dans le diagnostic. Ne dis JAMAIS qu'il n'a pas d'offre ou que son offre n'est pas claire si elle est fournie ici.`
         : `OFFRE : L'utilisateur ne vend rien pour le moment, ou offre non précisée. Si son contenu suggère un business (bio, handle), mentionne-le. Sinon indique qu'il/elle devrait commencer par définir une offre claire.`;
 
+      // Build business context block
+      const goalLabels = { abonnes:'Gagner des abonnés rapidement', vendre:'Vendre son offre / générer des revenus', prospects:'Trouver des clients / prospects', notoriete:'Développer sa notoriété / sa marque' };
+      const businessBlock = (p.businessDesc || p.targetAudience || p.goal) ? `
+CONTEXTE BUSINESS DÉCLARÉ PAR L'UTILISATEUR (PRIORITÉ ABSOLUE — utilise ces infos dans CHAQUE point du diagnostic) :
+${p.businessDesc ? `- Concept / offre exacte : "${p.businessDesc}"` : ''}
+${p.targetAudience ? `- Cible principale : "${p.targetAudience}"` : ''}
+${p.goal ? `- Objectif principal du compte : ${goalLabels[p.goal] || p.goal}` : ''}
+RÈGLE CONTEXTE : Toute recommandation doit être calibrée sur ce contexte précis. Adapte les hooks, les formats et les quick_wins à ce business spécifique.` : '';
+
       return `Audite ce créateur avec ces informations déclarées :
 
 HANDLE : @${handle}
@@ -3844,6 +3913,7 @@ STYLE DE CONTENU : ${{'faceless':'Faceless / voix off — choix STRATÉGIQUE dé
 TYPE DE CONTENU PRINCIPAL : ${{'edu':'Éducatif / conseils','divert':'Divertissement / humour','story':'Storytelling / vie perso','faceless':'Faceless / voix off','life':'Lifestyle / quotidien'}[p.contentType] || 'non précisé'}
 ${offerBlock}
 REVENUS ACTUELS : ${p.revenue || 'non précisé'}
+${businessBlock}
 ${ttBlock}
 
 INSTRUCTIONS :
@@ -3917,6 +3987,7 @@ HANDLE : ${p.url}
 NICHE / CE QU'IL VEND DÉJÀ : ${p.niche || p.desc || 'voir diagnostic'}
 PLATEFORME : ${p.platform}
 STYLE : ${{'faceless':'Faceless','camera':'Face caméra','both':'Mix'}[p.contentStyle] || 'mixte'}
+${_bizCtx(p)}
 DIAGNOSTIC PRÉCÉDENT : ${JSON.stringify(prev)}
 
 Réponds UNIQUEMENT avec ce JSON :
@@ -3979,6 +4050,7 @@ NICHE / OFFRE : ${p.niche || 'non précisé'}
 STYLE : ${{'faceless':'Faceless / voix off','camera':'Face caméra','both':'Mix faceless + face cam'}[p.contentStyle] || 'mixte'}
 OFFRE PRINCIPALE : ${offerName}${offerPrice ? ' — ' + offerPrice : ''}
 PROBLÈME PRINCIPAL : ${prev?.diagnostic?.probleme_principal || prev?.probleme_principal || 'voir audit'}
+${_bizCtx(p)}
 ${objectionBlock}
 
 Scripts attendus : hook accrocheur → bullet bénéfices → CTA commentaire.
@@ -4038,6 +4110,7 @@ RULES:
     user: (p, prev) => `Crée un funnel de conversion pour ce profil.
 
 PROFIL : ${p.desc || p.url}
+${_bizCtx(p)}
 OFFRE : ${JSON.stringify(prev)}
 
 Réponds UNIQUEMENT avec ce JSON :
@@ -4146,8 +4219,9 @@ RULES:
 
     user: (p, prev) => `Génère une stratégie de hashtags pour ce créateur :
 Plateforme : ${p.platform}
-Niche / Business : ${p.desc || p.url}
+Niche / Business : ${p.niche || p.desc || p.url}
 Style de contenu : ${p.contentStyle}
+${_bizCtx(p)}
 Diagnostic audit : ${JSON.stringify(prev?.diagnostic || {})}
 
 Réponds UNIQUEMENT avec ce JSON :
@@ -4220,7 +4294,7 @@ async function runAnalysis() {
   }
   const url  = S._pendingUrl || '';
   const desc = '';
-  S.profile = { url, desc, platform: S.platform, contentStyle: S.contentStyle, level: S.level, blocker: S.blocker, contentType: S.contentType, niche: S.niche, revenue: S.revenue };
+  S.profile = { url, desc, platform: S.platform, contentStyle: S.contentStyle, level: S.level, blocker: S.blocker, contentType: S.contentType, niche: S.niche, revenue: S.revenue, businessDesc: S.businessDesc || '', targetAudience: S.targetAudience || '', goal: S.goal || '' };
   S.modules = { 1:null,2:null,3:null,4:null,5:null,6:null,7:null,8:null,9:null,10:null,11:null,12:null };
   S.videoUrl = ''; S.videoTranscript = ''; S.mcTranscript = '';
   _mcFile = null; _mcClips = []; _mcBlobs = {};
@@ -6475,6 +6549,7 @@ RULES :
 
 PROFIL : ${p.desc || p.url}
 PLATEFORME : ${p.platform}
+${_bizCtx(p)}
 AUDIT : ${JSON.stringify(prev)}
 
 Réponds UNIQUEMENT avec ce JSON :
@@ -6529,6 +6604,7 @@ PROFIL : ${p.desc || p.url}
 PLATEFORME : ${p.platform}
 STYLE : ${p.contentStyle === 'faceless' ? 'Faceless (sans apparaître à l\'écran)' : p.contentStyle === 'camera' ? 'Face caméra' : 'Les deux'}
 ${prevSummary}
+${_bizCtx(p)}
 
 Réponds UNIQUEMENT avec ce JSON :
 {
@@ -6579,6 +6655,7 @@ PROFIL UTILISATEUR : ${p.desc || p.url}
 PLATEFORME : ${p.platform}
 STYLE : ${p.contentStyle === 'faceless' ? 'Faceless' : p.contentStyle === 'camera' ? 'Face caméra' : 'Les deux'}
 ${prevSummary}
+${_bizCtx(p)}
 CONCURRENT À ANALYSER : ${p.competitor || 'le concurrent francophone le plus performant dans la même niche — choisis-en un réel et identifie-le clairement'}
 
 Réponds UNIQUEMENT avec ce JSON :
@@ -7100,6 +7177,20 @@ function submitNicheAndAnalyse() {
   const categ  = (document.getElementById('fNicheInput')?.value  || '').trim();
   const detail = (document.getElementById('fNicheDetail')?.value || '').trim();
   S.niche = categ ? (detail ? `${categ} — ${detail}` : categ) : detail;
+  // Si "Je ne vends rien" on peut aller direct 0d2, sinon aussi
+  showFunnelStep('0d2');
+}
+
+function selectFunnelGoal(key, btn) {
+  S.goal = key;
+  document.querySelectorAll('#fGoalBtns .f-ans').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+}
+
+function submitBusinessDesc() {
+  S.businessDesc    = (document.getElementById('fBusinessDesc')?.value    || '').trim();
+  S.targetAudience  = (document.getElementById('fTargetAudience')?.value  || '').trim();
+  // S.goal already set by selectFunnelGoal (or stays undefined)
   showFunnelStep('0e');
 }
 
