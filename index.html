@@ -3571,8 +3571,8 @@ async function callClaude(system, user, opts = {}) {
     headers['x-proxy-secret'] = PROXY_SECRET;
     if (userKey) headers['x-user-key'] = userKey;
     bodyObj = {
-      model:      opts.model || 'claude-sonnet-4-5',
-      max_tokens: opts.max_tokens || 3000,
+      model:      opts.model || 'claude-haiku-4-5',
+      max_tokens: opts.max_tokens || 2000,
       system:     [{ type: 'text', text: system }],
       messages:   [{ role: 'user', content: user }],
     };
@@ -3584,8 +3584,8 @@ async function callClaude(system, user, opts = {}) {
     headers['anthropic-version']  = '2023-06-01';
     headers['anthropic-dangerous-direct-browser-access'] = 'true';
     bodyObj = {
-      model:      opts.model || 'claude-sonnet-4-5',
-      max_tokens: opts.max_tokens || 3000,
+      model:      opts.model || 'claude-haiku-4-5',
+      max_tokens: opts.max_tokens || 2000,
       system:     [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
       messages:   [{ role: 'user', content: user }],
     };
