@@ -1284,7 +1284,9 @@
     <div class="flex items-center gap-3">
       <div id="navUserInfo" style="display:none;align-items:center;gap:8px"></div>
       <button id="navLogoutBtn" onclick="supaLogout()" style="display:none;font-size:12px;font-weight:600;color:#f87171;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);padding:6px 14px;border-radius:99px;cursor:pointer">Se déconnecter</button>
-      <button id="navLoginBtn" onclick="openLoginModal()" style="font-size:12px;font-weight:700;color:#a855f7;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);padding:6px 14px;border-radius:99px;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">Se connecter</button>
+      <button id="navLoginBtn" onclick="openLoginModal()" style="font-size:12px;font-weight:700;color:#a855f7;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);padding:6px 14px;border-radius:99px;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
+        <span id="navLoginLabel">Se connecter</span>
+      </button>
       <div id="navAdminBtn" style="display:none">
         <button onclick="openApiModal()" class="btn-outline text-xs py-2 px-3">🔑 API</button>
       </div>
@@ -1837,52 +1839,212 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ RESULTS VIEW -->
+<style>
+  /* ══ Results layout — style Whoscale ══ */
+  #view-results { display:flex; flex-direction:column; height:calc(100vh - 64px); overflow:hidden; }
+
+  .res-topbar {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 24px; height:56px; flex-shrink:0;
+    background:#080810; border-bottom:1px solid rgba(255,255,255,.06);
+    gap:12px;
+  }
+  .res-topbar-left { display:flex; align-items:center; gap:14px; min-width:0; }
+  .res-profile-ava {
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#7c3aed,#db2777);
+    display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  .res-profile-name { font-size:14px; font-weight:800; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px; }
+  .res-profile-meta { font-size:11px; color:#4b5563; margin-top:1px; }
+  .res-topbar-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .res-top-btn {
+    font-size:11px; font-weight:700; padding:6px 12px; border-radius:8px;
+    cursor:pointer; border:1px solid rgba(255,255,255,.1); color:#9ca3af;
+    background:rgba(255,255,255,.04); transition:all .15s; white-space:nowrap;
+  }
+  .res-top-btn:hover { background:rgba(255,255,255,.08); color:#e2e8f0; }
+  .res-top-btn.primary {
+    background:linear-gradient(135deg,#7c3aed,#db2777);
+    border-color:transparent; color:#fff;
+  }
+  .res-top-btn.primary:hover { opacity:.88; }
+
+  /* ── Two-column layout ── */
+  .res-layout {
+    display:flex; flex:1; overflow:hidden;
+  }
+
+  /* ── Left sidebar ── */
+  .res-sidebar {
+    width:230px; flex-shrink:0;
+    background:#07070f; border-right:1px solid rgba(255,255,255,.05);
+    overflow-y:auto; padding:16px 10px;
+    scrollbar-width:thin; scrollbar-color:#1e1e30 transparent;
+  }
+  .res-sidebar-section {
+    font-size:9px; font-weight:800; color:#2a2a45;
+    letter-spacing:1.5px; text-transform:uppercase;
+    padding:0 8px; margin:14px 0 6px;
+  }
+  .res-sidebar-section:first-child { margin-top:0; }
+  .res-mod-item {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 10px; border-radius:9px; cursor:pointer;
+    border:1px solid transparent;
+    transition:all .15s; margin-bottom:2px; position:relative;
+  }
+  .res-mod-item:hover { background:rgba(255,255,255,.04); }
+  .res-mod-item.active {
+    background:rgba(124,58,237,.12);
+    border-color:rgba(124,58,237,.25);
+  }
+  .res-mod-item.locked { opacity:.35; pointer-events:none; }
+  .res-mod-icon {
+    width:30px; height:30px; border-radius:8px;
+    background:#111122; border:1px solid #1a1a2e;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; flex-shrink:0;
+  }
+  .res-mod-item.active .res-mod-icon {
+    background:rgba(124,58,237,.15); border-color:rgba(124,58,237,.3);
+  }
+  .res-mod-label { font-size:12px; font-weight:700; color:#9ca3af; flex:1; line-height:1.2; }
+  .res-mod-item.active .res-mod-label { color:#c4b5fd; }
+  .res-mod-status {
+    width:16px; height:16px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:8px;
+  }
+  .res-mod-status.done  { background:rgba(34,197,94,.15); color:#4ade80; }
+  .res-mod-status.empty { background:rgba(255,255,255,.05); color:#374151; }
+  .res-mod-status.lock  { background:rgba(255,255,255,.03); color:#2a2a40; }
+  .res-mod-plan {
+    font-size:8px; font-weight:800; padding:1px 5px; border-radius:4px;
+    flex-shrink:0;
+  }
+  .plan-pro  { background:rgba(139,92,246,.1); color:#a78bfa; }
+  .plan-elite{ background:rgba(249,115,22,.1); color:#fb923c; }
+
+  /* ── Main content ── */
+  .res-main {
+    flex:1; overflow-y:auto; padding:28px 32px;
+    scrollbar-width:thin; scrollbar-color:#1e1e30 transparent;
+  }
+  @media(max-width:900px) {
+    .res-sidebar { width:52px; }
+    .res-mod-label, .res-mod-status, .res-mod-plan,
+    .res-sidebar-section { display:none; }
+    .res-mod-item { justify-content:center; padding:9px 6px; }
+    .res-main { padding:16px; }
+    .res-topbar { padding:0 14px; }
+    .res-profile-name { max-width:120px; }
+  }
+  @media(max-width:600px) {
+    .res-sidebar { display:none; }
+  }
+</style>
+
 <div id="view-results" class="content" style="display:none">
-  <div class="max-w-4xl mx-auto px-5 pt-8 pb-20">
 
-    <!-- Profile header -->
-    <div class="card p-5 mb-6 flex items-center gap-4 fade-up">
-      <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl" style="background:linear-gradient(135deg,#7c3aed,#db2777)">
-        <span id="profileEmoji">📊</span>
-      </div>
-      <div class="flex-1 min-w-0">
-        <div class="font-bold truncate" id="profileName">Analyse business</div>
-        <div class="text-sm text-gray-500 truncate" id="profileMeta">—</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
-        <button onclick="generateAllModules()" id="btnGenerateAll" class="btn text-xs py-2 px-3" style="background:linear-gradient(135deg,#7c3aed,#db2777);border:none;font-weight:700" title="Générer tous les modules accessibles">⚡ Tout générer</button>
-        <button onclick="exportAnalysis()" class="btn-outline text-xs py-2 px-3" title="Exporter l'analyse">⬇ Export</button>
-        <button onclick="showView('app')" class="btn-outline text-xs py-2 px-3" title="Retour au dashboard">🏠 Dashboard</button>
-        <button onclick="goNewAnalysis()" class="btn-outline text-xs py-2 px-3">+ Nouveau</button>
+  <!-- ── Top bar ── -->
+  <div class="res-topbar">
+    <div class="res-topbar-left">
+      <div class="res-profile-ava"><span id="profileEmoji">📊</span></div>
+      <div>
+        <div class="res-profile-name" id="profileName">Analyse business</div>
+        <div class="res-profile-meta" id="profileMeta">—</div>
       </div>
     </div>
-
-    <!-- AvatarAds dashboard banner -->
-    <div id="avatarAdsBanner" style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,rgba(249,115,22,.1),rgba(239,68,68,.07));border:1px solid rgba(249,115,22,.3);border-radius:12px;padding:10px 16px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:10px;min-width:0">
-        <span style="font-size:18px;flex-shrink:0">🤖</span>
-        <a href="https://avatarads.fr" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:#f97316;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Crée des vidéos avatar UGC avec AvatarAds →</a>
+    <div class="res-topbar-right">
+      <!-- AvatarAds banner compact -->
+      <div id="avatarAdsBanner" style="display:flex;align-items:center;gap:6px;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2);border-radius:8px;padding:5px 10px">
+        <span style="font-size:13px">🤖</span>
+        <a href="https://avatarads.fr" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;color:#f97316;text-decoration:none;white-space:nowrap">AvatarAds →</a>
+        <button onclick="document.getElementById('avatarAdsBanner').style.display='none';localStorage.setItem('aa_banner_dismissed','1')" style="background:none;border:none;color:#4b5563;cursor:pointer;font-size:13px;padding:0 2px;line-height:1;margin-left:2px">✕</button>
       </div>
-      <button onclick="document.getElementById('avatarAdsBanner').style.display='none';localStorage.setItem('aa_banner_dismissed','1')" style="background:none;border:none;color:#4b5563;cursor:pointer;font-size:16px;flex-shrink:0;padding:0 4px;line-height:1">✕</button>
+      <button onclick="generateAllModules()" id="btnGenerateAll" class="res-top-btn primary" title="Générer tous les modules accessibles">⚡ Tout générer</button>
+      <button onclick="exportAnalysis()" class="res-top-btn" title="Exporter l'analyse">⬇ Export</button>
+      <button onclick="showView('app')" class="res-top-btn" title="Retour au dashboard">🏠</button>
+      <button onclick="goNewAnalysis()" class="res-top-btn">+ Nouveau</button>
     </div>
+  </div>
 
-    <!-- Module tabs -->
-    <div class="flex gap-2 overflow-x-auto pb-3 mb-6" style="scrollbar-width:none">
-      <button class="tab tab-active" id="tab-1" onclick="switchTab(1)">🔍 Audit</button>
-      <button class="tab" id="tab-2" onclick="switchTab(2)">💰 Offre</button>
-      <button class="tab" id="tab-3" onclick="switchTab(3)">🎬 Scripts</button>
-      <button class="tab" id="tab-4" onclick="switchTab(4)">🔗 Funnel</button>
-      <button class="tab" id="tab-5" onclick="switchTab(5)">🌐 Site web</button>
-      <button class="tab" id="tab-6" onclick="switchTab(6)" style="white-space:nowrap">📅 Calendrier</button>
-      <button class="tab" id="tab-7" onclick="switchTab(7)" style="white-space:nowrap">🕵️ Spy</button>
-      <button class="tab" id="tab-9" onclick="switchTab(9)" style="white-space:nowrap">🔬 Audit Concurrent</button>
-      <button class="tab" id="tab-10" onclick="switchTab(10)" style="white-space:nowrap">🎬 Analyse Vidéo</button>
-      <button class="tab" id="tab-11" onclick="switchTab(11)" style="white-space:nowrap">✂️ ShortClip</button>
-      <button class="tab" id="tab-12" onclick="switchTab(12)" style="white-space:nowrap">#️⃣ Hashtags</button>
-    </div>
+  <!-- ── Two-column layout ── -->
+  <div class="res-layout">
 
-    <!-- Module content area -->
-    <div id="moduleContent"></div>
+    <!-- ── Left sidebar ── -->
+    <aside class="res-sidebar">
+
+      <div class="res-sidebar-section">Analyse</div>
+      <div class="res-mod-item active" id="tab-1" onclick="switchTab(1)">
+        <div class="res-mod-icon">🔍</div>
+        <div class="res-mod-label">Audit TikTok</div>
+        <div class="res-mod-status done" id="tab-status-1">✓</div>
+      </div>
+
+      <div class="res-sidebar-section">Contenu</div>
+      <div class="res-mod-item" id="tab-2" onclick="switchTab(2)">
+        <div class="res-mod-icon">💰</div>
+        <div class="res-mod-label">Offre & Monétisation</div>
+        <div class="res-mod-status empty" id="tab-status-2">○</div>
+      </div>
+      <div class="res-mod-item" id="tab-3" onclick="switchTab(3)">
+        <div class="res-mod-icon">🎬</div>
+        <div class="res-mod-label">Scripts viraux</div>
+        <div class="res-mod-status empty" id="tab-status-3">○</div>
+      </div>
+      <div class="res-mod-item" id="tab-6" onclick="switchTab(6)">
+        <div class="res-mod-icon">📅</div>
+        <div class="res-mod-label">Calendrier 30j</div>
+        <div class="res-mod-status empty" id="tab-status-6">○</div>
+      </div>
+
+      <div class="res-sidebar-section">Intelligence <span class="res-mod-plan plan-pro" style="letter-spacing:.5px">Pro</span></div>
+      <div class="res-mod-item" id="tab-7" onclick="switchTab(7)">
+        <div class="res-mod-icon">🕵️</div>
+        <div class="res-mod-label">Spy Concurrent</div>
+        <div class="res-mod-status empty" id="tab-status-7">○</div>
+      </div>
+      <div class="res-mod-item" id="tab-9" onclick="switchTab(9)">
+        <div class="res-mod-icon">🔬</div>
+        <div class="res-mod-label">Audit Concurrent</div>
+        <div class="res-mod-status empty" id="tab-status-9">○</div>
+      </div>
+      <div class="res-mod-item" id="tab-10" onclick="switchTab(10)">
+        <div class="res-mod-icon">🎥</div>
+        <div class="res-mod-label">Analyse Vidéo</div>
+        <div class="res-mod-status empty" id="tab-status-10">○</div>
+      </div>
+      <div class="res-mod-item" id="tab-12" onclick="switchTab(12)">
+        <div class="res-mod-icon">#️⃣</div>
+        <div class="res-mod-label">Hashtags IA</div>
+        <div class="res-mod-status empty" id="tab-status-12">○</div>
+      </div>
+
+      <div class="res-sidebar-section">Monétisation <span class="res-mod-plan plan-elite" style="letter-spacing:.5px">Élite</span></div>
+      <div class="res-mod-item" id="tab-4" onclick="switchTab(4)">
+        <div class="res-mod-icon">🔗</div>
+        <div class="res-mod-label">Funnel & Conversion</div>
+        <div class="res-mod-status empty" id="tab-status-4">○</div>
+      </div>
+      <div class="res-mod-item" id="tab-5" onclick="switchTab(5)">
+        <div class="res-mod-icon">🌐</div>
+        <div class="res-mod-label">Site web IA</div>
+        <div class="res-mod-status empty" id="tab-status-5">○</div>
+      </div>
+      <div class="res-mod-item" id="tab-11" onclick="switchTab(11)">
+        <div class="res-mod-icon">✂️</div>
+        <div class="res-mod-label">ShortClip IA</div>
+        <div class="res-mod-status empty" id="tab-status-11">○</div>
+      </div>
+
+    </aside>
+
+    <!-- ── Main content ── -->
+    <main class="res-main">
+      <div id="moduleContent"></div>
+    </main>
+
   </div>
 </div>
 
@@ -2756,7 +2918,26 @@ window.onload = () => {
   initFunnelEmailListener();
 
   // Si déjà connecté en localStorage → aller direct sur le dashboard
-  const _initPlan = localStorage.getItem('blowup_access') || '';
+  const _initPlan  = localStorage.getItem('blowup_access') || '';
+  const _initEmail = localStorage.getItem('blowup_user_email') || '';
+
+  // ── Fix immédiat : cacher "Se connecter" si déjà connecté en localStorage ──
+  if (_initEmail) {
+    const _navLoginBtn  = document.getElementById('navLoginBtn');
+    const _navLogoutBtn = document.getElementById('navLogoutBtn');
+    const _navUserInfo  = document.getElementById('navUserInfo');
+    if (_navLoginBtn)  _navLoginBtn.style.display  = 'none';
+    if (_navLogoutBtn) _navLogoutBtn.style.display = 'block';
+    if (_navUserInfo) {
+      const _colors = { elite:'#f97316', pro:'#a855f7', starter:'#22c55e', trial:'#22c55e', free:'#6b7280' };
+      const _bgs    = { elite:'rgba(249,115,22,.15)', pro:'rgba(124,58,237,.15)', starter:'rgba(34,197,94,.15)', trial:'rgba(34,197,94,.15)', free:'rgba(107,114,128,.1)' };
+      const _labels = { elite:'ÉLITE', pro:'PRO', starter:'STARTER', trial:'TRIAL', free:'GRATUIT' };
+      const _p = _initPlan || 'free';
+      _navUserInfo.innerHTML = `<span style="font-size:11px;color:#6b7280;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_initEmail}</span><span style="font-size:10px;background:${_bgs[_p]||_bgs.free};color:${_colors[_p]||_colors.free};padding:2px 8px;border-radius:99px;font-weight:800;letter-spacing:.5px">${_labels[_p]||_p.toUpperCase()}</span>`;
+      _navUserInfo.style.display = 'flex';
+    }
+  }
+
   if (_initPlan && _initPlan !== 'free' && !_fromEmailLink) {
     showView('app');
   }
@@ -3870,8 +4051,9 @@ async function runAnalysis() {
 /* ── Switch tab ── */
 async function switchTab(n) {
   S.activeTab = n;
-  document.querySelectorAll('[id^="tab-"]').forEach((t,i) => {
-    t.classList.toggle('tab-active', i+1 === n);
+  // Mettre à jour l'état actif dans la sidebar (nouvelle UI)
+  document.querySelectorAll('.res-mod-item').forEach(el => {
+    el.classList.toggle('active', el.id === 'tab-' + n);
   });
   renderModuleContent();
 
@@ -4622,18 +4804,23 @@ function updateTabBadges() {
   const pro     = hasProAccess();
   const elite   = hasEliteAccess();
   for (let i=1;i<=12;i++) {
-    const tab = document.getElementById('tab-'+i);
+    if (i === 8) continue; // module 8 réservé
+    const tab    = document.getElementById('tab-'+i);
+    const status = document.getElementById('tab-status-'+i);
     if (!tab) continue;
+
     let locked = false;
-    // Starter tier: modules 2, 3, 6
-    if (i === 2 || i === 3 || i === 6)                   locked = !starter && !S.modules[i];
-    // Pro tier: Spy Concurrent, Audit Concurrent, Analyse Vidéo, Hashtags
-    if (i === 7 || i === 8 || i === 9 || i === 10 || i === 12) locked = !pro && !S.modules[i];
-    // Elite tier: Funnel, Site web, ShortClip
-    if (i === 4 || i === 5 || i === 11)                  locked = !elite && !S.modules[i];
-    tab.classList.toggle('tab-locked', locked);
-    if (i === 9 || i === 11) {
-      tab.style.color = tab.classList.contains('tab-active') ? '#fff' : (elite ? '#f97316' : '');
+    if (i === 2 || i === 3 || i === 6)                        locked = !starter && !S.modules[i];
+    if (i === 7 || i === 8 || i === 9 || i === 10 || i === 12) locked = !pro    && !S.modules[i];
+    if (i === 4 || i === 5 || i === 11)                        locked = !elite   && !S.modules[i];
+
+    tab.classList.toggle('locked', locked);
+
+    // Mettre à jour le dot de statut
+    if (status) {
+      const isDone = !!S.modules[i];
+      status.className = 'res-mod-status ' + (locked ? 'lock' : isDone ? 'done' : 'empty');
+      status.textContent = locked ? '🔒' : isDone ? '✓' : '○';
     }
   }
 }
