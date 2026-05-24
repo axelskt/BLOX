@@ -2907,8 +2907,12 @@ function _pushCurrentAccount() {
   // Check if handle already exists → update instead of duplicate
   const existingIdx = S.accounts.findIndex(a => a.handle === handle && a.type === type);
   const now = Date.now();
+  // Never persist empty/broken video modules (10 & 11) — they require fresh user input
+  const cleanModules = { ...S.modules };
+  if (cleanModules[10] && !cleanModules[10]?.elements_cles?.length && !cleanModules[10]?.analyse_complete) cleanModules[10] = null;
+  if (cleanModules[11] && !cleanModules[11]?.moments?.length) cleanModules[11] = null;
   const entry = { id: existingIdx >= 0 ? S.accounts[existingIdx].id : id, handle, platform: S.profile.platform || 'tiktok', type,
-    profile: { ...S.profile }, modules: { ...S.modules }, savedAt: now,
+    profile: { ...S.profile }, modules: cleanModules, savedAt: now,
     expiresAt: now + _getAnalysisTTL() };
 
   if (existingIdx >= 0) {
@@ -4388,6 +4392,13 @@ async function generateModule(n) {
 }
 
 async function _runGenerateModule(n) {
+  // Modules 10 & 11 require a user-supplied video URL — never auto-generate them
+  if ((n === 10 || n === 11) && !S.videoUrl && !S.videoTranscript) {
+    S.generateQueue = S.generateQueue.filter(q => q !== n);
+    const next = S.generateQueue.shift();
+    if (next) await _runGenerateModule(next);
+    return;
+  }
   S.generating = n;
   // Remove from queue if it was queued
   S.generateQueue = S.generateQueue.filter(q => q !== n);
@@ -4578,7 +4589,8 @@ function _autoGenerateAll() {
   // Trial et free n'ont pas accès aux modules dashboard
   if (!hasDashboardAccess()) return;
   if (!S.modules[1]) return; // besoin de l'audit d'abord
-  const order = [2, 3, 6, 7, 9, 10, 12, 4, 5, 11];
+  // 10 (Analyse Vidéo) et 11 (ShortClip) nécessitent une URL vidéo saisie par l'utilisateur — jamais auto-générés
+  const order = [2, 3, 6, 7, 9, 12, 4, 5];
   const missing = order.filter(n => {
     if (S.modules[n]) return false;
     const ns = n===2||n===3||n===6;
@@ -5344,7 +5356,11 @@ function renderModuleContent(loading=false) {
     return;
   }
 
-  if (!data && n > 1) {
+  // Modules 10 & 11 always show input form if no valid video data
+  const _isVideoModule = n === 10 || n === 11;
+  const _hasVideoData  = data && (n === 10 ? (data.elements_cles?.length || data.analyse_complete) : (data.moments?.length));
+
+  if ((!data || (_isVideoModule && !_hasVideoData)) && n > 1) {
     // Check plan access per module tier
     const _needsStarter = n === 2 || n === 3 || n === 6;
     const _needsPro     = n === 7 || n === 8 || n === 9 || n === 10 || n === 12;
