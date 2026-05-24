@@ -2113,9 +2113,8 @@ if (_supa) {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const PENDING_ANALYSIS_KEY = 'bloxai_pending_analysis';
-const ANALYSIS_TTL = 24 * 60 * 60 * 1000; // 24h en ms
 
-/* Sauvegarder l'analyse en cours avec TTL 24h (local + Supabase) */
+/* Sauvegarder l'analyse en cours — sans TTL (persistant) */
 function savePendingAnalysis(email) {
   if (!S.modules[1]) return; // rien à sauvegarder
   const snapshot = {
@@ -2125,7 +2124,7 @@ function savePendingAnalysis(email) {
     modules:  S.modules,
     email:    email || localStorage.getItem('blowup_email') || '',
     savedAt:  Date.now(),
-    expiresAt: Date.now() + ANALYSIS_TTL,
+    // Pas d'expiresAt → analyse conservée indéfiniment
   };
   try { localStorage.setItem(PENDING_ANALYSIS_KEY, JSON.stringify(snapshot)); } catch(e) {}
   // Aussi mettre à jour bloxai_last_analysis
@@ -2196,16 +2195,13 @@ async function _fetchAnalysisFromCloud(email) {
   return null;
 }
 
-/* Vérifier si une analyse pending est encore valide (< 24h) */
+/* Charger l'analyse persistante (plus de TTL) */
 function _getPendingAnalysis() {
   try {
     const raw = localStorage.getItem(PENDING_ANALYSIS_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw);
-    if (!data.expiresAt || Date.now() > data.expiresAt) {
-      localStorage.removeItem(PENDING_ANALYSIS_KEY);
-      return null;
-    }
+    if (!data?.modules?.[1]) return null; // invalide
     return data;
   } catch(e) { return null; }
 }
@@ -2913,6 +2909,22 @@ window.onload = () => {
   // Charger les comptes multi-comptes depuis localStorage
   S.accounts = _loadAccounts();
   _renderAccountSwitcher();
+
+  // ── Restaurer la dernière analyse au démarrage ──────────────────────────────
+  // Priorité 1 : bloxai_pending_analysis (analyse en cours, persistante)
+  // Priorité 2 : compte le plus récent dans bloxai_accounts_v2
+  const _initPending = _getPendingAnalysis();
+  if (_initPending?.modules?.[1]) {
+    _applyAnalysisSnapshot(_initPending);
+  } else if (S.accounts.length > 0) {
+    // Charger le compte le plus récent
+    const _mostRecent = S.accounts.reduce((best, a) => (!best || (a.savedAt||0) > (best.savedAt||0)) ? a : best, null);
+    if (_mostRecent?.modules?.[1]) {
+      S.profile  = { ...(_mostRecent.profile || {}) };
+      S.modules  = { 1:null,2:null,3:null,4:null,5:null,6:null,7:null,8:null,9:null,10:null,11:null,12:null, ...(_mostRecent.modules || {}) };
+      S.activeAccountIdx = S.accounts.indexOf(_mostRecent);
+    }
+  }
 
   selectPlan('yearly');
   initFunnelEmailListener();
@@ -4261,6 +4273,10 @@ function renderResults() {
 
   // Sauvegarder le compte courant dans le switcher multi-compte
   _pushCurrentAccount();
+
+  // Sauvegarder l'analyse de façon persistante (sans TTL) — remplace la précédente si même URL
+  const _email = localStorage.getItem('blowup_user_email') || localStorage.getItem('blowup_email') || '';
+  savePendingAnalysis(_email);
 
   updateTabBadges();
   showView('results');
