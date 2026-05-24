@@ -1277,7 +1277,7 @@
 <!-- ═══════════════════════════════════════════════════════════ NAV -->
 <nav class="sticky top-0 z-40" style="background:rgba(6,6,12,.85);backdrop-filter:blur(12px)">
   <div class="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between">
-    <div class="flex items-center gap-2 cursor-pointer" onclick="showView(localStorage.getItem('blowup_access')&&localStorage.getItem('blowup_access')!=='free'?'app':'landing')">
+    <div class="flex items-center gap-2 cursor-pointer" onclick="showView(hasDashboardAccess()?'app':'landing')">
       <span class="font-black text-xl tracking-tight grad">⚡ BloxAI</span>
       <span style="font-size:11px;font-weight:400;color:#4a4a70;letter-spacing:.3px">by IA MANAGER</span>
     </div>
@@ -2314,12 +2314,13 @@ async function syncSupabaseSession() {
         });
       }
 
-      // Si on n'est pas encore sur le dashboard → y aller
-      const appView = document.getElementById('view-app');
-      const isOnApp = appView && appView.style.display !== 'none';
-      if (!isOnApp) {
-        showView('app');
-        // Toast après transition (300ms)
+      // Si on n'est pas encore sur la bonne vue → y aller
+      const appView     = document.getElementById('view-app');
+      const resultsView = document.getElementById('view-results');
+      const isOnApp     = appView     && appView.style.display     !== 'none';
+      const isOnResults = resultsView && resultsView.style.display !== 'none';
+      if (!isOnApp && !isOnResults) {
+        showView(hasDashboardAccess() ? 'app' : 'results');
         if (pending?.modules?.[1]) {
           setTimeout(() => _showAnalysisRestoredToast(pending.url), 400);
         }
@@ -2926,11 +2927,11 @@ const LS_FORMATION_ELITE = LS.elite_y;
 const FORMATION_CODE       = 'BLOWUP2024';   // free full access (internal/test)
 
 /* ── Access level ──
-   'free'    → audit TikTok only (module 1, TikTok platform only)
-   'starter' → paid Starter (modules 1-3: Audit, Offre, Scripts)
-   'trial'   → 3-day full access (all modules)
-   'pro'     → paid Pro (modules 1-7 incl. Spy Concurrent)
-   'elite'   → paid Élite (all modules incl. Audit Concurrent + ShortClip)
+   'free'    → aucun accès dashboard
+   'trial'   → audit TikTok/IG de base uniquement (module 1) — pas de dashboard modules
+   'starter' → modules 1,2,3,6
+   'pro'     → modules 1,2,3,6,7,9,10,12
+   'elite'   → tous les modules
 */
 function getAccessLevel() {
   const stored = localStorage.getItem('blowup_access') || '';
@@ -2944,10 +2945,12 @@ function getAccessLevel() {
   }
   return 'free';
 }
-function hasStarterAccess() { const l = getAccessLevel(); return l === 'starter' || l === 'pro' || l === 'trial' || l === 'elite'; }
-function hasProAccess()     { const l = getAccessLevel(); return l === 'pro' || l === 'trial' || l === 'elite'; }
+// Trial = accès audit seulement, PAS aux modules dashboard
+function hasStarterAccess() { const l = getAccessLevel(); return l === 'starter' || l === 'pro' || l === 'elite'; }
+function hasProAccess()     { const l = getAccessLevel(); return l === 'pro' || l === 'elite'; }
 function hasEliteAccess()   { return getAccessLevel() === 'elite'; }
 function isTrialActive()    { return getAccessLevel() === 'trial'; }
+function hasDashboardAccess() { return hasStarterAccess(); } // trial exclut le dashboard
 
 function startTrial() {
   if (!localStorage.getItem('blowup_trial_start')) {
@@ -3153,8 +3156,12 @@ function _openPasswordSetup(email) {
 function showView(v) {
   const plan = localStorage.getItem('blowup_access') || '';
   const isLoggedIn = plan && plan !== 'free';
-  // Si connecté, impossible de retourner sur la LP
-  if (v === 'landing' && isLoggedIn) v = 'app';
+  // Trial/free ne peuvent pas aller sur le dashboard — redirige vers résultats ou landing
+  if (v === 'app' && !hasDashboardAccess()) {
+    v = S.modules?.[1] ? 'results' : 'landing';
+  }
+  // Si abonné payant, impossible de retourner sur la LP
+  if (v === 'landing' && hasDashboardAccess()) v = 'app';
   ['landing','app','loading','results'].forEach(x => {
     const el = document.getElementById('view-'+x);
     if (el) el.style.display = x===v ? '' : 'none';
@@ -3183,17 +3190,17 @@ function _refreshAppHeader() {
 
 /* ── Dashboard modules definition ── */
 const _DASH_MODULES = [
-  { icon:'🔍', label:'Audit IA',            tab:1,  plans:['starter','pro','elite','trial'] },
-  { icon:'💰', label:'Offre & Monétisation', tab:2,  plans:['starter','pro','elite','trial'] },
-  { icon:'🎬', label:'Scripts viraux',       tab:3,  plans:['starter','pro','elite','trial'] },
-  { icon:'🔗', label:'Funnel & Conversion',  tab:4,  plans:['elite','trial'] },
-  { icon:'🌐', label:'Site web',             tab:5,  plans:['elite','trial'] },
-  { icon:'📅', label:'Calendrier 30j',       tab:6,  plans:['starter','pro','elite','trial'] },
-  { icon:'🕵️', label:'Spy concurrents',      tab:7,  plans:['pro','elite','trial'] },
-  { icon:'🔬', label:'Audit Concurrent',     tab:9,  plans:['elite','trial'] },
-  { icon:'🎬', label:'Analyse Vidéo',        tab:10, plans:['elite','trial'] },
-  { icon:'✂️',  label:'ShortClip IA',         tab:11, plans:['pro','elite','trial'] },
-  { icon:'#️⃣', label:'Hashtags IA',          tab:12, plans:['pro','elite','trial'] },
+  { icon:'🔍', label:'Audit IA',            tab:1,  plans:['starter','pro','elite'] },
+  { icon:'💰', label:'Offre & Monétisation', tab:2,  plans:['starter','pro','elite'] },
+  { icon:'🎬', label:'Scripts viraux',       tab:3,  plans:['starter','pro','elite'] },
+  { icon:'🔗', label:'Funnel & Conversion',  tab:4,  plans:['elite'] },
+  { icon:'🌐', label:'Site web',             tab:5,  plans:['elite'] },
+  { icon:'📅', label:'Calendrier 30j',       tab:6,  plans:['starter','pro','elite'] },
+  { icon:'🕵️', label:'Spy concurrents',      tab:7,  plans:['pro','elite'] },
+  { icon:'🔬', label:'Audit Concurrent',     tab:9,  plans:['elite'] },
+  { icon:'🎬', label:'Analyse Vidéo',        tab:10, plans:['elite'] },
+  { icon:'✂️',  label:'ShortClip IA',         tab:11, plans:['pro','elite'] },
+  { icon:'#️⃣', label:'Hashtags IA',          tab:12, plans:['pro','elite'] },
 ];
 
 const _DASH_DEFAULTS = {
@@ -4387,13 +4394,15 @@ async function generateAllModules() {
    ══════════════════════════════════════════════════════ */
 
 function _getAnalysisTTL() {
-  // TTL en ms selon le plan
+  // TTL en ms selon le plan (trial et free = pas de stockage long terme)
   if (hasEliteAccess() || hasProAccess()) return 30 * 86400000; // 30 jours
   if (hasStarterAccess()) return 14 * 86400000;                  // 14 jours
-  return 3 * 86400000;                                            // 3 jours (trial/free)
+  return 1 * 86400000;                                            // 1 jour (trial/free — audit basique seulement)
 }
 
 function _autoGenerateAll() {
+  // Trial et free n'ont pas accès aux modules dashboard
+  if (!hasDashboardAccess()) return;
   if (!S.modules[1]) return; // besoin de l'audit d'abord
   const order = [2, 3, 6, 7, 9, 10, 12, 4, 5, 11];
   const missing = order.filter(n => {
@@ -4513,10 +4522,16 @@ function renderResults() {
   savePendingAnalysis(_email);
 
   updateTabBadges();
-  showView('app');
-  _showModuleInDash(1);
-  // Auto-générer tous les modules accessibles dès la fin de l'analyse
-  setTimeout(() => _autoGenerateAll(), 800);
+  if (hasDashboardAccess()) {
+    // Abonné payant → dashboard avec modules
+    showView('app');
+    _showModuleInDash(1);
+    setTimeout(() => _autoGenerateAll(), 800);
+  } else {
+    // Trial / free → vue résultats basique (audit seulement)
+    showView('results');
+    switchTab(1);
+  }
 }
 
 function restoreLastAnalysis(tab) {
