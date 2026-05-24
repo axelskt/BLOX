@@ -3572,7 +3572,7 @@ async function callClaude(system, user, opts = {}) {
     if (userKey) headers['x-user-key'] = userKey;
     bodyObj = {
       model:      opts.model || 'claude-haiku-4-5',
-      max_tokens: opts.max_tokens || 2000,
+      max_tokens: opts.max_tokens || 4000,
       system:     [{ type: 'text', text: system }],
       messages:   [{ role: 'user', content: user }],
     };
@@ -3585,7 +3585,7 @@ async function callClaude(system, user, opts = {}) {
     headers['anthropic-dangerous-direct-browser-access'] = 'true';
     bodyObj = {
       model:      opts.model || 'claude-haiku-4-5',
-      max_tokens: opts.max_tokens || 2000,
+      max_tokens: opts.max_tokens || 4000,
       system:     [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
       messages:   [{ role: 'user', content: user }],
     };
