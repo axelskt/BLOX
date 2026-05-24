@@ -6423,27 +6423,33 @@ Réponds UNIQUEMENT avec ce JSON :
 
   7: {
     system: `Tu es un expert en intelligence concurrentielle et stratégie de contenu pour créateurs TikTok/Instagram/YouTube.
-OBJECTIF : Identifier les patterns qui cartonnent dans la niche de l'utilisateur, suggérer des comptes d'inspiration (pas forcément des concurrents directs), et générer 10 hooks immédiatement utilisables.
+OBJECTIF : Identifier les patterns qui cartonnent dans la niche exacte de l'utilisateur, suggérer 3 comptes francophones réels dans LA MÊME niche, et générer 5 hooks immédiatement utilisables.
 RULES :
-- Suggère 3 comptes d'inspiration dans des niches proches ou complémentaires (pas forcément concurrents directs)
-- Adapte les recommandations au style faceless / face caméra / les deux selon le profil
-- Hooks directement utilisables, pas des modèles vagues
+- CRITIQUE : Suggère UNIQUEMENT des comptes francophones (France, Belgique, Suisse, Canada francophone) — JAMAIS de comptes anglophones ou américains
+- CRITIQUE : Les 3 comptes doivent être dans la MÊME niche exacte que l'utilisateur (ex: si niche = dropshipping → comptes dropshipping francophone, pas "e-commerce généraliste US")
+- Les comptes doivent exister réellement et être vérifiables — pas de comptes inventés
+- Adapte les recommandations au style faceless / face caméra selon le profil
+- Hooks directement utilisables en français, pas des modèles vagues
 - LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
-    user: (p, prev) => `Intelligence concurrentielle pour ce créateur.
+    user: (p, prev) => {
+      const prevSummary = prev ? `NICHE : ${prev.diagnostic?.niche_dominante || p.desc || p.url}
+TYPE DE CONTENU : ${prev.diagnostic?.formats_recommandes?.[0] || p.contentStyle}
+OFFRE ACTUELLE : ${prev.monetisation?.offre_principale || 'non précisée'}` : `NICHE : ${p.desc || p.url}`;
+      return `Intelligence concurrentielle pour ce créateur.
 
 PROFIL : ${p.desc || p.url}
 PLATEFORME : ${p.platform}
-STYLE DE CONTENU : ${p.contentStyle === 'faceless' ? 'Faceless (sans apparaître à l\'écran)' : p.contentStyle === 'camera' ? 'Face caméra' : 'Les deux (faceless + face caméra)'}
-AUDIT : ${JSON.stringify(prev)}
+STYLE : ${p.contentStyle === 'faceless' ? 'Faceless (sans apparaître à l\'écran)' : p.contentStyle === 'camera' ? 'Face caméra' : 'Les deux'}
+${prevSummary}
 
 Réponds UNIQUEMENT avec ce JSON :
 {
   "comptes_inspiration": [
     {
-      "compte": "string — @nomcompte (plateforme)",
-      "niche": "string — leur niche exacte",
+      "compte": "string — @nomcompte (plateforme) — compte francophone réel dans la même niche",
+      "niche": "string — leur niche exacte (doit correspondre à la niche de l'utilisateur)",
       "pourquoi": "string — ce qui fonctionne chez eux et qu'on peut adapter",
       "format_cle": "string — le format / style qu'ils maîtrisent"
     },
@@ -6451,24 +6457,20 @@ Réponds UNIQUEMENT avec ce JSON :
     { "compte":"","niche":"","pourquoi":"","format_cle":"" }
   ],
   "patterns_gagnants": [
-    "string — pattern 1 qui cartonne dans la niche",
+    "string — pattern 1 qui cartonne dans cette niche",
     "string — pattern 2",
     "string — pattern 3"
   ],
   "hooks_adaptes": [
-    "string — hook 1 adapté à ton profil et style (${p.contentStyle || 'both'})",
+    "string — hook 1 adapté à la niche et au style",
     "string — hook 2",
     "string — hook 3",
     "string — hook 4",
-    "string — hook 5",
-    "string — hook 6",
-    "string — hook 7",
-    "string — hook 8",
-    "string — hook 9",
-    "string — hook 10"
+    "string — hook 5"
   ],
-  "conseil_differentiation": "string — comment te démarquer de ces comptes tout en t'en inspirant"
-}`
+  "conseil_differentiation": "string — comment se démarquer de ces comptes tout en s'en inspirant"
+}`;
+    }
   },
 
   9: {
@@ -6481,13 +6483,17 @@ RULES :
 - LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
 - Réponds en JSON uniquement`,
 
-    user: (p, prev) => `Audit concurrent approfondi pour ce créateur.
+    user: (p, prev) => {
+      const prevSummary = prev ? `NICHE : ${prev.diagnostic?.niche_dominante || p.desc || p.url}
+OFFRE : ${prev.monetisation?.offre_principale || 'non précisée'}
+STYLE DOMINANT : ${prev.diagnostic?.formats_recommandes?.[0] || p.contentStyle}` : `NICHE : ${p.desc || p.url}`;
+      return `Audit concurrent approfondi pour ce créateur.
 
 PROFIL UTILISATEUR : ${p.desc || p.url}
 PLATEFORME : ${p.platform}
-STYLE DE CONTENU : ${p.contentStyle === 'faceless' ? 'Faceless' : p.contentStyle === 'camera' ? 'Face caméra' : 'Les deux'}
-DIAGNOSTIC : ${JSON.stringify(prev)}
-CONCURRENT À ANALYSER : ${p.competitor || 'le concurrent le plus performant dans la même niche — choisis-en un réel et identifie-le clairement'}
+STYLE : ${p.contentStyle === 'faceless' ? 'Faceless' : p.contentStyle === 'camera' ? 'Face caméra' : 'Les deux'}
+${prevSummary}
+CONCURRENT À ANALYSER : ${p.competitor || 'le concurrent francophone le plus performant dans la même niche — choisis-en un réel et identifie-le clairement'}
 
 Réponds UNIQUEMENT avec ce JSON :
 {
@@ -6504,12 +6510,7 @@ Réponds UNIQUEMENT avec ce JSON :
     "string — hook 2",
     "string — hook 3",
     "string — hook 4",
-    "string — hook 5",
-    "string — hook 6",
-    "string — hook 7",
-    "string — hook 8",
-    "string — hook 9",
-    "string — hook 10"
+    "string — hook 5"
   ],
   "scripts_inspires": [
     {
@@ -6521,7 +6522,8 @@ Réponds UNIQUEMENT avec ce JSON :
     { "titre":"","inspiration":"","adaptation":"","script":"" },
     { "titre":"","inspiration":"","adaptation":"","script":"" }
   ]
-}`
+}`;
+    }
   },
 
   10: {
