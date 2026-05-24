@@ -4421,13 +4421,22 @@ async function _runGenerateModule(n) {
 
     const userPrompt = PROMPTS[n].user(S.profile, prevData);
 
+    // Modules with rich structured output need more tokens
+    const _modOpts = {
+      4: { max_tokens: 5000 },  // Funnel (LP + emails)
+      5: { max_tokens: 7000 },  // Site web (HTML complet)
+      9: { max_tokens: 5000 },  // Audit concurrent (analyse + scripts)
+      6: { max_tokens: 5000 },  // Calendrier 30j (30 entrées)
+    };
+    const _callOpts = _modOpts[n] || {};
+
     let result;
     try {
-      result = await callClaude(PROMPTS[n].system, userPrompt);
+      result = await callClaude(PROMPTS[n].system, userPrompt, _callOpts);
     } catch(e1) {
       if (e1.message === 'no_key') throw e1;
       await new Promise(r => setTimeout(r, 2000));
-      result = await callClaude(PROMPTS[n].system, userPrompt);
+      result = await callClaude(PROMPTS[n].system, userPrompt, _callOpts);
     }
     S.modules[n] = result;
     // Save immediately so navigation never loses this module
@@ -4525,7 +4534,8 @@ async function generateAllModules() {
       if (n === 12) prevData = S.modules[1];
 
       const userPrompt = PROMPTS[n].user(S.profile, prevData);
-      const result = await callClaude(PROMPTS[n].system, userPrompt);
+      const _mOpts2 = { 4:{max_tokens:5000}, 5:{max_tokens:7000}, 9:{max_tokens:5000}, 6:{max_tokens:5000} };
+      const result = await callClaude(PROMPTS[n].system, userPrompt, _mOpts2[n] || {});
       S.modules[n] = result;
       done++;
       // Save after each module so navigation never loses progress
@@ -6696,7 +6706,7 @@ Réponds UNIQUEMENT avec ce JSON :
       "titre": "string",
       "inspiration": "string — ce qui a marché chez le concurrent",
       "adaptation": "string — comment on l'adapte à ton compte",
-      "script": "string — script complet (150 mots max)"
+      "script": "string — script complet (80 mots max)"
     },
     { "titre":"","inspiration":"","adaptation":"","script":"" },
     { "titre":"","inspiration":"","adaptation":"","script":"" }
