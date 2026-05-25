@@ -1472,7 +1472,7 @@
         <div class="lp-feat">
           <div class="lp-feat-icon">🎬</div>
           <div class="font-bold text-white mb-1">Analyse Vidéo Virale</div>
-          <div class="text-gray-500 text-sm">Pourquoi ça cartonne + sous-titres Hormozi / MrBeast.</div>
+          <div class="text-gray-500 text-sm">Pourquoi ça cartonne + génère les sous-titres à réutiliser dans tes vidéos.</div>
         </div>
         <div class="lp-feat" style="border-color:rgba(249,115,22,.2)">
           <div class="lp-feat-icon" style="border-color:rgba(249,115,22,.25)">🔬</div>
@@ -2202,7 +2202,7 @@
       <div class="res-sidebar-section">Monétisation <span class="res-mod-plan plan-elite" style="letter-spacing:.5px">Élite</span></div>
       <div class="res-mod-item" id="tab-4" onclick="switchTab(4)">
         <div class="res-mod-icon">🔗</div>
-        <div class="res-mod-label">Funnel & Conversion</div>
+        <div class="res-mod-label">Funnel Qualif → Calendly</div>
         <div class="res-mod-status empty" id="tab-status-4">○</div>
       </div>
       <div class="res-mod-item" id="tab-5" onclick="switchTab(5)">
@@ -3098,7 +3098,7 @@ function startTrial() {
 }
 
 /* ── Module labels ── */
-const MOD_LABELS = { 1:'Audit', 2:'Offre', 3:'Scripts', 4:'Funnel', 5:'Site web', 6:'Calendrier 30j', 7:'Spy Concurrent', 9:'Audit Concurrent', 10:'Analyse Vidéo', 11:'ShortClip', 12:'Hashtags' };
+const MOD_LABELS = { 1:'Audit', 2:'Offre', 3:'Scripts', 4:'Funnel Qualif', 5:'Site web', 6:'Calendrier 30j', 7:'Spy Concurrent', 9:'Audit Concurrent', 10:'Analyse Vidéo', 11:'ShortClip', 12:'Hashtags' };
 const MOD_EMOJI  = { 1:'🔍', 2:'💰', 3:'🎬', 4:'🔗', 5:'🌐', 6:'📅', 7:'🕵️', 9:'🔬', 10:'🎬', 11:'✂️', 12:'#️⃣' };
 
 /* ── Boot ── */
@@ -4020,18 +4020,48 @@ Réponds UNIQUEMENT avec ce JSON :
     system: `Tu es un expert en scripts TikTok viraux orientés conversion + scripts de vente en DM.
 OBJECTIF : Générer des scripts courts percutants qui vendent, ET des scripts DM pour closer les prospects.
 LANGUE OBLIGATOIRE : Français UNIQUEMENT. Zéro anglicisme, zéro franglais. Jamais "feel", "vibe", "check", "game", "mindset", "hype", "boost", "deal", "cool", "ok". Remplace par : "ressentir", "ambiance", "vérifier", "jeu", "état d'esprit", "engouement", "améliorer", "accord", "super", "d'accord".
+
+PATTERNS DE SCRIPTS VIRAUX QUI CARTONNENT (adapte ces structures à la niche exacte) :
+
+PATTERN 1 — CONTRASTE TEMPOREL (très viral) :
+"En [année] tu as raté [opportunité passée], en [année] tu as raté [opportunité], ..., Ne rate pas [ton offre] en 2026"
+→ Ex: "En 2014 tu as raté le bitcoin, en 2017 le dropshipping, en 2019 le SMMA, en 2021 l'OFM, ne rate pas [ton offre] en 2026"
+Corps : -Potentiel +10K/mois / -100% de bénéfice / -1h/jour / -0 expérience
+CTA : Commente "[MOT CLÉ]" si tu veux les étapes en DM
+
+PATTERN 2 — DE FAUCHÉ À RÉSULTATS :
+"De fauché à +[chiffre] en moins de [délai] grâce à [ton offre] — voici comment"
+→ Corps : liste des avantages, CTA commentaire
+
+PATTERN 3 — POV RÉSULTAT :
+"POV : tu t'es lancé dans [ton offre] et tu gagnes +[chiffre]/mois à [âge] ans"
+→ Corps : les avantages concrets, CTA
+
+PATTERN 4 — CONTRASTE SOCIAL :
+"Dire que certains [action négative / travail ingrat]... alors que [ton offre] te permet de [résultat positif]"
+→ Ex: "Dire que certains se lèvent à 6h pour enrichir leur patron... alors que [ton offre] génère des revenus pendant qu'ils dorment"
+
+PATTERN 5 — LISTE DE BÉNÉFICES (format 5 slides) :
+Slide 1 : Tu veux [résultat] mais... "Je [objection 1]" / "J'ai peur de [objection 2]" / "Je [objection 3]"
+Slides 2-4 : [Ton offre] : -Pas de concurrence / -100% de bénéfice / -1h/jour / -0 compétence requise
+Slide 5 : CTA commentaire
+
+PATTERN 6 — URGENCE SAISONNIÈRE :
+"C'est bientôt [saison/événement] et tu n'as toujours pas [résultat] ? C'est normal tu utilises les mauvaises stratégies"
+→ Corps : présentation solution, CTA
+
 RÈGLES SCRIPTS TIKTOK :
 - Hook choc en 1 phrase (curiosité ou FOMO dès la 1ère seconde)
-- Corps : 3-5 bullet points bénéfices (pas de blabla)
+- Corps : 3-5 bullet points bénéfices (✓ symbole, pas de blabla)
 - Langage direct, familier — "tu" pas "vous"
-- CTA : "Commente [MOT CLÉ]" pour générer des leads
+- CTA : "Commente [MOT CLÉ]" + "Écris [MOT CLÉ] en DM" — TOUJOURS 2 CTA différents
 - Faceless-friendly par défaut (voix off + texte écran)
-- Durée cible : 15-25 secondes
+- Durée cible : 15-25 secondes (ou 5 slides pour carrousel)
 RÈGLES SCRIPTS DM (si offre formation/accompagnement) :
 - Scripts naturels, pas commerciaux — conversation d'abord
 - Gérer les objections classiques avec empathie + pivot — en français correct et naturel
 - Toujours terminer par une question ouverte
-- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => {
@@ -4102,51 +4132,86 @@ Réponds UNIQUEMENT avec ce JSON :
   },
 
   4: {
-    system: `Tu es un expert en funnel marketing et optimisation de conversion pour créateurs.
-OBJECTIF : Transformer une audience en clients payants via un système simple.
+    system: `Tu es un expert en tunnel de qualification et conversion pour créateurs et infopreneurs.
+OBJECTIF : Construire le système de conversion ENTRE le contenu viral et le Calendly — c'est l'étape TypeForm/Quiz → qualification → prise de RDV.
+TUNNEL TYPE : TikTok/Reel viral → CTA "Commente X" → DM automatique → Lien TypeForm → Questions de qualification → Si qualifié : Calendly → Appel découverte → Vente.
 RULES:
-- Simple et exécutable immédiatement
-- Orienté DM + landing page + email
-- Pas de complexité inutile
+- Focus sur la qualification : 4-5 questions qui filtrent les prospects AVANT le Calendly
+- DM de bienvenue naturel et non commercial
+- Séquence email après qualification
+- Bio optimisée avec les 4 éléments clés : @username_signifiant + preuve chiffrable + CTA unique vers DM + lien Beacons.ai
 - LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
-- Réponds en JSON uniquement`,
+- Réponds en JSON uniquement
 
-    user: (p, prev) => `Crée un funnel de conversion pour ce profil.
+MODÈLE DE BIO QUI CONVERTIT (utilise TOUJOURS cette structure) :
+1. Nom d'utilisateur : doit ATTIRER les acheteurs et REPOUSSER les curieux — ex: @ia.lebd.business, @revenus.ia.officiel
+2. La preuve : chiffre précis qui active la confiance — ex: "147K abonnés", "50+ clients accompagnés", "10K€/mois générés"
+3. CTA unique vers les DMs — ex: 'DM "INFO" pour démarrer →' ou 'Envoie "GO" en DM📩'
+4. Lien : une seule URL, Beacons.ai ou lien.bio pour centraliser (pas de linktree multipage)`,
+
+    user: (p, prev) => {
+      const offerName = prev?.offre_principale?.nom || prev?.nom_offre || p.niche || 'ton offre';
+      const offerPrice = prev?.offre_principale?.prix || '';
+      return `Crée le tunnel de qualification Typeform → Calendly pour ce créateur.
 
 PROFIL : ${p.desc || p.url}
+PLATEFORME : ${p.platform}
 ${_bizCtx(p)}
-OFFRE : ${JSON.stringify(prev)}
+OFFRE : ${offerName}${offerPrice ? ' — ' + offerPrice : ''}
+DIAGNOSTIC : ${prev?.diagnostic?.probleme_principal || 'voir audit'}
 
 Réponds UNIQUEMENT avec ce JSON :
 {
-  "lead_magnet": "string — description du lead magnet à proposer",
-  "dm_script": "string — script DM exact pour convertir un follower en client (200 mots max)",
-  "landing_page_structure": {
-    "hero": "string — titre principal de la landing page",
-    "sous_titre": "string",
-    "probleme": "string — section problème (3-4 bullet points séparés par |)",
-    "solution": "string — section solution",
-    "preuve": "string — section preuve sociale / résultats",
-    "cta": "string — texte du bouton CTA"
+  "lead_magnet": "string — lead magnet gratuit pour déclencher la conversation DM",
+  "dm_script_bienvenue": "string — message DM automatique envoyé quand quelqu'un commente le mot clé (naturel, non commercial, 80 mots max)",
+  "tunnel_qualification": {
+    "titre": "string — titre de la page TypeForm (ex: Vérifie si tu es éligible)",
+    "intro": "string — phrase d'intro qui filtre les curieux",
+    "questions": [
+      { "num": 1, "question": "string", "type": "choix_multiple", "options": ["A","B","C"], "filtre": "string — qui disqualifier" },
+      { "num": 2, "question": "string", "type": "choix_multiple", "options": ["A","B","C"], "filtre": "string" },
+      { "num": 3, "question": "Budget disponible ?", "type": "choix_multiple", "options": ["Moins de 300€","300€-1000€","1000€-3000€","Plus de 3000€"], "filtre": "Disqualifier si Moins de 300€" },
+      { "num": 4, "question": "Objectif en 60 jours ?", "type": "texte_libre", "options": [], "filtre": "none" },
+      { "num": 5, "question": "Motivation à passer à l'action maintenant sur 10 ?", "type": "échelle_1_10", "options": [], "filtre": "Disqualifier si score < 7" }
+    ],
+    "message_qualifie": "string — message affiché si qualifié + lien Calendly",
+    "message_non_qualifie": "string — message doux de redirection",
+    "conseil_calendly": "string — comment nommer le créneau Calendly pour maximiser les présentations"
   },
   "email_sequence": [
-    "string — Email 1 : sujet + contenu court",
-    "string — Email 2 : sujet + contenu court",
-    "string — Email 3 : sujet + contenu court",
-    "string — Email 4 : sujet + contenu court"
+    "string — Email 1 : SUJET + CONTENU court (après inscription lead magnet)",
+    "string — Email 2 : SUJET + CONTENU court (nurturing / preuve sociale)",
+    "string — Email 3 : SUJET + CONTENU court (urgence / offre)",
+    "string — Email 4 : SUJET + CONTENU court (relance / dernier appel)"
   ],
-  "bio_optimisee": "string — bio Instagram/TikTok optimisée pour la conversion (150 chars max)"
-}`
+  "bio_optimisee": {
+    "username_suggere": "string — @handle recommandé (attire acheteurs, repousse curieux)",
+    "description": "string — 2 lignes max : preuve chiffrable + ce que tu apportes",
+    "cta_dm": "string — ex: DM \\"INFO\\" pour démarrer →",
+    "lien_bio": "string — URL unique recommandée (Beacons.ai / lien.bio)",
+    "bio_complete": "string — bio complète prête à coller (150 chars max)"
+  }
+}`;
+    }
   },
 
   5: {
     system: `Tu es un expert en conversion web pour infopreneurs et créateurs qui vendent des formations, accompagnements ou services premium.
-OBJECTIF : Créer une landing page haute conversion complète + tunnel de qualification Typeform → Calendly + analyse stratégique.
+OBJECTIF : Créer une landing page haute conversion COMPLÈTE qui ressemble à un vrai tunnel de vente professionnel (Systeme.io / ClickFunnels style).
+STRUCTURE D'UNE LANDING PAGE QUI CONVERTIT :
+1. HERO : H1 puissant + sous-titre + CTA principal (bouton visible immédiatement)
+2. SOCIAL PROOF IMMÉDIAT : chiffres clés juste après le hero (ex: "127 créateurs accompagnés • 89% de premiers résultats en < 60 jours")
+3. PROBLÈME : douleur exacte de la cible — 3-4 points concrets
+4. SOLUTION : comment tu résous, résultat promis, mécanisme unique
+5. CE QUE TU VAS APPRENDRE / RECEVOIR : liste complète de l'offre
+6. PREUVE SOCIALE / TÉMOIGNAGES : 2-3 témoignages fictifs mais réalistes avec prénom, âge, résultat chiffré
+7. VSL PLACEHOLDER : si demandé, section avec script VSL complet (hook 0-5s, problème, solution, preuve, CTA)
+8. FAQ : 4-5 questions objections + réponses
+9. FOOTER : mentions légales, liens, copyright
 RÈGLES :
-- Copywriting direct, bénéfices concrets, preuve sociale, objections réfutées
-- Tunnel qualification : 5 questions qui filtrent les prospects non qualifiés AVANT le Calendly
-- Inclure un raisonnement stratégique et des axes d'amélioration concrets (dont VSL)
-- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
+- Copywriting direct, bénéfices concrets, preuve sociale réaliste
+- Tunnel qualification TypeForm si demandé : 5 questions qui filtrent AVANT le Calendly
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => {
@@ -4154,7 +4219,10 @@ RÈGLES :
       const offerName  = prefs.offerName  || prev?.offre_principale?.nom || prev?.nom_offre || p.niche || 'ton offre';
       const offerPrice = prefs.price      || prev?.offre_principale?.prix || '';
       const niche      = p.niche || p.desc || p.url;
-      return `Crée le site web complet + stratégie pour ce créateur.
+      const mustHave   = prefs.mustHave || [];
+      const wantsVSL   = mustHave.some(m => m.toLowerCase().includes('vsl'));
+      const wantsTypeform = mustHave.some(m => m.toLowerCase().includes('typeform') || m.toLowerCase().includes('calendly'));
+      return `Crée le site web haute conversion + stratégie pour ce créateur.
 
 HANDLE : ${p.url}
 NICHE / OFFRE : ${niche}
@@ -4163,47 +4231,64 @@ TYPE D'OFFRE : ${prefs.offerType || 'non précisé'}
 PRIX : ${offerPrice || 'non précisé'}
 RÉSULTAT PROMIS : ${prefs.result || prev?.diagnostic?.probleme_principal || 'non précisé'}
 AUDIENCE CIBLE : ${prefs.audience || 'non précisé'}
-STYLE VISUEL SOUHAITÉ : ${prefs.style || 'Dark & premium'}
-TON DE COMMUNICATION : ${prefs.tone || 'Direct & cash'}
-ÉLÉMENTS OBLIGATOIRES : ${prefs.mustHave?.join(', ') || 'aucun spécifié'}
-CE QUI EST INTERDIT / NON VOULU : ${prefs.dontWant || 'aucune restriction'}
-CONTEXTE ANALYSE : ${prev?.diagnostic?.probleme_principal || prev?.etapes?.[0]?.titre || 'non précisé'}
+STYLE VISUEL : ${prefs.style || 'Dark & premium'}
+TON : ${prefs.tone || 'Direct & cash'}
+ÉLÉMENTS OBLIGATOIRES : ${mustHave.join(', ') || 'aucun spécifié'}
+CE QUI EST INTERDIT : ${prefs.dontWant || 'aucune restriction'}
+VSL DEMANDÉE : ${wantsVSL ? 'OUI — génère un script VSL complet de 3-5 min (hook, problème, solution, preuve, objections, CTA)' : 'NON'}
+TUNNEL TYPEFORM→CALENDLY : ${wantsTypeform ? 'OUI — génère les 5 questions de qualification' : 'NON — pas besoin'}
 
 Réponds UNIQUEMENT avec ce JSON :
 {
   "homepage": {
     "hero": "string — H1 puissant 8-12 mots",
-    "subheadline": "string — pour qui + résultat attendu",
-    "cta": "string — texte bouton CTA principal"
+    "subheadline": "string — pour qui + résultat attendu en X jours",
+    "cta": "string — texte bouton CTA principal",
+    "social_proof_hero": "string — 1 ligne de preuves chiffrées juste sous le CTA (ex: '127 créateurs accompagnés • 89% de résultats en < 60 jours')"
   },
   "couleurs": { "primaire": "#hexcode", "secondaire": "#hexcode", "fond": "#hexcode", "texte": "#hexcode" },
   "sections": [
-    { "type": "probleme", "titre": "string", "contenu": "string — 2-3 phrases douleur exacte" },
-    { "type": "solution", "titre": "string", "contenu": "string — comment tu résous, résultat promis" },
-    { "type": "offre", "titre": "string", "contenu": "string — ce que comprend l'offre", "prix": "string" },
-    { "type": "preuve", "titre": "string", "contenu": "string — témoignage / résultat client / chiffre clé" },
-    { "type": "faq", "titre": "string", "questions": ["Q: ... A: ...","Q: ... A: ...","Q: ... A: ..."] }
+    { "type": "probleme", "titre": "string", "contenu": "string — 3-4 douleurs exactes de la cible séparées par |" },
+    { "type": "solution", "titre": "string", "contenu": "string — mécanisme unique + résultat promis" },
+    { "type": "offre", "titre": "string", "contenu": "string — liste complète de ce que comprend l'offre", "prix": "string" },
+    { "type": "preuve", "titre": "string", "temoignages": [
+      { "prenom": "string", "age": "number", "resultat": "string — résultat chiffré obtenu", "texte": "string — témoignage 2-3 phrases" },
+      { "prenom": "string", "age": "number", "resultat": "string", "texte": "string" },
+      { "prenom": "string", "age": "number", "resultat": "string", "texte": "string" }
+    ]},
+    { "type": "faq", "titre": "string", "questions": ["Q: ... | A: ...","Q: ... | A: ...","Q: ... | A: ...","Q: ... | A: ..."] },
+    { "type": "footer", "mentions": "string — mentions légales courtes", "liens": ["CGV","Politique de confidentialité","Contact"] }
   ],
-  "tunnel_qualification": {
+  "vsl_script": ${wantsVSL ? `{
+    "duree_cible": "string — ex: 4 min",
+    "hook_0_5s": "string — accroche brutale des 5 premières secondes",
+    "probleme": "string — développement du problème (30-40 sec)",
+    "solution": "string — présentation de la solution (30 sec)",
+    "preuve": "string — résultats et témoignages (45 sec)",
+    "offre_detail": "string — ce qu'ils reçoivent, bonus, prix (30 sec)",
+    "objections": "string — réfuter 2-3 objections clés (30 sec)",
+    "cta_final": "string — appel à l'action final avec urgence (15 sec)",
+    "script_complet": "string — script complet en 1 bloc à lire devant la caméra ou en voix off"
+  }` : 'null'},
+  "tunnel_qualification": ${wantsTypeform ? `{
     "titre": "string",
     "intro": "string",
     "questions": [
       { "num": 1, "question": "string", "type": "choix_multiple", "options": ["A","B","C"], "filtre": "string" },
       { "num": 2, "question": "string", "type": "choix_multiple", "options": ["A","B","C"], "filtre": "string" },
-      { "num": 3, "question": "Budget disponible ?", "type": "choix_multiple", "options": ["Moins de 500€","500€-1500€","1500€-3000€","Plus de 3000€"], "filtre": "Disqualifier si Moins de 500€" },
-      { "num": 4, "question": "Objectif en 90 jours ?", "type": "texte_libre", "options": [], "filtre": "none" },
-      { "num": 5, "question": "Motivation sur 10 ?", "type": "échelle_1_10", "options": [], "filtre": "Disqualifier si score < 7" }
+      { "num": 3, "question": "Budget disponible ?", "type": "choix_multiple", "options": ["Moins de 300€","300€-1000€","1000€-3000€","Plus de 3000€"], "filtre": "Disqualifier si Moins de 300€" },
+      { "num": 4, "question": "Objectif en 60 jours ?", "type": "texte_libre", "options": [], "filtre": "none" },
+      { "num": 5, "question": "Motivation à passer à l'action maintenant sur 10 ?", "type": "échelle_1_10", "options": [], "filtre": "Disqualifier si score < 7" }
     ],
     "message_qualifie": "string",
     "message_non_qualifie": "string",
     "conseils_calendly": "string"
-  },
+  }` : 'null'},
   "raisonnement": "string — 3-4 phrases expliquant pourquoi cette structure convertit pour cette niche précise",
   "axes_amelioration": [
-    { "priorite": 1, "titre": "Tourner une VSL (Video Sales Letter)", "description": "string — pourquoi une VSL de 3-5 min sur la hero section multiplierait les conversions, ce qu'elle doit contenir : hook, problème, solution, preuve, CTA", "impact": "élevé", "effort": "moyen" },
+    { "priorite": 1, "titre": "string", "description": "string", "impact": "élevé | moyen | faible", "effort": "fort | moyen | faible" },
     { "priorite": 2, "titre": "string", "description": "string", "impact": "string", "effort": "string" },
-    { "priorite": 3, "titre": "string", "description": "string", "impact": "string", "effort": "string" },
-    { "priorite": 4, "titre": "string", "description": "string", "impact": "string", "effort": "string" }
+    { "priorite": 3, "titre": "string", "description": "string", "impact": "string", "effort": "string" }
   ],
   "cta_final": "string",
   "meta_description": "string — 160 chars SEO",
@@ -4219,19 +4304,31 @@ RULES:
 - Hashtags classés par type : niche, volume moyen, viral, tendance
 - Pour chaque hashtag : estimation portée et niveau de compétition
 - Mix stratégique : 30% gros volumes, 40% moyens, 30% niche
+
+RÈGLE TIKTOK — LIMITE ABSOLUE :
+- Sur TikTok : maximum 5 hashtags par vidéo — au-delà, l'algorithme pénalise. combinaison_ideale = exactement 3-5 hashtags pour TikTok.
+- Sur Instagram : jusqu'à 10-15 hashtags est acceptable. combinaison_ideale = 8-12 hashtags pour Instagram.
+- Sur YouTube : pas de limite stricte mais 3-5 tags suffisent dans la description.
 - Réponds uniquement en JSON sans texte autour`,
 
-    user: (p, prev) => `Génère une stratégie de hashtags pour ce créateur :
+    user: (p, prev) => {
+      const isTikTok = (p.platform || 'tiktok').toLowerCase().includes('tiktok');
+      const isInsta  = (p.platform || '').toLowerCase().includes('instagram') || (p.platform || '').toLowerCase().includes('insta');
+      const maxTags  = isTikTok ? 5 : isInsta ? 12 : 5;
+      const tagNote  = isTikTok ? 'TIKTOK : exactement 3-5 hashtags dans combinaison_ideale — pas plus !' : isInsta ? 'INSTAGRAM : 8-12 hashtags dans combinaison_ideale' : '3-5 hashtags dans combinaison_ideale';
+      return `Génère une stratégie de hashtags pour ce créateur :
 Plateforme : ${p.platform}
 Niche / Business : ${p.niche || p.desc || p.url}
 Style de contenu : ${p.contentStyle}
 ${_bizCtx(p)}
 Diagnostic audit : ${JSON.stringify(prev?.diagnostic || {})}
 
+⚠ ${tagNote}
+
 Réponds UNIQUEMENT avec ce JSON :
 {
   "strategie": "string",
-  "mix_recommande": "string ex: 5 niche + 8 moyens + 3 viraux par post",
+  "mix_recommande": "string — adapté à la plateforme (ex TikTok: 2 niche + 2 moyens + 1 viral = 5 max)",
   "hashtags_niche": [
     { "tag": "#exemple", "portee": "50k-200k", "competition": "faible", "pourquoi": "string" }
   ],
@@ -4244,10 +4341,11 @@ Réponds UNIQUEMENT avec ce JSON :
   "hashtags_tendance": [
     { "tag": "#exemple", "contexte": "string" }
   ],
-  "combinaison_ideale": ["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6","#tag7","#tag8","#tag9","#tag10","#tag11","#tag12","#tag13","#tag14","#tag15"],
-  "conseil_rotation": "string",
+  "combinaison_ideale": ${isTikTok ? '["#tag1","#tag2","#tag3","#tag4","#tag5"]' : '["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6","#tag7","#tag8","#tag9","#tag10"]'},
+  "conseil_rotation": "string — comment varier les hashtags d'une vidéo à l'autre",
   "erreurs_a_eviter": ["string","string","string"]
-}`
+}`;
+    }
   },
 };
 
@@ -5447,7 +5545,7 @@ function renderModule10Input() {
 
     <!-- Style sous-titres -->
     <div>
-      <label class="section-lbl">Style de sous-titres</label>
+      <label class="section-lbl">Style de sous-titres <span style="font-size:11px;color:#6b7280;font-weight:400">(pour générer les sous-titres découpés à réutiliser dans tes propres vidéos)</span></label>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
         ${[
           { key:'hormozi', emoji:'⚡', label:'Hormozi', desc:'Gras blanc · 1-3 mots · mot clé en jaune' },
@@ -6030,8 +6128,12 @@ function renderModule3(d) {
 
 /* ── MODULE 4 RENDER ── */
 function renderModule4(d) {
-  const lp  = d.landing_page_structure || {};
+  const tq  = d.tunnel_qualification || {};
   const emails = d.email_sequence || [];
+  const bio = d.bio_optimisee || {};
+  const bioComplete = typeof bio === 'string' ? bio : (bio.bio_complete || '');
+  const questions = tq.questions || [];
+
   return `<div class="fade-up space-y-5">
     <!-- Lead magnet -->
     <div class="card p-6">
@@ -6039,37 +6141,52 @@ function renderModule4(d) {
       <p class="text-gray-300 text-sm leading-relaxed">${esc(d.lead_magnet||'—')}</p>
     </div>
 
-    <!-- DM script -->
+    <!-- DM de bienvenue -->
     <div class="card p-6" style="border-color:rgba(168,85,247,.2)">
-      <div class="section-lbl" style="color:#a855f7">💬 Script DM (copie-colle)</div>
-      <p class="text-purple-200 text-sm leading-relaxed whitespace-pre-line bg-purple-950 bg-opacity-20 rounded-lg p-4 border border-purple-900 border-opacity-30">${esc(d.dm_script||'—')}</p>
+      <div class="section-lbl" style="color:#a855f7">💬 DM automatique de bienvenue (copie-colle)</div>
+      <p class="text-purple-200 text-sm leading-relaxed whitespace-pre-line bg-purple-950 bg-opacity-20 rounded-lg p-4 border border-purple-900 border-opacity-30">${esc(d.dm_script_bienvenue || d.dm_script || '—')}</p>
     </div>
 
-    <!-- Landing page structure -->
-    <div class="card p-6">
-      <div class="section-lbl">🌐 Structure landing page</div>
-      <div class="space-y-3">
-        <div class="r-yellow"><strong>Hero :</strong> ${esc(lp.hero||'—')}</div>
-        <div class="r-yellow"><strong>Sous-titre :</strong> ${esc(lp.sous_titre||'—')}</div>
-        <div class="r-red"><strong>Problème :</strong> ${esc(lp.probleme||'—')}</div>
-        <div class="r-green"><strong>Solution :</strong> ${esc(lp.solution||'—')}</div>
-        <div class="r-purple"><strong>Preuve :</strong> ${esc(lp.preuve||'—')}</div>
-        <div class="r-blue"><strong>CTA :</strong> ${esc(lp.cta||'—')}</div>
+    <!-- Tunnel qualification -->
+    ${questions.length ? `<div class="card p-6" style="border-color:rgba(59,130,246,.2)">
+      <div class="section-lbl" style="color:#60a5fa">📋 Tunnel Typeform → Calendly</div>
+      ${tq.titre ? `<h4 style="font-size:15px;font-weight:800;color:#e2e8f0;margin-bottom:4px">${esc(tq.titre)}</h4>` : ''}
+      ${tq.intro ? `<p style="font-size:12px;color:#9ca3af;margin-bottom:12px">${esc(tq.intro)}</p>` : ''}
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${questions.map(q=>`<div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:8px;padding:10px 12px">
+          <div style="font-size:12px;font-weight:700;color:#93c5fd;margin-bottom:4px">Question ${q.num}</div>
+          <p style="font-size:13px;color:#e2e8f0;margin-bottom:4px">${esc(q.question)}</p>
+          ${q.options?.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap">${q.options.map(o=>`<span style="font-size:11px;background:rgba(59,130,246,.12);color:#93c5fd;border-radius:4px;padding:2px 8px">${esc(o)}</span>`).join('')}</div>` : ''}
+          ${q.filtre && q.filtre !== 'none' ? `<p style="font-size:11px;color:#f87171;margin-top:4px">⚡ ${esc(q.filtre)}</p>` : ''}
+        </div>`).join('')}
       </div>
-    </div>
+      ${tq.message_qualifie ? `<div style="margin-top:10px" class="r-green">✅ Si qualifié : ${esc(tq.message_qualifie)}</div>` : ''}
+      ${tq.message_non_qualifie ? `<div style="margin-top:6px" class="r-red">❌ Si non qualifié : ${esc(tq.message_non_qualifie)}</div>` : ''}
+      ${tq.conseil_calendly ? `<div style="margin-top:6px" class="r-blue">📅 Conseil Calendly : ${esc(tq.conseil_calendly)}</div>` : ''}
+    </div>` : ''}
 
     <!-- Email sequence -->
     <div class="card p-6">
-      <div class="section-lbl">📧 Séquence email (4 emails)</div>
+      <div class="section-lbl">📧 Séquence email (${emails.length} emails)</div>
       <div class="space-y-2">
         ${emails.map((e,i)=>`<div class="r-blue"><strong>Email ${i+1} :</strong> ${esc(e)}</div>`).join('') || '<p class="text-gray-500 text-sm">—</p>'}
       </div>
     </div>
 
     <!-- Bio optimisée -->
-    ${d.bio_optimisee ? `<div class="card p-6" style="border-color:rgba(34,197,94,.2)">
-      <div class="section-lbl" style="color:#22c55e">✍ Bio optimisée (copie-colle)</div>
-      <p class="text-green-300 font-medium text-sm bg-green-950 bg-opacity-20 rounded-lg p-4 border border-green-900 border-opacity-30">${esc(d.bio_optimisee)}</p>
+    ${(bioComplete || typeof bio === 'string') ? `<div class="card p-6" style="border-color:rgba(34,197,94,.2)">
+      <div class="section-lbl" style="color:#22c55e">✍ Bio optimisée — 4 éléments clés</div>
+      ${typeof bio === 'object' ? `
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+        ${bio.username_suggere ? `<div class="r-purple">👤 <strong>@Username :</strong> ${esc(bio.username_suggere)}</div>` : ''}
+        ${bio.description ? `<div class="r-blue">📣 <strong>Description :</strong> ${esc(bio.description)}</div>` : ''}
+        ${bio.cta_dm ? `<div class="r-green">💬 <strong>CTA DM :</strong> ${esc(bio.cta_dm)}</div>` : ''}
+        ${bio.lien_bio ? `<div class="r-yellow">🔗 <strong>Lien :</strong> ${esc(bio.lien_bio)}</div>` : ''}
+      </div>` : ''}
+      <div style="position:relative">
+        <p class="text-green-300 font-medium text-sm bg-green-950 bg-opacity-20 rounded-lg p-4 border border-green-900 border-opacity-30 pr-16">${esc(bioComplete)}</p>
+        <button onclick="navigator.clipboard.writeText(${JSON.stringify(bioComplete)}).then(()=>{this.textContent='✓ Copié!';setTimeout(()=>this.textContent='📋 Copier',1500)})" style="position:absolute;top:8px;right:8px;padding:4px 10px;border-radius:6px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#86efac;font-size:11px;cursor:pointer">📋 Copier</button>
+      </div>
     </div>` : ''}
   </div>`;
 }
@@ -6149,7 +6266,7 @@ function renderModule5Form() {
     <div style="margin-bottom:12px">
       <label style="font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:7px">Éléments à inclure absolument</label>
       <div style="display:flex;flex-wrap:wrap;gap:7px" id="sw_mustGroup">
-        ${['VSL vidéo','Témoignages clients','Garantie remboursement','FAQ','Timer / urgence','Section "À propos"','Formulaire de qualification','Preuve sociale (chiffres)','Section bonus'].map(t=>`
+        ${['VSL (script vidéo de vente)','Témoignages / Social proof','Tunnel Typeform → Calendly','Footer complet','Garantie remboursement','FAQ','Timer / urgence','Section "À propos"','Preuve sociale (chiffres)'].map(t=>`
         <button type="button" onclick="_sw_toggle(this)" data-val="${t}" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#9ca3af;font-size:12px;cursor:pointer;transition:all .15s">${t}</button>`).join('')}
       </div>
     </div>
@@ -6286,14 +6403,26 @@ function _generateSiteHtml(d) {
       <a href="#postuler" style="display:inline-block;background:linear-gradient(135deg,${c1},${c2});color:#fff;padding:18px 44px;border-radius:50px;font-size:17px;font-weight:800;text-decoration:none;box-shadow:0 8px 32px ${c1}55">${esc(hp.cta||'Postuler →')}</a>
     </div>
   </section>`;
-    if (s.type === 'preuve') return `
+    if (s.type === 'preuve') {
+      const temos = Array.isArray(s.temoignages) ? s.temoignages : [];
+      return `
   <section style="background:#f8f9fa;padding:60px 20px;">
-    <div style="max-width:740px;margin:0 auto;text-align:center;">
-      <div style="display:inline-block;background:#fef9c3;color:#92400e;font-size:12px;font-weight:800;padding:4px 14px;border-radius:20px;letter-spacing:.5px;margin-bottom:16px;text-transform:uppercase">⭐ Résultats</div>
-      <h2 style="font-size:clamp(22px,4vw,32px);font-weight:800;color:#111;margin-bottom:20px">${esc(s.titre||'')}</h2>
-      <blockquote style="background:#fff;border-left:4px solid ${c1};border-radius:12px;padding:24px 28px;font-size:15px;color:#555;line-height:1.7;text-align:left;box-shadow:0 2px 16px rgba(0,0,0,.06)">"${esc(s.contenu||'')}"</blockquote>
+    <div style="max-width:800px;margin:0 auto;text-align:center;">
+      <div style="display:inline-block;background:#fef9c3;color:#92400e;font-size:12px;font-weight:800;padding:4px 14px;border-radius:20px;letter-spacing:.5px;margin-bottom:16px;text-transform:uppercase">⭐ Ils l'ont fait</div>
+      <h2 style="font-size:clamp(22px,4vw,32px);font-weight:800;color:#111;margin-bottom:28px">${esc(s.titre||'Témoignages')}</h2>
+      ${temos.length ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;text-align:left">
+        ${temos.map(t=>`<div style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 16px rgba(0,0,0,.07);border:1px solid #f0f0f0">
+          <div style="font-size:24px;color:#f59e0b;margin-bottom:8px">★★★★★</div>
+          <p style="font-size:14px;color:#444;line-height:1.6;margin-bottom:12px">"${esc(t.texte||'')}"</p>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,${c1},${c2});display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800">${(t.prenom||'?')[0]}</div>
+            <div><div style="font-size:13px;font-weight:700;color:#111">${esc(t.prenom||'')}${t.age?', '+t.age+' ans':''}</div><div style="font-size:12px;color:#22c55e;font-weight:700">${esc(t.resultat||'')}</div></div>
+          </div>
+        </div>`).join('')}
+      </div>` : `<blockquote style="background:#fff;border-left:4px solid ${c1};border-radius:12px;padding:24px 28px;font-size:15px;color:#555;line-height:1.7;text-align:left;box-shadow:0 2px 16px rgba(0,0,0,.06)">"${esc(s.contenu||'')}"</blockquote>`}
     </div>
   </section>`;
+    }
     if (s.type === 'faq') return `
   <section style="background:#fff;padding:60px 20px;">
     <div style="max-width:740px;margin:0 auto;">
@@ -6310,8 +6439,22 @@ function _generateSiteHtml(d) {
       </div>
     </div>
   </section>`;
+    if (s.type === 'footer') return `
+  <footer style="background:#0d0d1a;color:#6b7280;padding:32px 20px;text-align:center;font-size:12px;border-top:1px solid rgba(255,255,255,.06)">
+    <div style="max-width:740px;margin:0 auto">
+      <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:12px">
+        ${(s.liens||[]).map(l=>`<a href="#" style="color:#6b7280;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#6b7280'">${esc(l)}</a>`).join('')}
+      </div>
+      <p>${esc(s.mentions||'')} · © ${new Date().getFullYear()} Tous droits réservés.</p>
+    </div>
+  </footer>`;
     return '';
   }).join('\n');
+
+  const socialProof = hp.social_proof_hero ? `
+  <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:24px;margin-top:24px;padding-top:24px;border-top:1px solid rgba(255,255,255,.1)">
+    ${hp.social_proof_hero.split('•').map(s=>s.trim()).filter(Boolean).map(item=>`<div style="display:flex;align-items:center;gap:6px;font-size:13px;opacity:.8"><span style="color:#4ade80;font-weight:800">✓</span> ${esc(item)}</div>`).join('')}
+  </div>` : '';
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -6332,8 +6475,9 @@ a{color:inherit}
 <section style="background:linear-gradient(135deg,${cbg},${c1}66);color:${ctxt};padding:100px 20px 80px;text-align:center;position:relative;overflow:hidden">
   <div style="max-width:740px;margin:0 auto;position:relative;z-index:1">
     <h1 style="font-size:clamp(28px,5.5vw,56px);font-weight:900;line-height:1.1;margin-bottom:20px;letter-spacing:-1px">${esc(hp.hero||'Titre accrocheur')}</h1>
-    <p style="font-size:clamp(15px,2.2vw,20px);opacity:.85;max-width:600px;margin:0 auto 40px;line-height:1.6">${esc(hp.subheadline||'')}</p>
+    <p style="font-size:clamp(15px,2.2vw,20px);opacity:.85;max-width:600px;margin:0 auto 32px;line-height:1.6">${esc(hp.subheadline||'')}</p>
     <a href="#postuler" style="display:inline-block;background:linear-gradient(135deg,${c1},${c2});color:#fff;padding:20px 48px;border-radius:50px;font-size:18px;font-weight:800;text-decoration:none;box-shadow:0 10px 40px ${c1}66;transition:transform .2s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">${esc(hp.cta||'Commencer →')}</a>
+    ${socialProof}
   </div>
 </section>
 
@@ -6342,7 +6486,7 @@ ${sectionHtml}
 <!-- CTA FINAL -->
 <section id="postuler" style="background:linear-gradient(135deg,${cbg},#1a0a2e);color:#fff;padding:80px 20px;text-align:center">
   <div style="max-width:600px;margin:0 auto">
-    <h2 style="font-size:clamp(24px,4vw,38px);font-weight:900;margin-bottom:16px">${esc(d.cta_final||hp.hero||'Prêt à passer à l\'action ?')}</h2>
+    <h2 style="font-size:clamp(24px,4vw,38px);font-weight:900;margin-bottom:16px">${esc(d.cta_final||hp.cta||'Prêt à passer à l\'action ?')}</h2>
     <p style="font-size:15px;opacity:.7;margin-bottom:32px">Places limitées — réserve ton appel maintenant</p>
     <a href="VOTRE_LIEN_TYPEFORM" style="display:inline-block;background:linear-gradient(135deg,${c1},${c2});color:#fff;padding:20px 48px;border-radius:50px;font-size:18px;font-weight:800;text-decoration:none;box-shadow:0 10px 40px ${c1}66">${esc(hp.cta||'Postuler →')}</a>
     <p style="font-size:12px;opacity:.45;margin-top:20px">Appel stratégique 100% gratuit · Sans engagement</p>
@@ -6366,11 +6510,12 @@ function renderModule5(d) {
   return `<div class="fade-up" id="mod5wrap">
 
   <!-- Tab bar -->
-  <div style="display:flex;gap:6px;margin-bottom:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:5px">
-    <button id="m5tab-preview" onclick="_m5tab('preview')" style="flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:rgba(124,58,237,.25);color:#c084fc;transition:all .2s">👁 Aperçu</button>
-    <button id="m5tab-code"    onclick="_m5tab('code')"    style="flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:#6b7280;transition:all .2s">&lt;/&gt; Code HTML</button>
-    <button id="m5tab-strat"   onclick="_m5tab('strat')"   style="flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:#6b7280;transition:all .2s">🎯 Stratégie</button>
-    <button id="m5tab-tunnel"  onclick="_m5tab('tunnel')"  style="flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:#6b7280;transition:all .2s">🔗 Tunnel</button>
+  <div style="display:flex;gap:6px;margin-bottom:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:5px;flex-wrap:wrap">
+    <button id="m5tab-preview" onclick="_m5tab('preview')" style="flex:1;min-width:80px;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:rgba(124,58,237,.25);color:#c084fc;transition:all .2s">👁 Aperçu</button>
+    <button id="m5tab-code"    onclick="_m5tab('code')"    style="flex:1;min-width:80px;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:#6b7280;transition:all .2s">&lt;/&gt; Code HTML</button>
+    <button id="m5tab-strat"   onclick="_m5tab('strat')"   style="flex:1;min-width:80px;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:#6b7280;transition:all .2s">🎯 Stratégie</button>
+    <button id="m5tab-tunnel"  onclick="_m5tab('tunnel')"  style="flex:1;min-width:80px;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:#6b7280;transition:all .2s">🔗 Tunnel</button>
+    ${d.vsl_script ? `<button id="m5tab-vsl" onclick="_m5tab('vsl')" style="flex:1;min-width:80px;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:#f97316;transition:all .2s">🎬 Script VSL</button>` : ''}
   </div>
 
   <!-- ── TAB: APERÇU ── -->
@@ -6491,6 +6636,28 @@ function renderModule5(d) {
     </div>` : '<p style="color:#6b7280;font-size:13px">Tunnel non disponible.</p>'}
   </div>
 
+  <!-- ── TAB: VSL ── -->
+  ${d.vsl_script ? `<div id="m5pane-vsl" style="display:none">
+    <div style="background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);border-radius:14px;padding:18px;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:800;color:#fb923c;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">🎬 Script VSL — ${esc(d.vsl_script.duree_cible||'3-5 min')}</div>
+      <p style="font-size:12px;color:#9ca3af;margin-bottom:14px">Lis ce script face caméra ou en voix off. Adapte les chiffres et prénoms à ta réalité.</p>
+      ${d.vsl_script.hook_0_5s ? `<div class="r-yellow" style="margin-bottom:8px"><strong>⚡ Hook (0-5s) :</strong> ${esc(d.vsl_script.hook_0_5s)}</div>` : ''}
+      ${d.vsl_script.probleme ? `<div class="r-red" style="margin-bottom:8px"><strong>😰 Problème :</strong> ${esc(d.vsl_script.probleme)}</div>` : ''}
+      ${d.vsl_script.solution ? `<div class="r-green" style="margin-bottom:8px"><strong>✓ Solution :</strong> ${esc(d.vsl_script.solution)}</div>` : ''}
+      ${d.vsl_script.preuve ? `<div class="r-purple" style="margin-bottom:8px"><strong>⭐ Preuve :</strong> ${esc(d.vsl_script.preuve)}</div>` : ''}
+      ${d.vsl_script.offre_detail ? `<div class="r-blue" style="margin-bottom:8px"><strong>💰 Offre :</strong> ${esc(d.vsl_script.offre_detail)}</div>` : ''}
+      ${d.vsl_script.objections ? `<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;margin-bottom:8px"><strong style="font-size:11px;color:#9ca3af">❓ Objections :</strong><p style="font-size:13px;color:#d1d5db;margin-top:4px">${esc(d.vsl_script.objections)}</p></div>` : ''}
+      ${d.vsl_script.cta_final ? `<div class="r-green" style="margin-bottom:14px"><strong>🚀 CTA final :</strong> ${esc(d.vsl_script.cta_final)}</div>` : ''}
+    </div>
+    ${d.vsl_script.script_complet ? `<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:11px;font-weight:800;color:#e2e8f0">📄 Script complet (copie-colle)</span>
+        <button onclick="navigator.clipboard.writeText(this.dataset.t).then(()=>{this.textContent='✓ Copié!';setTimeout(()=>this.textContent='📋 Copier',1500)})" data-t="${esc(d.vsl_script.script_complet)}" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:7px;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:#fb923c;cursor:pointer">📋 Copier</button>
+      </div>
+      <p style="font-size:13px;color:#d1d5db;line-height:1.7;white-space:pre-line">${esc(d.vsl_script.script_complet)}</p>
+    </div>` : ''}
+  </div>` : ''}
+
   <!-- Regen footer -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px">
     <div>
@@ -6508,14 +6675,15 @@ function renderModule5(d) {
 
 /* ── Module 5 tab switcher ── */
 function _m5tab(name) {
-  ['preview','code','strat','tunnel'].forEach(t => {
+  ['preview','code','strat','tunnel','vsl'].forEach(t => {
     const pane = document.getElementById('m5pane-'+t);
     const btn  = document.getElementById('m5tab-'+t);
     if (!pane||!btn) return;
     const active = t === name;
     pane.style.display = active ? 'block' : 'none';
-    btn.style.background  = active ? 'rgba(124,58,237,.25)' : 'transparent';
-    btn.style.color       = active ? '#c084fc' : '#6b7280';
+    const isVsl = t === 'vsl';
+    btn.style.background  = active ? (isVsl?'rgba(249,115,22,.2)':'rgba(124,58,237,.25)') : 'transparent';
+    btn.style.color       = active ? (isVsl?'#fb923c':'#c084fc') : (isVsl?'#f97316':'#6b7280');
   });
   // Inject iframe content on first preview open
   if (name === 'preview') {
@@ -6564,19 +6732,50 @@ Object.assign(PROMPTS, {
   6: {
     system: `Tu es un expert en stratégie de contenu pour créateurs TikTok, Instagram et YouTube.
 OBJECTIF : Créer un calendrier éditorial de 30 jours ultra-actionnable, avec des hooks variés, des formats mixtes et une cohérence de niche.
+
+FORMATS DE CONTENU À VARIER (adapte selon le style faceless/face caméra) :
+FACELESS (voix off + texte à l'écran) :
+• Script contraste temporel : "En [année] tu as raté [opp], ..., ne rate pas [offre] en 2026"
+• Script liste de bénéfices : ✓ Pas de concurrence / ✓ 100% bénéfice / ✓ 1h/jour
+• Script "De fauché à..." : résultats chiffrés, délai court
+• POV : "POV : tu t'es lancé dans [offre] et tu génères +X€/mois"
+• 5 slides carrousel : slide 1 = objection → slides 2-4 = avantages → slide 5 = CTA
+• "Dire que certains..." : contraste social fort, finit sur avantage de l'offre
+• Urgence saisonnière : "C'est bientôt [événement], tu n'as toujours pas [résultat] ?"
+FACE CAMÉRA :
+• Storytelling personnel : "J'ai fais X avec seulement Y..."
+• Coulisses : "Voici ce que je fais à [heure] chaque matin pour [résultat]"
+• Réaction : réagir à une objection courante dans la niche
+• Audit rapide : "Je vais analyser ton compte en 60 secondes"
+UNIVERSEL :
+• Éducatif bullet points : "Les 3 raisons pour lesquelles [problème commun]..."
+• Avant/Après : transformation visible en résultats ou process
+• Motivation forte : citation + réalité du business + CTA
+
+RÈGLE CTA — TOUJOURS 2 CTA différents à la fin :
+→ "Commente [MOT CLÉ]" + "Écris [MOT CLÉ 2] en commentaire"
+→ Mots clés exemples : GO, PLAN, GUIDE, MÉTHODE, PRÊT, INFO
+
 RULES :
-- Chaque jour = 1 post avec hook + type de contenu + meilleur créneau horaire
-- Varier les formats (éducatif, storytelling, UGC, coulisses, motivation)
+- Chaque jour = 1 post avec hook PRÉCIS + type de contenu + créneau horaire
+- Minimum 50% de formats faceless si le créateur est faceless
+- Varier les déclencheurs psychologiques (curiosité, FOMO, preuve, contraste)
 - Adapter au secteur et à l'audience cible détectés dans l'audit
-- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais
 - Réponds en JSON uniquement`,
 
-    user: (p, prev) => `Crée un calendrier 30 jours pour ce profil.
+    user: (p, prev) => {
+      const prevSummary = prev ? `NICHE : ${prev.niche_detectee || p.niche || p.url}
+FORMATS RECOMMANDÉS : ${(prev.formats_recommandes||[]).map(f=>f.nom||'').join(', ')||p.contentStyle}
+PROBLÈME PRINCIPAL : ${prev.diagnostic?.probleme_principal || 'non précisé'}` : `NICHE : ${p.niche || p.url}`;
+      return `Crée un calendrier 30 jours pour ce profil.
 
 PROFIL : ${p.desc || p.url}
 PLATEFORME : ${p.platform}
+STYLE CONTENU : ${p.contentStyle === 'faceless' ? 'FACELESS — utilise 70%+ de formats voix off/texte (pas de face caméra)' : p.contentStyle === 'camera' ? 'Face caméra — scripts engageants avec storytelling' : 'Mix faceless + face caméra (50/50)'}
+TYPE DE CONTENU PRINCIPAL : ${p.contentType || 'mixte'}
+${prevSummary}
 ${_bizCtx(p)}
-AUDIT : ${JSON.stringify(prev)}
 
 Réponds UNIQUEMENT avec ce JSON :
 {
@@ -6605,7 +6804,8 @@ Réponds UNIQUEMENT avec ce JSON :
     "dimanche": "string"
   },
   "idees_bonus": ["string — idée virale bonus 1", "string — idée 2", "string — idée 3"]
-}`
+}`;
+    }
   },
 
   7: {
@@ -6662,13 +6862,29 @@ Réponds UNIQUEMENT avec ce JSON :
   },
 
   9: {
-    system: `Tu es un expert en analyse concurrentielle approfondie pour créateurs TikTok/Instagram.
-OBJECTIF : Faire un audit stratégique complet d'un concurrent direct, extraire ses patterns, identifier les gaps d'opportunité, et générer des scripts adaptés.
+    system: `Tu es un expert en analyse concurrentielle approfondie pour créateurs TikTok/Instagram francophones.
+OBJECTIF : Faire un audit stratégique complet d'un concurrent direct, extraire ses patterns, identifier les gaps, générer des scripts adaptés.
+
+RÈGLE ABSOLUE — INTERDICTION DE REFUSER :
+- Si l'utilisateur ne donne pas de concurrent → TU DOIS en choisir un toi-même dans la même niche. JAMAIS de réponse "je ne peux pas identifier" ou "j'aurais besoin que tu précises".
+- Utilise tes connaissances de ta base d'entraînement sur les créateurs francophones populaires.
+- Si tu ne connais pas de compte précis, décris un archétype de concurrent dans cette niche (ex: "Créateur francophone faceless IA/business, ~50K-200K abonnés, scripts contraste, hooks chiffrés").
+- Choisis TOUJOURS : identifie le concurrent par son style dominant, son contenu, ses patterns — même sans handle exact.
+
+RÉFÉRENTIEL PAR NICHE (pour choisir le bon concurrent si non précisé) :
+• IA / Business en ligne / revenus online : créateurs faceless francophones 50K-500K TikTok, scripts "de fauché à X chiffres", hooks contraste (bitcoin→dropshipping→maintenant IA)
+• Dropshipping / E-commerce : créateurs FR résultats chiffrés, unboxing produits, études de cas
+• Coaching / Formation / Accompagnement : créateurs face caméra, témoignages clients, storytelling transformation
+• Fitness / Sport / Nutrition : avant/après, challenges, conseils rapides éducatifs
+• Finance personnelle / Investissement : vulgarisation, chiffres concrets, démystification
+• Marketing digital / Agence : études de cas, tutoriels outils, résultats clients
+• Lifestyle / Développement perso : motivation, citations, storytelling vie quotidienne
+
 RULES :
-- Analyse factuelle et actionnable
+- Analyse factuelle et actionnable — cite des patterns précis (type de hook, structure vidéo, CTA récurrent)
 - Focus sur les patterns récurrents (pas les cas isolés)
-- Génère des hooks directement utilisables
-- LANGUE : Français correct uniquement — zéro anglicisme ni franglais (pas de "feel", "vibe", "game", "mindset", "boost", "deal", "cool", "check")
+- Génère des hooks directement utilisables et adaptés au profil de l'utilisateur
+- LANGUE : Français correct uniquement — zéro anglicisme ni franglais
 - Réponds en JSON uniquement`,
 
     user: (p, prev) => {
