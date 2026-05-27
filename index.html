@@ -2198,6 +2198,11 @@
         <div class="res-mod-label">Hashtags IA</div>
         <div class="res-mod-status empty" id="tab-status-12">○</div>
       </div>
+      <div class="res-mod-item" id="tab-8" onclick="switchTab(8)">
+        <div class="res-mod-icon">💡</div>
+        <div class="res-mod-label">Idées Business</div>
+        <div class="res-mod-status empty" id="tab-status-8">○</div>
+      </div>
 
       <div class="res-sidebar-section">Monétisation <span class="res-mod-plan plan-elite" style="letter-spacing:.5px">Élite</span></div>
       <div class="res-mod-item" id="tab-4" onclick="switchTab(4)">
@@ -3098,8 +3103,8 @@ function startTrial() {
 }
 
 /* ── Module labels ── */
-const MOD_LABELS = { 1:'Audit', 2:'Offre', 3:'Scripts', 4:'Funnel Qualif', 5:'Site web', 6:'Calendrier 30j', 7:'Spy Concurrent', 9:'Audit Concurrent', 10:'Analyse Vidéo', 11:'ShortClip', 12:'Hashtags' };
-const MOD_EMOJI  = { 1:'🔍', 2:'💰', 3:'🎬', 4:'🔗', 5:'🌐', 6:'📅', 7:'🕵️', 9:'🔬', 10:'🎬', 11:'✂️', 12:'#️⃣' };
+const MOD_LABELS = { 1:'Audit', 2:'Offre', 3:'Scripts', 4:'Funnel Qualif', 5:'Site web', 6:'Calendrier 30j', 7:'Spy Concurrent', 8:'Idées Business', 9:'Audit Concurrent', 10:'Analyse Vidéo', 11:'ShortClip', 12:'Hashtags' };
+const MOD_EMOJI  = { 1:'🔍', 2:'💰', 3:'🎬', 4:'🔗', 5:'🌐', 6:'📅', 7:'🕵️', 8:'💡', 9:'🔬', 10:'🎬', 11:'✂️', 12:'#️⃣' };
 
 /* ── Boot ── */
 window.onload = () => {
@@ -4512,6 +4517,7 @@ async function _runGenerateModule(n) {
     if (n === 5) prevData = S.modules[4] || S.modules[2] || S.modules[1];
     if (n === 6) prevData = S.modules[1];
     if (n === 7) prevData = S.modules[1];
+    if (n === 8) prevData = S.modules[1];
     if (n === 9) prevData = S.modules[1];
     if (n === 10) prevData = S.modules[1];
     if (n === 11) prevData = S.modules[1];
@@ -4523,6 +4529,7 @@ async function _runGenerateModule(n) {
     const _modOpts = {
       4: { max_tokens: 5000 },  // Funnel (LP + emails)
       5: { max_tokens: 7000 },  // Site web (HTML complet)
+      8: { max_tokens: 4000 },  // Idées business (6 idées + plans)
       9: { max_tokens: 5000 },  // Audit concurrent (analyse + scripts)
       6: { max_tokens: 5000 },  // Calendrier 30j (30 entrées)
     };
@@ -4576,7 +4583,7 @@ async function generateAllModules() {
   if (!S.modules[1]) { alert('Lance d\'abord une analyse TikTok/Instagram !'); return; }
 
   // Build ordered list of modules to generate (respecting dependencies)
-  const order = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12]; // skip 8 (reserved)
+  const order = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const toGenerate = order.filter(n => {
     if (S.modules[n]) return false; // already done
     const needsStarter = n === 2 || n === 3 || n === 6;
@@ -4698,7 +4705,7 @@ function _autoGenerateAll() {
   if (!hasDashboardAccess()) return;
   if (!S.modules[1]) return; // besoin de l'audit d'abord
   // 10 (Analyse Vidéo) et 11 (ShortClip) nécessitent une URL vidéo saisie par l'utilisateur — jamais auto-générés
-  const order = [2, 3, 6, 7, 9, 12, 4, 5];
+  const order = [2, 3, 6, 7, 8, 9, 12, 4, 5];
   const missing = order.filter(n => {
     if (S.modules[n]) return false;
     const ns = n===2||n===3||n===6;
@@ -5415,7 +5422,7 @@ function updateTabBadges() {
   const pro     = hasProAccess();
   const elite   = hasEliteAccess();
   for (let i=1;i<=12;i++) {
-    if (i === 8) continue; // module 8 réservé
+    // module 8 now active (Idées Business)
     const tab    = document.getElementById('tab-'+i);
     const status = document.getElementById('tab-status-'+i);
     if (!tab) continue;
@@ -5504,6 +5511,7 @@ function renderModuleContent(loading=false) {
     case 5: el.innerHTML = renderModule5(data); setTimeout(()=>{ const f=document.getElementById('mod5iframe'); if(f&&!f.dataset.loaded&&data){f.srcdoc=_generateSiteHtml(data);f.dataset.loaded='1';} },50); break;
     case 6: el.innerHTML = renderModule6(data); break;
     case 7: el.innerHTML = renderModule7(data); break;
+    case 8: el.innerHTML = renderModule8(data); break;
     case 9:  el.innerHTML = renderModule9(data); break;
     case 10: el.innerHTML = renderModule10(data); break;
     case 11: renderModule11(el); break;
@@ -6861,6 +6869,59 @@ Réponds UNIQUEMENT avec ce JSON :
     }
   },
 
+  8: {
+    system: `Tu es un expert en business en ligne et entrepreneuriat digital pour créateurs de contenu.
+OBJECTIF : Générer 6 idées de business personnalisées, réalistes et actionnables, adaptées au profil exact du créateur.
+RÈGLES :
+- Idées concrètes et adaptées à la niche, au style (faceless/face caméra) et au niveau du créateur
+- Revenus potentiels réalistes basés sur le marché francophone
+- Plans 7 jours concrets — des tâches actionnables, pas des conseils vagues
+- Pas de modèles trop génériques (type "lance une formation") sans précision sur la NICHE et le FORMAT
+- Varier les catégories : offre digitale, service, affiliation, communauté, contenu monétisé, automation
+- LANGUE : Français uniquement — zéro anglicisme
+- Réponds en JSON uniquement`,
+
+    user: (p, prev) => {
+      const niche = prev?.niche_detectee || prev?.diagnostic?.niche_dominante || p.niche || p.url;
+      const offre = prev?.monetisation?.offre_principale || p.businessDesc || 'non précisée';
+      return `Génère 6 idées de business personnalisées pour ce créateur.
+
+PROFIL : ${p.desc || p.url}
+NICHE : ${niche}
+STYLE CONTENU : ${p.contentStyle === 'faceless' ? 'Faceless (sans apparaître)' : p.contentStyle === 'camera' ? 'Face caméra' : 'Mix'}
+NIVEAU : ${p.level}
+PLATEFORME : ${p.platform}
+OFFRE ACTUELLE : ${offre}
+${_bizCtx(p)}
+
+Réponds UNIQUEMENT avec ce JSON :
+{
+  "idees": [
+    {
+      "emoji": "string — 1 emoji représentatif",
+      "nom": "string — nom court et percutant",
+      "categorie": "string — ex: Formation, Coaching, Affiliation, Agence, SaaS, Communauté",
+      "description": "string — 1 phrase qui explique le concept",
+      "temps_lancement": "string — ex: 7 jours, 2 semaines, 1 mois",
+      "investissement": "string — ex: 0€, 50-200€, 500€+",
+      "revenus_potentiels": "string — ex: 500-2000€/mois, 2000-5000€/mois",
+      "difficulte": "number — 1 à 5 (1=très facile, 5=difficile)",
+      "pour_toi": "string — pourquoi cette idée est parfaite pour ce profil spécifique (2-3 phrases)",
+      "plan_7j": [
+        "Jour 1 : action précise",
+        "Jour 2 : action précise",
+        "Jour 3 : action précise",
+        "Jour 4 : action précise",
+        "Jour 5 : action précise",
+        "Jour 6 : action précise",
+        "Jour 7 : action précise"
+      ]
+    }
+  ]
+}`;
+    }
+  },
+
   9: {
     system: `Tu es un expert en analyse concurrentielle approfondie pour créateurs TikTok/Instagram francophones.
 OBJECTIF : Faire un audit stratégique complet d'un concurrent direct, extraire ses patterns, identifier les gaps, générer des scripts adaptés.
@@ -7085,53 +7146,204 @@ async function cutClip(videoFile, startSec, durationSec, outputName) {
 }
 
 /* ── Module 6 render : Calendrier 30 jours ── */
+function _calKey() { return 'bloxai_cal6_' + (S.profile?.url || 'x'); }
+function _calGetDone() {
+  try { return new Set(JSON.parse(localStorage.getItem(_calKey()) || '[]')); } catch(e) { return new Set(); }
+}
+function _calToggle(jour) {
+  const done = _calGetDone();
+  if (done.has(jour)) done.delete(jour); else done.add(jour);
+  localStorage.setItem(_calKey(), JSON.stringify([...done]));
+  // Re-render just progress & checkbox without full re-render
+  const cb = document.getElementById('cal-cb-' + jour);
+  if (cb) {
+    const checked = done.has(jour);
+    cb.checked = checked;
+    const card = document.getElementById('cal-card-' + jour);
+    if (card) {
+      card.style.opacity = checked ? '.55' : '1';
+      card.style.borderColor = checked ? 'rgba(34,197,94,.3)' : 'rgba(99,102,241,.2)';
+    }
+  }
+  // Update progress bars
+  const activeWeek = document.querySelector('.cal-week-tab[data-active="1"]')?.dataset?.week;
+  if (activeWeek) _calUpdateProgress(+activeWeek, done);
+  _calUpdateGlobal(done);
+}
+function _calUpdateProgress(weekNum, done) {
+  const start = (weekNum-1)*7 + 1, end = weekNum < 4 ? weekNum*7 : 30;
+  const days = Array.from({length: end-start+1}, (_,i)=>start+i);
+  const count = days.filter(d=>done.has(d)).length;
+  const pct = Math.round(count/days.length*100);
+  const bar = document.getElementById('cal-prog-bar-'+weekNum);
+  const lbl = document.getElementById('cal-prog-lbl-'+weekNum);
+  if (bar) bar.style.width = pct + '%';
+  if (lbl) lbl.textContent = count + '/' + days.length;
+}
+function _calUpdateGlobal(done) {
+  const lbl = document.getElementById('cal-global-done');
+  if (lbl) lbl.textContent = done.size + '/30';
+  const bar = document.getElementById('cal-global-bar');
+  if (bar) bar.style.width = Math.round(done.size/30*100) + '%';
+}
+function _calShowWeek(n) {
+  for (let i=1;i<=4;i++) {
+    const pane = document.getElementById('cal-pane-'+i);
+    const tab  = document.getElementById('cal-tab-'+i);
+    if (pane) pane.style.display = i===n ? 'block' : 'none';
+    if (tab)  {
+      tab.dataset.active = i===n ? '1' : '';
+      tab.style.background  = i===n ? 'rgba(99,102,241,.25)' : 'transparent';
+      tab.style.color       = i===n ? '#818cf8' : '#6b7280';
+    }
+  }
+  _calUpdateProgress(n, _calGetDone());
+}
+
 function renderModule6(d) {
   const strat = d.strategie_globale || {};
   const cal   = d.calendrier || [];
   const sem   = d.semaine_type || {};
   const bonus = d.idees_bonus || [];
+  const done  = _calGetDone();
+
+  const weeks = [
+    { num:1, label:'Sem. 1',  days: cal.filter(c=>c.jour<=7) },
+    { num:2, label:'Sem. 2',  days: cal.filter(c=>c.jour>=8&&c.jour<=14) },
+    { num:3, label:'Sem. 3',  days: cal.filter(c=>c.jour>=15&&c.jour<=21) },
+    { num:4, label:'Sem. 4+', days: cal.filter(c=>c.jour>=22) },
+  ].filter(w=>w.days.length);
+
+  const weekThemes = { 1:'Lancement & validation', 2:'Croissance & hooks', 3:'Conversion & preuves', 4:'Scale & fidélisation' };
 
   return `<div class="fade-up space-y-5">
-    <!-- Stratégie globale -->
+    <!-- Stratégie + progression globale -->
     <div class="card p-6" style="border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.04)">
-      <div class="section-lbl" style="color:#818cf8">📅 Stratégie du mois</div>
-      <div class="r-purple mb-2"><strong>Thème du mois</strong> — ${esc(strat.theme_du_mois||'—')}</div>
-      <div class="r-blue mb-2"><strong>Objectif 30j</strong> — ${esc(strat.objectif_30j||'—')}</div>
-      ${strat.formats_prioritaires?.length ? `<div class="flex flex-wrap gap-2 mt-2">
-        ${strat.formats_prioritaires.map(f=>`<span class="hook-tag" style="background:rgba(99,102,241,.15);color:#818cf8;border-color:rgba(99,102,241,.3)">${esc(f)}</span>`).join('')}
-      </div>` : ''}
-    </div>
-
-    <!-- Semaine type -->
-    ${Object.keys(sem).length ? `<div class="card p-6">
-      <div class="section-lbl">📆 Semaine type</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
-        ${Object.entries(sem).map(([j,v])=>`<div class="r-blue"><strong style="text-transform:capitalize">${esc(j)}</strong><br/><span class="opacity-80" style="font-size:12px">${esc(v)}</span></div>`).join('')}
-      </div>
-    </div>` : ''}
-
-    <!-- Calendrier complet -->
-    <div>
-      <div class="section-lbl">🗓 Les 30 jours</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px">
-        ${cal.map(day=>`<div class="script-card" style="border-color:rgba(99,102,241,.2)">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-            <span style="background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.3);border-radius:99px;font-size:11px;font-weight:800;padding:2px 10px">Jour ${day.jour}</span>
-            <span style="font-size:12px;color:#6b7280">${esc(day.format||'')}</span>
-            ${day.creneaux ? `<span style="font-size:11px;color:#4a4a70;margin-left:auto">⏰ ${esc(day.creneaux)}</span>` : ''}
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div class="section-lbl" style="color:#818cf8">📅 Stratégie du mois</div>
+          <div class="r-purple mb-2"><strong>Thème</strong> — ${esc(strat.theme_du_mois||'—')}</div>
+          <div class="r-blue"><strong>Objectif</strong> — ${esc(strat.objectif_30j||'—')}</div>
+        </div>
+        <div style="text-align:center;min-width:100px">
+          <div style="font-size:24px;font-weight:900;background:linear-gradient(135deg,#818cf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="cal-global-done">${done.size}/30</div>
+          <div style="font-size:10px;color:#6b7280;margin-bottom:6px">posts complétés</div>
+          <div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;width:90px">
+            <div id="cal-global-bar" style="height:100%;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:3px;transition:width .3s;width:${Math.round(done.size/30*100)}%"></div>
           </div>
-          <div class="r-purple mb-2" style="font-size:13px"><strong>⚡ Hook</strong> — ${esc(day.hook||'—')}</div>
-          <div class="r-blue mb-1" style="font-size:12px"><strong>Sujet</strong> — ${esc(day.sujet||'—')}</div>
-          ${day.tips ? `<div style="font-size:11px;color:#4a4a70;margin-top:6px">💡 ${esc(day.tips)}</div>` : ''}
-        </div>`).join('')}
+        </div>
       </div>
     </div>
 
-    <!-- Bonus idées -->
+    <!-- Semaine tabs -->
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:5px;display:flex;gap:5px">
+      ${weeks.map(w=>`<button id="cal-tab-${w.num}" data-week="${w.num}" onclick="_calShowWeek(${w.num})" data-active="${w.num===1?'1':''}" style="flex:1;padding:9px 6px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all .2s;background:${w.num===1?'rgba(99,102,241,.25)':'transparent'};color:${w.num===1?'#818cf8':'#6b7280'}">
+        ${w.label}<br/><span style="font-size:10px;opacity:.7">${weekThemes[w.num]||''}</span>
+      </button>`).join('')}
+    </div>
+
+    <!-- Semaine panes -->
+    ${weeks.map(w=>{
+      const wDone = w.days.filter(d=>done.has(d.jour)).length;
+      return `<div id="cal-pane-${w.num}" style="display:${w.num===1?'block':'none'}">
+        <!-- Progress bar semaine -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+            <div id="cal-prog-bar-${w.num}" style="height:100%;background:linear-gradient(90deg,#818cf8,#22c55e);border-radius:3px;transition:width .3s;width:${Math.round(wDone/Math.max(w.days.length,1)*100)}%"></div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:#818cf8;min-width:30px" id="cal-prog-lbl-${w.num}">${wDone}/${w.days.length}</span>
+          <span style="font-size:11px;color:#6b7280">${w.days.length > 0 ? Math.round(wDone/w.days.length*100)+'%' : ''}</span>
+        </div>
+        <!-- Days -->
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${w.days.map(day=>{
+            const isDone = done.has(day.jour);
+            return `<div id="cal-card-${day.jour}" style="background:rgba(255,255,255,.03);border:1px solid ${isDone?'rgba(34,197,94,.3)':'rgba(99,102,241,.2)'};border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;opacity:${isDone?.55:1};transition:all .2s;cursor:pointer" onclick="_calToggle(${day.jour})">
+              <!-- Checkbox -->
+              <div style="flex-shrink:0;padding-top:1px">
+                <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${isDone?'#22c55e':'rgba(99,102,241,.4)'};background:${isDone?'rgba(34,197,94,.2)':'transparent'};display:flex;align-items:center;justify-content:center;transition:all .2s">
+                  ${isDone?'<span style="color:#4ade80;font-size:12px">✓</span>':''}
+                </div>
+                <input id="cal-cb-${day.jour}" type="checkbox" ${isDone?'checked':''} style="display:none" />
+              </div>
+              <!-- Content -->
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+                  <span style="background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.3);border-radius:99px;font-size:10px;font-weight:800;padding:1px 8px">J${day.jour}</span>
+                  <span style="font-size:11px;color:#6b7280">${esc(day.format||'')}</span>
+                  ${day.temps_estime ? `<span style="font-size:11px;color:#4a4a70;margin-left:auto">⏱ ${esc(day.temps_estime)}</span>` : day.creneaux ? `<span style="font-size:11px;color:#4a4a70;margin-left:auto">⏰ ${esc(day.creneaux)}</span>` : ''}
+                </div>
+                <p style="font-size:13px;font-weight:600;color:#c4b5fd;margin-bottom:4px;line-height:1.4">"${esc(day.hook||'—')}"</p>
+                <p style="font-size:12px;color:#6b7280;line-height:1.4">${esc(day.sujet||'—')}</p>
+                ${day.tips ? `<p style="font-size:11px;color:#4a4a70;margin-top:4px">💡 ${esc(day.tips)}</p>` : ''}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+
+    <!-- Semaine type (collapsed) -->
+    ${Object.keys(sem).length ? `<details style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 14px">
+      <summary style="font-size:12px;font-weight:700;color:#6b7280;cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px">📆 Semaine type récurrente ▾</summary>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px">
+        ${Object.entries(sem).map(([j,v])=>`<div class="r-blue"><strong style="text-transform:capitalize">${esc(j)}</strong><br/><span style="font-size:11px;opacity:.8">${esc(v)}</span></div>`).join('')}
+      </div>
+    </details>` : ''}
+
+    <!-- Bonus -->
     ${bonus.length ? `<div class="card p-6" style="border-color:rgba(34,197,94,.2)">
       <div class="section-lbl" style="color:#22c55e">💡 Idées virales bonus</div>
       ${bonus.map(b=>`<div class="r-green mb-1">${esc(b)}</div>`).join('')}
     </div>` : ''}
+  </div>`;
+}
+
+/* ── Module 8 render : Idées Business ── */
+function renderModule8(d) {
+  const idees = d?.idees || [];
+  const diffDots = n => Array.from({length:5},(_,i)=>`<span style="width:7px;height:7px;border-radius:50%;background:${i<n?'#a855f7':'rgba(255,255,255,.1)'};display:inline-block;margin-right:2px"></span>`).join('');
+
+  return `<div class="fade-up space-y-4">
+    <div style="margin-bottom:4px">
+      <div class="section-lbl">💡 Idées business adaptées à ton profil</div>
+      <p style="font-size:12px;color:#6b7280">Clique sur une idée pour voir le plan d'action 7 jours</p>
+    </div>
+    ${idees.map((id,i)=>`
+    <details id="idea-${i}" style="background:rgba(255,255,255,.03);border:1px solid rgba(168,85,247,.2);border-radius:14px;overflow:hidden">
+      <summary style="list-style:none;padding:16px 18px;cursor:pointer;display:flex;gap:14px;align-items:center">
+        <span style="font-size:28px;flex-shrink:0">${esc(id.emoji||'💡')}</span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+            <span style="font-size:15px;font-weight:800;color:#e2e8f0">${esc(id.nom||'—')}</span>
+            <span style="font-size:10px;background:rgba(168,85,247,.15);color:#c084fc;border-radius:99px;padding:1px 8px;font-weight:700">${esc(id.categorie||'')}</span>
+          </div>
+          <p style="font-size:13px;color:#9ca3af;margin-bottom:8px;line-height:1.4">${esc(id.description||'')}</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:700;background:rgba(99,102,241,.1);color:#818cf8;border-radius:6px;padding:2px 8px">⏱ ${esc(id.temps_lancement||'—')}</span>
+            <span style="font-size:11px;font-weight:700;background:rgba(34,197,94,.08);color:#4ade80;border-radius:6px;padding:2px 8px">💰 ${esc(id.revenus_potentiels||'—')}</span>
+            <span style="font-size:11px;font-weight:700;background:rgba(255,255,255,.05);color:#9ca3af;border-radius:6px;padding:2px 8px">🚀 ${esc(id.investissement||'0€')}</span>
+            <span style="font-size:11px;font-weight:700;background:rgba(255,255,255,.05);color:#9ca3af;border-radius:6px;padding:2px 8px">Difficulté : ${'●'.repeat(id.difficulte||1)}${'○'.repeat(5-(id.difficulte||1))}</span>
+          </div>
+        </div>
+        <span style="font-size:12px;color:#6b7280;flex-shrink:0">▼</span>
+      </summary>
+      <!-- Expanded -->
+      <div style="padding:0 18px 18px">
+        ${id.pour_toi ? `<div style="background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+          <div style="font-size:10px;font-weight:800;color:#a855f7;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">🎯 Pourquoi c'est fait pour toi</div>
+          <p style="font-size:13px;color:#d1d5db;line-height:1.5">${esc(id.pour_toi)}</p>
+        </div>` : ''}
+        ${Array.isArray(id.plan_7j) && id.plan_7j.length ? `
+        <div style="font-size:10px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🗓 Plan d'action 7 jours</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          ${id.plan_7j.map((task,j)=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.06)">
+            <span style="font-size:10px;font-weight:800;background:rgba(99,102,241,.15);color:#818cf8;border-radius:99px;padding:2px 7px;flex-shrink:0;margin-top:1px">J${j+1}</span>
+            <span style="font-size:13px;color:#d1d5db;line-height:1.4">${esc(task)}</span>
+          </div>`).join('')}
+        </div>` : ''}
+      </div>
+    </details>`).join('') || '<p class="text-gray-500 text-sm">Aucune idée générée.</p>'}
   </div>`;
 }
 
@@ -8339,6 +8551,393 @@ function closeModal(id) {
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════ COACH IA -->
+<style>
+/* ── Coach IA Floating Button ── */
+#coach-fab {
+  position:fixed;bottom:28px;right:28px;z-index:9998;
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  box-shadow:0 4px 20px rgba(168,85,247,.5);
+  border:none;cursor:pointer;
+  display:none;
+  align-items:center;justify-content:center;
+  font-size:24px;transition:transform .2s,box-shadow .2s;
+}
+#coach-fab:hover { transform:scale(1.08);box-shadow:0 6px 28px rgba(168,85,247,.7); }
+#coach-fab .fab-badge {
+  position:absolute;top:-2px;right:-2px;
+  width:18px;height:18px;border-radius:50%;
+  background:#ef4444;color:#fff;font-size:9px;font-weight:800;
+  display:none;align-items:center;justify-content:center;
+}
+
+/* ── Coach Modal ── */
+#coach-modal {
+  position:fixed;bottom:100px;right:28px;z-index:9999;
+  width:min(420px, calc(100vw - 32px));
+  height:min(580px, calc(100vh - 140px));
+  background:#0f0f1a;border:1px solid rgba(168,85,247,.3);
+  border-radius:20px;box-shadow:0 16px 60px rgba(0,0,0,.7);
+  display:none;flex-direction:column;overflow:hidden;
+  animation:coachSlideUp .22s ease;
+}
+@keyframes coachSlideUp {
+  from { opacity:0;transform:translateY(20px) scale(.96); }
+  to   { opacity:1;transform:translateY(0) scale(1); }
+}
+#coach-modal-header {
+  padding:14px 18px;
+  background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(168,85,247,.1));
+  border-bottom:1px solid rgba(168,85,247,.2);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+#coach-modal-header .coach-avatar {
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+#coach-modal-header .coach-info { flex:1;min-width:0 }
+#coach-modal-header .coach-name { font-size:14px;font-weight:800;color:#e2e8f0 }
+#coach-modal-header .coach-status { font-size:11px;color:#a855f7;display:flex;align-items:center;gap:4px }
+#coach-modal-header .coach-status::before { content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block }
+#coach-quota-display { font-size:11px;color:#6b7280;flex-shrink:0 }
+#coach-close-btn {
+  background:none;border:none;color:#6b7280;font-size:18px;cursor:pointer;padding:4px;
+  line-height:1;transition:color .15s;flex-shrink:0;
+}
+#coach-close-btn:hover { color:#e2e8f0 }
+
+#coach-messages {
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:10px;
+  scrollbar-width:thin;scrollbar-color:rgba(168,85,247,.3) transparent;
+}
+#coach-messages::-webkit-scrollbar { width:4px }
+#coach-messages::-webkit-scrollbar-track { background:transparent }
+#coach-messages::-webkit-scrollbar-thumb { background:rgba(168,85,247,.3);border-radius:99px }
+
+.coach-msg {
+  max-width:88%;display:flex;flex-direction:column;gap:3px;
+}
+.coach-msg.user { align-self:flex-end;align-items:flex-end }
+.coach-msg.ai   { align-self:flex-start;align-items:flex-start }
+.coach-msg .bubble {
+  padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word;
+}
+.coach-msg.user .bubble {
+  background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;
+  border-bottom-right-radius:4px;
+}
+.coach-msg.ai .bubble {
+  background:rgba(255,255,255,.05);color:#d1d5db;
+  border:1px solid rgba(255,255,255,.08);border-bottom-left-radius:4px;
+}
+.coach-msg .bubble.loading {
+  background:rgba(255,255,255,.04);color:#6b7280;
+  border:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;gap:8px;
+}
+.coach-typing-dot {
+  width:6px;height:6px;border-radius:50%;background:#a855f7;
+  animation:coachTyping .9s ease-in-out infinite;display:inline-block;
+}
+.coach-typing-dot:nth-child(2) { animation-delay:.2s }
+.coach-typing-dot:nth-child(3) { animation-delay:.4s }
+@keyframes coachTyping {
+  0%,60%,100% { transform:translateY(0);opacity:.5 }
+  30% { transform:translateY(-4px);opacity:1 }
+}
+.coach-msg .ts { font-size:10px;color:#4a4a70;padding:0 4px }
+
+#coach-input-area {
+  padding:12px 14px;
+  border-top:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.02);
+  flex-shrink:0;
+}
+#coach-input-row { display:flex;gap:8px;align-items:flex-end; }
+#coach-input {
+  flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;color:#e2e8f0;font-size:13px;
+  padding:9px 12px;resize:none;max-height:120px;min-height:38px;
+  font-family:inherit;outline:none;line-height:1.4;transition:border-color .15s;
+}
+#coach-input:focus { border-color:rgba(168,85,247,.5) }
+#coach-input::placeholder { color:#4a4a70 }
+#coach-send-btn {
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  border:none;cursor:pointer;color:#fff;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .15s,transform .15s;flex-shrink:0;
+}
+#coach-send-btn:hover:not(:disabled) { opacity:.85;transform:scale(1.05) }
+#coach-send-btn:disabled { opacity:.4;cursor:not-allowed }
+#coach-quota-bar {
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:8px;font-size:11px;color:#4a4a70;
+}
+#coach-quota-fill {
+  height:3px;background:rgba(255,255,255,.06);border-radius:99px;flex:1;margin:0 8px;overflow:hidden;
+}
+#coach-quota-used { height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:99px;transition:width .3s }
+
+.coach-suggest-chips { display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px; }
+.coach-chip {
+  font-size:11px;color:#9ca3af;border:1px solid rgba(255,255,255,.1);
+  border-radius:99px;padding:4px 10px;cursor:pointer;background:transparent;
+  transition:border-color .15s,color .15s;white-space:nowrap;
+}
+.coach-chip:hover { border-color:rgba(168,85,247,.5);color:#c084fc }
+</style>
+
+<!-- Coach FAB button -->
+<button id="coach-fab" onclick="toggleCoachModal()" title="Coach IA">🤖</button>
+
+<!-- Coach Modal -->
+<div id="coach-modal">
+  <div id="coach-modal-header">
+    <div class="coach-avatar">🤖</div>
+    <div class="coach-info">
+      <div class="coach-name">Coach BloxAI</div>
+      <div class="coach-status">En ligne — prêt à t'aider</div>
+    </div>
+    <span id="coach-quota-display"></span>
+    <button id="coach-close-btn" onclick="toggleCoachModal()">✕</button>
+  </div>
+  <div id="coach-messages"></div>
+  <div id="coach-input-area">
+    <div class="coach-suggest-chips" id="coach-chips"></div>
+    <div id="coach-input-row">
+      <textarea id="coach-input" rows="1" placeholder="Pose ta question…" onkeydown="coachKeydown(event)" oninput="coachAutoResize(this)"></textarea>
+      <button id="coach-send-btn" onclick="sendCoachMessage()">➤</button>
+    </div>
+    <div id="coach-quota-bar">
+      <span id="coach-quota-label">0 / 0 messages</span>
+      <div id="coach-quota-fill"><div id="coach-quota-used" style="width:0%"></div></div>
+      <span id="coach-plan-badge"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════ COACH IA ══════════════════════════════ */
+const COACH_QUOTAS = { pro:10, elite:30, trial:30 };
+
+function _coachQKey() {
+  const d = new Date();
+  return 'bloxai_coach_' + d.getFullYear() + '_' + d.getMonth() + '_' + d.getDate();
+}
+function _coachUsed()  { return parseInt(localStorage.getItem(_coachQKey()) || '0', 10); }
+function _coachIncr()  { localStorage.setItem(_coachQKey(), String(_coachUsed() + 1)); }
+function _coachLimit() { const p = localStorage.getItem('blowup_access') || ''; return COACH_QUOTAS[p] ?? 0; }
+function _coachCanSend(){ return _coachUsed() < _coachLimit(); }
+function _coachPlan()  { return localStorage.getItem('blowup_access') || ''; }
+
+function _coachUpdateQuota() {
+  const used = _coachUsed(), limit = _coachLimit(), plan = _coachPlan();
+  const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
+  const label = document.getElementById('coach-quota-label');
+  const fill  = document.getElementById('coach-quota-used');
+  const badge = document.getElementById('coach-plan-badge');
+  const disp  = document.getElementById('coach-quota-display');
+  if (label) label.textContent = used + ' / ' + limit + ' messages';
+  if (fill)  { fill.style.width = pct + '%'; fill.style.background = pct > 80 ? 'linear-gradient(90deg,#ef4444,#f97316)' : 'linear-gradient(90deg,#7c3aed,#a855f7)'; }
+  if (badge) { badge.textContent = plan === 'elite' ? '🔥 Élite' : '⚡ Pro'; badge.style.color = plan === 'elite' ? '#f97316' : '#a855f7'; }
+  if (disp)  disp.textContent = used + '/' + limit;
+  const btn = document.getElementById('coach-send-btn');
+  if (btn) btn.disabled = !_coachCanSend();
+}
+
+function _coachContext() {
+  const plan = _coachPlan();
+  const profile = (function(){ try { return JSON.parse(localStorage.getItem('bloxai_profile') || '{}'); } catch(e) { return {}; } })();
+  let auditCtx = '', offreCtx = '';
+  try {
+    const a = JSON.parse(localStorage.getItem('bloxai_module_1') || 'null');
+    if (a) {
+      const d = a.data || a;
+      auditCtx = '\nAUDIT : niche=' + (d.niche_detectee || d.diagnostic?.niche_dominante || '') + ', problème=' + (d.diagnostic?.probleme_principal || '') + ', potentiel=' + (d.potentiel_monetisation?.estimation_mois || '');
+    }
+  } catch(e) {}
+  try {
+    const o = JSON.parse(localStorage.getItem('bloxai_module_2') || 'null');
+    if (o) {
+      const d = o.data || o;
+      offreCtx = '\nOFFRE : nom=' + (d.nom_offre || '') + ', prix=' + (d.prix_recommande || '') + ', format=' + (d.format_offre || '');
+    }
+  } catch(e) {}
+  return 'Tu es le Coach BloxAI, expert en business en ligne et création de contenu monétisé pour créateurs TikTok/Instagram/YouTube francophones.\n\nPROFIL UTILISATEUR :\n- URL/Pseudo : ' + (profile.url || 'non précisé') + '\n- Niche : ' + (profile.niche || 'non précisée') + '\n- Plateforme : ' + (profile.platform || 'non précisée') + '\n- Style : ' + (profile.contentStyle || 'non précisé') + '\n- Business : ' + (profile.businessDesc || 'non précisé') + '\n- Audience : ' + (profile.targetAudience || 'non précisée') + '\n- Objectif : ' + (profile.goal || 'non précisé') + '\n- Plan : ' + plan + auditCtx + offreCtx + '\n\nRÈGLES :\n- Réponds en français uniquement\n- Direct, concret, actionnable — pas de généralités\n- Max 250 mots sauf si plus demandé\n- Adapte chaque conseil à SON profil spécifique\n- Style coach de terrain, pas chatbot corporatif';
+}
+
+let _coachOpen = false;
+let _coachHistory = [];
+
+function toggleCoachModal() {
+  const plan = _coachPlan();
+  if (!['pro','elite','trial'].includes(plan)) {
+    const t = document.getElementById('toast');
+    if (t) { t.textContent = '🤖 Coach IA disponible en plan Pro & Élite'; t.style.display = 'flex'; setTimeout(function(){ t.style.display = 'none'; }, 3000); }
+    return;
+  }
+  _coachOpen = !_coachOpen;
+  const modal = document.getElementById('coach-modal');
+  if (modal) modal.style.display = _coachOpen ? 'flex' : 'none';
+  if (_coachOpen) {
+    _coachUpdateQuota();
+    _coachLoadHistory();
+    if (_coachHistory.length === 0) _coachWelcome();
+    _coachUpdateChips();
+    setTimeout(function(){ const inp = document.getElementById('coach-input'); if (inp) inp.focus(); }, 50);
+  }
+}
+
+function _coachLoadHistory() {
+  try { _coachHistory = JSON.parse(localStorage.getItem('bloxai_coach_history') || '[]'); } catch(e) { _coachHistory = []; }
+  _renderCoachMessages();
+}
+
+function _coachSaveHistory() {
+  if (_coachHistory.length > 40) _coachHistory = _coachHistory.slice(-40);
+  try { localStorage.setItem('bloxai_coach_history', JSON.stringify(_coachHistory)); } catch(e) {}
+}
+
+function _renderCoachMessages() {
+  const container = document.getElementById('coach-messages');
+  if (!container) return;
+  container.innerHTML = _coachHistory.map(function(m) {
+    const ts = m.ts ? '<span class="ts">' + m.ts + '</span>' : '';
+    return '<div class="coach-msg ' + (m.role === 'user' ? 'user' : 'ai') + '"><div class="bubble">' + esc(m.content) + '</div>' + ts + '</div>';
+  }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+function _coachWelcome() {
+  const profile = (function(){ try { return JSON.parse(localStorage.getItem('bloxai_profile') || '{}'); } catch(e) { return {}; } })();
+  const name  = profile.url ? '@' + profile.url.replace('@','') : 'créateur';
+  const plan  = _coachPlan();
+  const limit = _coachLimit();
+  const msg   = plan === 'elite'
+    ? '👋 Salut ' + name + ' ! Je suis ton Coach BloxAI.\n\nJe connais ton profil et tes modules générés — je suis là pour débloquer tes problèmes et t\'aider à scaler.\n\n🔥 Plan Élite — ' + limit + ' messages/jour, on peut aller en profondeur.\n\nQue veux-tu travailler ?'
+    : '👋 Salut ' + name + ' ! Je suis ton Coach BloxAI.\n\nPose-moi n\'importe quelle question sur ton business, tes contenus ou ta stratégie.\n\n⚡ Plan Pro — ' + limit + ' messages/jour à ta disposition.\n\nQue veux-tu travailler ?';
+  _coachAddMsg('assistant', msg);
+}
+
+function _coachAddMsg(role, content) {
+  const now = new Date();
+  const ts = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+  _coachHistory.push({ role: role, content: content, ts: ts });
+  _coachSaveHistory();
+  _renderCoachMessages();
+}
+
+function _coachShowTyping() {
+  const container = document.getElementById('coach-messages');
+  if (!container) return;
+  const div = document.createElement('div');
+  div.className = 'coach-msg ai';
+  div.id = 'coach-typing';
+  div.innerHTML = '<div class="bubble loading"><span class="coach-typing-dot"></span><span class="coach-typing-dot"></span><span class="coach-typing-dot"></span></div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function _coachRemoveTyping() {
+  const t = document.getElementById('coach-typing');
+  if (t) t.remove();
+}
+
+function _coachUpdateChips() {
+  const chips = [
+    'Comment améliorer mon taux de conversion ?',
+    'Donne-moi un hook viral pour demain',
+    'Comment scaler mon offre ?',
+    'Analyse mon positionnement',
+    'Idée de contenu pour cette semaine',
+  ];
+  const container = document.getElementById('coach-chips');
+  if (!container) return;
+  if (_coachHistory.length > 2) { container.innerHTML = ''; return; }
+  container.innerHTML = chips.map(function(c) { return '<button class="coach-chip" onclick="coachUseChip(this)">' + esc(c) + '</button>'; }).join('');
+}
+
+function coachUseChip(btn) {
+  const inp = document.getElementById('coach-input');
+  if (inp) { inp.value = btn.textContent; coachAutoResize(inp); inp.focus(); }
+}
+
+function coachAutoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function coachKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendCoachMessage(); }
+}
+
+async function sendCoachMessage() {
+  const inp = document.getElementById('coach-input');
+  if (!inp) return;
+  const text = inp.value.trim();
+  if (!text) return;
+
+  if (!_coachCanSend()) {
+    _coachAddMsg('assistant', '⚠️ Tu as atteint ta limite de ' + _coachLimit() + ' messages aujourd\'hui. Reviens demain — le compteur se réinitialise chaque jour à minuit !');
+    return;
+  }
+
+  _coachAddMsg('user', text);
+  inp.value = '';
+  inp.style.height = 'auto';
+  const chips = document.getElementById('coach-chips');
+  if (chips) chips.innerHTML = '';
+
+  const btn = document.getElementById('coach-send-btn');
+  if (btn) btn.disabled = true;
+  _coachShowTyping();
+  _coachIncr();
+  _coachUpdateQuota();
+
+  /* Build messages array — last 20 turns */
+  const msgs = _coachHistory.filter(function(m){ return m.role === 'user' || m.role === 'assistant'; }).slice(-20).map(function(m){ return { role: m.role, content: m.content }; });
+
+  try {
+    const PROXY_SECRET = [97,120,101,108,50,48,50,52].map(function(c){ return String.fromCharCode(c); }).join('');
+    const res = await fetch('https://blox-proxy-kappa.vercel.app/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-proxy-secret': PROXY_SECRET },
+      body: JSON.stringify({ model: 'claude-opus-4-5', max_tokens: 600, system: _coachContext(), messages: msgs })
+    });
+    if (!res.ok) throw new Error('proxy ' + res.status);
+    const j = await res.json();
+    const reply = (j.content && j.content[0] && j.content[0].text) || j.error || 'Réponse vide.';
+    _coachRemoveTyping();
+    _coachAddMsg('assistant', reply);
+  } catch(e) {
+    _coachRemoveTyping();
+    _coachAddMsg('assistant', '❌ Erreur de connexion. Vérifie ta connexion et réessaie.');
+  }
+
+  _coachUpdateQuota();
+  _coachUpdateChips();
+  if (btn) btn.disabled = !_coachCanSend();
+}
+
+/* Show FAB only for pro/elite/trial plans */
+(function _initCoachFab() {
+  function checkFab() {
+    const plan = localStorage.getItem('blowup_access') || '';
+    const fab  = document.getElementById('coach-fab');
+    if (!fab) return;
+    fab.style.display = ['pro','elite','trial'].includes(plan) ? 'flex' : 'none';
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', checkFab); } else { checkFab(); }
+  window.addEventListener('storage', checkFab);
+  setInterval(checkFab, 3000);
+})();
+</script>
 
 </body>
 </html>
