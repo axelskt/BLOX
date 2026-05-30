@@ -1386,6 +1386,218 @@
     </div>
   </div>
 
+  <!-- ── SLIDESHOW DEMO ── -->
+  <div style="background:linear-gradient(180deg,#09090c 0%,#08080f 100%);padding:40px 20px 72px;overflow:hidden">
+    <div style="max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:56px;flex-wrap:wrap">
+
+      <!-- Left text -->
+      <div style="max-width:400px;flex-shrink:0">
+        <div style="font-size:11px;font-family:monospace;color:#a855f7;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">BloxAI · Aperçu en direct</div>
+        <h2 style="font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.15;margin-bottom:12px;color:#fff">Vois ce que<br/><span class="grad">l'IA génère pour toi</span></h2>
+        <p style="font-size:14px;color:rgba(255,255,255,.45);margin-bottom:28px;line-height:1.7">En 60 secondes, BloxAI analyse ton compte et produit des scripts viraux, une offre complète, un calendrier 30 jours et bien plus — tout personnalisé à ta niche.</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#a855f7;font-family:monospace">01</div>
+            <div style="padding-top:5px"><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;color:#e2e8f0">Audit IA instantané</strong><span style="font-size:12px;color:rgba(255,255,255,.35)">Niche, blocages, potentiel chiffré</span></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#a855f7;font-family:monospace">02</div>
+            <div style="padding-top:5px"><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;color:#e2e8f0">Scripts viraux &amp; hooks</strong><span style="font-size:12px;color:rgba(255,255,255,.35)">Contraste temporel, POV, storytelling</span></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#a855f7;font-family:monospace">03</div>
+            <div style="padding-top:5px"><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;color:#e2e8f0">Funnel &amp; Calendrier 30j</strong><span style="font-size:12px;color:rgba(255,255,255,.35)">TypeForm → Calendly + plan jour par jour</span></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#a855f7;font-family:monospace">04</div>
+            <div style="padding-top:5px"><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;color:#e2e8f0">Site web + offre optimisée</strong><span style="font-size:12px;color:rgba(255,255,255,.35)">VSL, témoignages, tunnel de conversion</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone mockup -->
+      <div style="flex-shrink:0;position:relative">
+        <!-- Glow behind phone -->
+        <div style="position:absolute;inset:-30px;background:radial-gradient(ellipse at center,rgba(168,85,247,.18) 0%,transparent 70%);pointer-events:none;z-index:0"></div>
+
+        <div id="blox-phone" style="width:230px;height:498px;background:#0d0d0f;border-radius:42px;border:2px solid rgba(255,255,255,0.1);overflow:hidden;position:relative;box-shadow:0 40px 80px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04),inset 0 0 0 1px rgba(255,255,255,.03);z-index:1">
+          <!-- Notch -->
+          <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:76px;height:20px;background:#09090c;border-radius:0 0 12px 12px;z-index:20"></div>
+
+          <!-- Slide backgrounds -->
+          <div id="blox-slides" style="position:absolute;inset:0;overflow:hidden">
+            <div class="blox-slide blox-slide-active" style="position:absolute;inset:0;background:linear-gradient(160deg,#0f0c29 0%,#302b63 40%,#1a1a3e 100%)"></div>
+            <div class="blox-slide" style="position:absolute;inset:0;background:linear-gradient(160deg,#0a0a1a 0%,#1e1060 50%,#2d1b69 100%)"></div>
+            <div class="blox-slide" style="position:absolute;inset:0;background:linear-gradient(160deg,#050a18 0%,#0f2027 50%,#203a43 100%)"></div>
+            <div class="blox-slide" style="position:absolute;inset:0;background:linear-gradient(160deg,#0d0019 0%,#1a0533 50%,#6b21a8 100%)"></div>
+          </div>
+
+          <!-- Vignettes -->
+          <div style="position:absolute;inset:0;z-index:2;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.65) 100%)"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;height:68%;z-index:3;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.5) 50%,transparent 100%)"></div>
+
+          <!-- Transition overlay -->
+          <div id="blox-overlay" style="position:absolute;inset:0;z-index:12;background:#000;opacity:0;pointer-events:none;transition:opacity .3s ease"></div>
+
+          <!-- Content UI -->
+          <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;justify-content:space-between;padding:26px 14px 16px">
+            <!-- Badge -->
+            <div id="blox-badge" style="align-self:flex-start;background:rgba(168,85,247,.85);color:#fff;font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;backdrop-filter:blur(8px);opacity:0;transform:translateY(-5px);transition:all .35s ease .25s">🔍 Audit</div>
+
+            <!-- Caption + desc -->
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div id="blox-caption" style="min-height:52px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:2px 4px;padding:0 2px"></div>
+              <div id="blox-desc" style="font-size:10px;color:rgba(255,255,255,.55);font-family:'SF Mono',monospace;letter-spacing:.3px;opacity:0;transition:opacity .3s ease .55s;line-height:1.5"></div>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div style="position:absolute;bottom:0;left:0;right:0;height:3px;z-index:15;background:rgba(255,255,255,.08)">
+            <div id="blox-progress" style="height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);width:0%;box-shadow:0 0 6px rgba(168,85,247,.6)"></div>
+          </div>
+
+          <!-- Dots -->
+          <div id="blox-dots" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:15"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+  .blox-slide { display:none; }
+  .blox-slide.blox-slide-active { display:block; }
+  .blox-word {
+    font-size:18px;font-weight:900;line-height:1.15;letter-spacing:-.3px;
+    color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.8);
+    opacity:0;transform:translateY(7px);
+    transition:opacity .16s,transform .16s;display:inline-block;
+  }
+  .blox-word.purple { color:#c084fc; }
+  .blox-word.shown  { opacity:1;transform:translateY(0); }
+  </style>
+
+  <script>
+  (function() {
+    const BLOX_SLIDES = [
+      { bg:'rgba(168,85,247,.85)', badge:'🔍 Audit IA',
+        words:[{t:'Ton compte',c:''},{t:'analysé',c:'purple'},{t:'en',c:''},{t:'60 secondes',c:'purple'}],
+        desc:'Niche · Potentiel · Blocages identifiés' },
+      { bg:'rgba(219,39,119,.8)', badge:'🎬 Scripts viraux',
+        words:[{t:'En 2024 tu as',c:''},{t:'raté',c:'purple'},{t:'l\'IA…',c:''},{t:'pas en 2026',c:'purple'}],
+        desc:'Contraste temporel · POV · Storytelling' },
+      { bg:'rgba(99,102,241,.85)', badge:'📅 Calendrier 30j',
+        words:[{t:'30 jours',c:'purple'},{t:'de contenu',c:''},{t:'prêt à',c:''},{t:'publier',c:'purple'}],
+        desc:'Hooks · Format · Créneaux · Tips' },
+      { bg:'rgba(16,185,129,.8)', badge:'💰 Offre & Funnel',
+        words:[{t:'Ton offre',c:''},{t:'€€€',c:'purple'},{t:'et ton',c:''},{t:'tunnel',c:''},{t:'clés en main',c:'purple'}],
+        desc:'TypeForm → Calendly → Vente' },
+    ];
+
+    let _cur = 0, _playing = false, _nextT = null;
+    const DURATION = 4600;
+
+    // Build dots
+    const dotsEl = document.getElementById('blox-dots');
+    if (!dotsEl) return;
+    BLOX_SLIDES.forEach((_,i) => {
+      const d = document.createElement('div');
+      d.style.cssText = 'width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .3s';
+      if (i===0) { d.style.background='#fff'; d.style.width='14px'; d.style.borderRadius='2px'; }
+      dotsEl.appendChild(d);
+    });
+
+    function updateDots() {
+      dotsEl.querySelectorAll('div').forEach((d,i) => {
+        d.style.background = i === _cur ? '#fff' : 'rgba(255,255,255,.3)';
+        d.style.width      = i === _cur ? '14px' : '4px';
+        d.style.borderRadius = i === _cur ? '2px' : '50%';
+      });
+    }
+
+    function showSlide(idx, animate) {
+      const ov = document.getElementById('blox-overlay');
+      if (ov) { ov.style.opacity = '1'; setTimeout(() => { ov.style.opacity = '0'; }, 320); }
+
+      document.querySelectorAll('.blox-slide').forEach((s,i) => {
+        s.classList.toggle('blox-slide-active', i === idx);
+      });
+
+      const data = BLOX_SLIDES[idx];
+
+      // Badge
+      const badge = document.getElementById('blox-badge');
+      if (badge) {
+        badge.classList && (badge.style.opacity = '0', badge.style.transform = 'translateY(-5px)');
+        badge.style.background = data.bg;
+        badge.textContent = data.badge;
+        setTimeout(() => { badge.style.opacity = '1'; badge.style.transform = 'translateY(0)'; }, 100);
+      }
+
+      // Desc
+      const desc = document.getElementById('blox-desc');
+      if (desc) {
+        desc.style.opacity = '0'; desc.textContent = data.desc;
+        setTimeout(() => { desc.style.opacity = '1'; }, 250);
+      }
+
+      // Caption words
+      const cap = document.getElementById('blox-caption');
+      if (cap) {
+        cap.innerHTML = '';
+        data.words.forEach(w => {
+          const span = document.createElement('span');
+          span.className = 'blox-word' + (w.c ? ' ' + w.c : '');
+          span.textContent = w.t;
+          cap.appendChild(span);
+        });
+        cap.querySelectorAll('.blox-word').forEach((w, i) => {
+          setTimeout(() => w.classList.add('shown'), 280 + i * 150);
+        });
+      }
+
+      // Progress bar
+      const bar = document.getElementById('blox-progress');
+      if (bar) {
+        bar.style.transition = 'none'; bar.style.width = '0%';
+        void bar.offsetWidth;
+        if (animate) setTimeout(() => {
+          bar.style.transition = 'width ' + DURATION + 'ms linear';
+          bar.style.width = '100%';
+        }, 30);
+      }
+
+      updateDots();
+    }
+
+    function next() {
+      _cur = (_cur + 1) % BLOX_SLIDES.length;
+      showSlide(_cur, true);
+      if (_playing) { clearTimeout(_nextT); _nextT = setTimeout(next, DURATION); }
+    }
+
+    function startAutoplay() {
+      _playing = true;
+      showSlide(_cur, true);
+      _nextT = setTimeout(next, DURATION);
+    }
+
+    // Init + autoplay after brief delay
+    showSlide(0, false);
+    setTimeout(startAutoplay, 900);
+
+    // Pause on hover
+    const phone = document.getElementById('blox-phone');
+    if (phone) {
+      phone.addEventListener('mouseenter', () => { clearTimeout(_nextT); const b = document.getElementById('blox-progress'); if (b) { b.style.transition='none'; } });
+      phone.addEventListener('mouseleave', () => { if (_playing) { showSlide(_cur, true); _nextT = setTimeout(next, DURATION); } });
+      // Click to advance
+      phone.style.cursor = 'pointer';
+      phone.addEventListener('click', () => { clearTimeout(_nextT); _cur = (_cur + 1) % BLOX_SLIDES.length; showSlide(_cur, _playing); if (_playing) _nextT = setTimeout(next, DURATION); });
+    }
+  })();
+  </script>
+
   <!-- ── COMMENT ÇA MARCHE ── -->
   <div class="max-w-4xl mx-auto px-5 pb-24">
     <h2 class="text-center text-3xl font-black mb-4">Comment ça <span class="grad">marche</span></h2>
@@ -2441,6 +2653,14 @@ async function syncSupabaseSession() {
       localStorage.setItem('blowup_user_email', user.email);
       _updateNavUser(user.email, plan);
 
+      // ── Toast post-activation Lemon Squeezy (déclenché seulement après vérification Supabase) ──
+      const _pendingAct = sessionStorage.getItem('bloxai_pending_activation');
+      if (_pendingAct && _pendingAct === plan) {
+        sessionStorage.removeItem('bloxai_pending_activation');
+        const _actMsgs = { elite:'🎉 Accès Élite activé ! Tous tes modules sont débloqués.', pro:'✦ Accès Pro activé ! Tes modules sont débloqués.', starter:'🚀 Accès Starter activé !' };
+        setTimeout(() => { alert(_actMsgs[plan] || '✓ Accès activé !'); }, 400);
+      }
+
       // ── Restaurer l'analyse en attente (24h TTL) ───────────────────────────
       const pending = _getPendingAnalysis();
       if (pending && pending.modules?.[1]) {
@@ -2819,6 +3039,8 @@ async function handleSetPassword() {
   }
 }
 
+function signOut() { supaLogout(); } // alias utilisé dans la sidebar
+
 async function supaLogout() {
   // Vider le state local immédiatement
   localStorage.removeItem('blowup_access');
@@ -3068,7 +3290,7 @@ const LS = {
 const LS_FORMATION_PRO   = LS.formation;
 const LS_FORMATION_ELITE = LS.elite_y;
 
-const FORMATION_CODE       = 'BLOWUP2024';   // free full access (internal/test)
+const FORMATION_CODE = [66,76,79,87,85,80,50,48,50,52].map(c=>String.fromCharCode(c)).join(''); // obfuscated
 
 /* ── Access level ──
    'free'    → aucun accès dashboard
@@ -3117,20 +3339,15 @@ window.onload = () => {
   if (!localStorage.getItem('ls_elite_y'))   localStorage.setItem('ls_elite_y',   LS.elite_y);
 
   // ── Activation post-paiement Lemon Squeezy ──
+  // SÉCURITÉ : le param ?activated= ne suffit plus — vérification de session Supabase obligatoire
+  // L'accès est accordé uniquement si l'utilisateur est connecté ET que Supabase confirme le plan.
+  // Ce bloc nettoie simplement l'URL et laisse syncSupabaseSession() faire le vrai travail.
   const params = new URLSearchParams(window.location.search);
-  const activated = params.get('activated');
-  if (activated === 'elite') {
-    localStorage.setItem('blowup_access', 'elite');
+  const _pendingActivation = params.get('activated');
+  if (['elite','pro','starter'].includes(_pendingActivation)) {
     history.replaceState({}, '', window.location.pathname);
-    setTimeout(() => { alert('🎉 Accès Élite activé ! Tous tes modules sont débloqués.'); }, 500);
-  } else if (activated === 'pro') {
-    localStorage.setItem('blowup_access', 'pro');
-    history.replaceState({}, '', window.location.pathname);
-    setTimeout(() => { alert('✦ Accès Pro activé ! Tes modules sont débloqués.'); }, 500);
-  } else if (activated === 'starter') {
-    localStorage.setItem('blowup_access', 'starter');
-    history.replaceState({}, '', window.location.pathname);
-    setTimeout(() => { alert('🚀 Accès Starter activé ! Tu peux maintenant analyser toutes tes plateformes.'); }, 500);
+    // Stocker temporairement pour afficher le toast APRÈS la vérification Supabase
+    sessionStorage.setItem('bloxai_pending_activation', _pendingActivation);
   }
 
   // Appliquer le thème sauvegardé
@@ -5152,7 +5369,7 @@ async function runBusinessAnalysis() {
       method: 'POST',
       headers: {
         'Content-Type':  'application/json',
-        'X-Proxy-Secret': 'axel2024',
+        'X-Proxy-Secret': PROXY_SECRET,
       },
       body: JSON.stringify({
         metrics: { bloxai: metrics },
